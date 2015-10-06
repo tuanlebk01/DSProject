@@ -9,8 +9,11 @@ public class NSImpl implements NS {
     private static final long serialVersionUID = 1L;
     private NS ns;
     private static String Name = "NamingService";
+    private String testingGIT = null;
 
     // Map<String,Member> groupList;
+    
+    
 
     public NSImpl() throws RemoteException, AlreadyBoundException {
         // groupList=new HashMap<String,Member>();
