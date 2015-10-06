@@ -1,4 +1,4 @@
-package GroupManagement;
+package Application;
 
 import java.rmi.AlreadyBoundException;
 import java.rmi.RemoteException;
@@ -14,7 +14,7 @@ public class Client {
 		try {
 			Registry registry = LocateRegistry.getRegistry("localhost", 1111);
 			// NS nameService=new NSImpl();
-			NS ns = (NS) registry.lookup("NamingService");
+			NameServer ns = (NameServer) registry.lookup("NamingService");
 			String message = ns.connect("client1 connected");
 			System.out.println(message);
 

@@ -5,7 +5,7 @@ import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
 
-import GroupManagement.NS;
+import Application.NameServer;
 
 public class Test {
 
@@ -17,7 +17,7 @@ public class Test {
         try {
             Registry registry = LocateRegistry.getRegistry("localhost", 1111);
             // NS nameService=new NSImpl();
-            NS ns = (NS) registry.lookup("NamingService");
+            NameServer ns = (NameServer) registry.lookup("NamingService");
             String message = ns.connect("client1 connected");
             System.out.println(message);
 

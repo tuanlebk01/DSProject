@@ -1,14 +1,14 @@
-package GroupManagement;
+package Application;
 import java.rmi.*;
 import java.rmi.registry.*;
 import java.rmi.server.*;
 import java.util.*;
 import java.io.*;
 
-public class NSImpl implements NS {
+public class NSImpl implements NameServer {
 
     private static final long serialVersionUID = 1L;
-    private NS ns;
+    private NameServer ns;
     private static String Name = "NamingService";
 
     // Map<String,Member> groupList;
@@ -43,7 +43,7 @@ public class NSImpl implements NS {
          * port = Registry.REGISTRY_PORT; } }
          */
 
-        this.ns = (NS) UnicastRemoteObject.exportObject(this, 0);
+        this.ns = (NameServer) UnicastRemoteObject.exportObject(this, 0);
         Registry registry = LocateRegistry.createRegistry(port);
         registry.bind(NSImpl.Name, ns);
         System.out.println("Naming Service Running on port " + port);
