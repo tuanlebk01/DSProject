@@ -8,6 +8,8 @@ import java.rmi.server.UnicastRemoteObject;
 public class Test {
 
     public static void main(String[] args) throws RemoteException,
+    
+    
             AlreadyBoundException {
         // TODO Auto-generated method stub
         try {
