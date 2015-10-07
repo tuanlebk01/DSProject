@@ -1,16 +1,6 @@
 import java.awt.EventQueue;
 
 import javax.swing.JFrame;
-import java.awt.FlowLayout;
-import java.awt.GridBagLayout;
-import javax.swing.JTextField;
-import java.awt.GridBagConstraints;
-import javax.swing.BoxLayout;
-import com.jgoodies.forms.layout.FormLayout;
-import com.jgoodies.forms.layout.ColumnSpec;
-import com.jgoodies.forms.layout.RowSpec;
-import com.jgoodies.forms.layout.FormSpecs;
-import javax.swing.JTextPane;
 import javax.swing.JTextArea;
 import javax.swing.JLabel;
 import javax.swing.JCheckBox;
