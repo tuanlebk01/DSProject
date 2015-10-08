@@ -1,22 +1,35 @@
 package GroupManagement;
 
-public class GroupLeader {
+import java.rmi.RemoteException;
 
-	private String groupName;
-	
-	public void createGroup(String groupName){
-		this.groupName = groupName;
+public class GroupLeader implements GroupLeaderInterface {
+
+	private static final long serialVersionUID = 1L;
+
+	@Override
+	public void joinGroup(String userName, String groupName)
+			throws RemoteException {
+		// TODO Auto-generated method stub
+
 	}
-	
-	public void removeGroup(String groupName){
-		
+
+	@Override
+	public void leaveGroup(String userName, String groupName)
+			throws RemoteException {
+		// TODO Auto-generated method stub
+
 	}
-	
-	public void joinGroup (String groupName){
-		
+
+	@Override
+	public void broadcastMessage(String message) throws RemoteException {
+		// TODO Auto-generated method stub
+
 	}
-	
-	public void leaveGroup (String groupName){
-		
+
+	@Override
+	public void getClientList() throws RemoteException {
+		// TODO Auto-generated method stub
+
 	}
+
 }
