@@ -1,10 +1,15 @@
 package GroupManagement;
 
 import java.rmi.RemoteException;
+import java.util.ArrayList;
+
 
 public class GroupLeader implements GroupLeaderInterface {
 
 	private static final long serialVersionUID = 1L;
+	private NameServerInterface nameServer;
+	private ArrayList<ClientInterface> clientList;
+	
 
 	@Override
 	public void joinGroup(String userName, String groupName)
