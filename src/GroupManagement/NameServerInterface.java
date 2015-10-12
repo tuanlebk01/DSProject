@@ -11,7 +11,8 @@ public interface NameServerInterface extends Remote, Serializable {
     public void deleteGroup(GroupLeaderInterface groupName) throws RemoteException;
     public void addMember(String groupName,String member) throws RemoteException;
     public void removeMember(String groupName, String userName) throws RemoteException;
-    public ArrayList<String> getMemberOfGroup(String groupName) throws RemoteException;
+    public ArrayList<String> getMemberOfGroup(String groupName);
     public void updateGroupLeaderInfo(String Groupname) throws RemoteException;
-    public void getGroupLeaderInfo() throws RemoteException;
+    public void getLeaderInfo() throws RemoteException;
+    public ArrayList<String> getGroupList();
 }
