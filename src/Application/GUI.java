@@ -15,6 +15,7 @@ import javax.swing.JButton;
 
 import java.awt.List;
 import java.rmi.Naming;
+import java.rmi.RemoteException;
 import java.util.Vector;
 
 import javax.swing.JTextArea;
@@ -132,7 +133,12 @@ public class GUI {
 
 				if(input != null && (input.length() > 1)) {
 
-					client.createGroup(input, userName);
+					try {
+						client.createGroup(input, userName);
+					} catch (RemoteException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
 					JOptionPane.showMessageDialog(null, "Group created with name: " + input);
 					System.out.println(input);
 

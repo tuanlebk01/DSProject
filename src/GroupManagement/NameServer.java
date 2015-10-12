@@ -12,9 +12,9 @@ public class NameServer extends RemoteServer implements NameServerInterface {
 	private NameServerInterface nameServer;
 	private GroupLeaderInterface groupLeader;
 	private static String Name = "NamingService";
-	private HashMap<String, ArrayList<String>> groupList = new HashMap<String, ArrayList<String>>();
-	private HashMap<String, ArrayList<String>> groupLeaderInfo = new HashMap<String, ArrayList<String>>();
-	private ArrayList<String> clientList;
+	private HashMap<String, String> LeaderInfo = new HashMap<String, String>();
+	private HashMap<String, ArrayList<String>> MemberInGroup = new HashMap<String, ArrayList<String>>();
+	private HashMap<String, ArrayList<String>> ClientInfo = new HashMap<String, ArrayList<String>>();
 
 	public NameServer() throws RemoteException, AlreadyBoundException {
 		bind();
@@ -28,28 +28,6 @@ public class NameServer extends RemoteServer implements NameServerInterface {
 		Registry registry = LocateRegistry.createRegistry(port);
 		registry.bind(NameServer.Name, nameServer);
 		System.out.println("Naming Service Running on port " + port);
-<<<<<<< HEAD
-		/*
-		Map<String, ArrayList<String>> myMap = new HashMap<String, ArrayList<String>>();
-		ArrayList<String> list = new ArrayList<String>();
-		list.add("client1");
-		list.add("client2");
-		myMap.put("group1", list); // stores list containing instances #1 and #2 under key "key1"
-		ArrayList<String> list2 = new ArrayList<String>();
-		list2.add("client3");
-		myMap.put("group2", list2); // stores list2 containing instance #3 under key "key2"
-
-		String obj1 = myMap.get("group1").get(1); // returns instance #1
-		ArrayList<String> obj2 = myMap.get("group1");
-		//myMap.remove("group2");
-		ArrayList<String> key = myMap.get(1);
-		ArrayList<String> obj3 = myMap.get("group2");
-
-		System.out.println(obj1 + obj2 + obj3 + key);
-		*/
-=======
->>>>>>> e611aa0e2ba78ca99018e38f65eae1f7daff23e3
-
 	}
 
 	public static void main(String args[]) {
@@ -84,17 +62,29 @@ public class NameServer extends RemoteServer implements NameServerInterface {
 		}
 	}
 
-	public void createGroup(String groupName, String name)
+	public void createGroup(String groupName, String userName)
 			throws RemoteException {
 
 		ArrayList<String> clientList = new ArrayList<String>();
-		ArrayList<String> info = new ArrayList<String>();
-		for (String groupN : this.groupList.keySet()) {
+		String address = getClientHost();
+
+		for (String groupN : this.LeaderInfo.keySet()) {
 			if (groupN == groupName) {
 				System.out.println("The group existed");
 				return;
 			}
 		}
+
+		try {
+			String hostAddress = getClientHost();
+		} catch (Exception e) {
+			// TODO: handle exception
+		}
+
+		LeaderInfo.put(groupName, userName);
+		clientList.add(userName);
+		MemberInGroup.put(groupName,clientList);
+
 
 		System.out.println("Naming Service Running on port " + portNumber);
 		System.out.println("Group Leader " + groupName + " Started");
@@ -137,13 +127,7 @@ public class NameServer extends RemoteServer implements NameServerInterface {
 	@Override
 	public void deleteGroup(GroupLeaderInterface groupName)
 			throws RemoteException {
-<<<<<<< HEAD
-		ArrayList<ClientInterface> clientList = this.groupList.get(groupName);
-		return (ClientInterface) clientList;
-
-=======
 		// TODO Auto-generated method stub
->>>>>>> e611aa0e2ba78ca99018e38f65eae1f7daff23e3
 
 	}
 

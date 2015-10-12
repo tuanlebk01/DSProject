@@ -5,12 +5,9 @@ import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
-import java.util.ArrayList;
-import java.util.Scanner;
 
 import Application.GUI;
 
-import com.sun.org.apache.xalan.internal.xsltc.runtime.Hashtable;
 
 public class Client extends UnicastRemoteObject implements ClientInterface {
 
@@ -22,22 +19,14 @@ public class Client extends UnicastRemoteObject implements ClientInterface {
 		super();
 	}
 
-<<<<<<< HEAD
 	public void retrieveMessage(String message) throws RemoteException {
 		GUI.writeMsg(message);
 	}
 
 	public void connectToNameServer(int portNr) throws RemoteException, AlreadyBoundException {
 
-=======
-	private static final long serialVersionUID = 1L;
-	private
-
-	public  void main(String[] args) throws RemoteException, AlreadyBoundException {
-
->>>>>>> e611aa0e2ba78ca99018e38f65eae1f7daff23e3
 		try {
-			this.registry = LocateRegistry.getRegistry("localhost", portNr);
+			this.registry = LocateRegistry.getRegistry("harry.cs.umu.se", portNr);
 			this.ns = (NameServerInterface) registry
 					.lookup("NamingService");
 
@@ -46,7 +35,7 @@ public class Client extends UnicastRemoteObject implements ClientInterface {
 		}
 	}
 
-	public void createGroup(String groupName, String userName) {
+	public void createGroup(String groupName, String userName) throws RemoteException {
 
 		ns.createGroup(groupName, userName);
 
