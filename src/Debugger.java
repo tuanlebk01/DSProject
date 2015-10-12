@@ -1,4 +1,4 @@
-package Application;
+
 
 import javax.swing.JCheckBox;
 import javax.swing.JFrame;

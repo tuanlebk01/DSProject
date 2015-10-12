@@ -191,8 +191,11 @@ public class GUI {
 				client.connectToNameServer(userName, portNr);
 				listOfGroups = client.getGroupList();
 
+//				clear gui of old groups before filling with new ones.
+//				this has to be done in nameserver
+//				so all items are unique.
+				
 				for(int i = 0; i < listOfGroups.size(); i++) {
-					System.out.println(listOfGroups.get(i));
 					groupList.add(i, listOfGroups.get(i));
 				}
 
@@ -225,38 +228,5 @@ public class GUI {
 		else chatArea.append(message + "\n");
 	}
 
-	//https://docs.oracle.com/javase/tutorial/uiswing/events/listselectionlistener.html
-
-	class SharedListSelectionHandler implements ListSelectionListener {
-
-	    public void valueChanged(ListSelectionEvent e) {
-
-	    	System.out.println("E rätt");
-
-	    	ListSelectionModel lsm = (ListSelectionModel)e.getSource();
-
-	        int firstIndex = e.getFirstIndex();
-	        int lastIndex = e.getLastIndex();
-	        boolean isAdjusting = e.getValueIsAdjusting();
-	        chatArea.append("Event for indexes "
-	                      + firstIndex + " - " + lastIndex
-	                      + "; isAdjusting is " + isAdjusting
-	                      + "; selected indexes:");
-
-	        if (lsm.isSelectionEmpty()) {
-	        	chatArea.append(" <none>");
-	        } else {
-	            // Find out which indexes are selected.
-	            int minIndex = lsm.getMinSelectionIndex();
-	            int maxIndex = lsm.getMaxSelectionIndex();
-	            for (int i = minIndex; i <= maxIndex; i++) {
-	                if (lsm.isSelectedIndex(i)) {
-	                	chatArea.append(" " + i);
-	                }
-	            }
-	        }
-	        chatArea.append("\n");
-	    }
-	}
-
+//	http://www.java2s.com/Code/Java/Swing-JFC/JListselectionchangedlistener.htm
 }

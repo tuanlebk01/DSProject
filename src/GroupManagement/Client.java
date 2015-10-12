@@ -30,7 +30,7 @@ public class Client extends UnicastRemoteObject implements ClientInterface {
 
 	public void connectToNameServer(String userName, int portNr) throws RemoteException, AlreadyBoundException, ServerNotActiveException, NotBoundException {
 
-			this.registry = LocateRegistry.getRegistry("Harry.cs.umu.se", portNr);
+			this.registry = LocateRegistry.getRegistry("Localhost", portNr);
 			this.ns = (NameServerInterface) registry.lookup("NamingService");
 			ns.registerChatClient1(userName);
 			groupList = ns.getGroupList();
