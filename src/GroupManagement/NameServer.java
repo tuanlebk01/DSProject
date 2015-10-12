@@ -70,12 +70,12 @@ public class NameServer extends RemoteServer implements NameServerInterface {
 
 	}
 
-	public void registerChatClient1(String userName) throws RemoteException,
+	public ArrayList<String> registerChatClient1(String userName) throws RemoteException,
 			ServerNotActiveException {
 
 		String hostAddress = getClientHost();
 		this.ClientInfo.put(userName, hostAddress);
-		getGroupList();
+		return getGroupList();
 	}
 
 	public void createGroup(String groupName, String userName)
@@ -133,12 +133,6 @@ public class NameServer extends RemoteServer implements NameServerInterface {
 
 	}
 
-	@Override
-	public void registerChatClient(String name) throws RemoteException,
-			ServerNotActiveException {
-		// TODO Auto-generated method stub
-
-	}
 
 	@Override
 	public void getLeaderInfo() throws RemoteException {

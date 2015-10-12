@@ -10,6 +10,6 @@ public interface ClientInterface extends Remote {
 	public void retrieveMessage(String message) throws RemoteException;
 	public void connectToNameServer(String userName, int portNr) throws RemoteException, AlreadyBoundException, ServerNotActiveException, NotBoundException;
 	public void connectToNameServer() throws RemoteException, AlreadyBoundException;
-	public void createGroup(String groupName, String userName) throws RemoteException;
+	public void createGroup(String groupName, String userName) throws RemoteException, ServerNotActiveException;
 
 }
