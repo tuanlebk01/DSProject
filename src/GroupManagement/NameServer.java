@@ -6,15 +6,16 @@ import java.rmi.server.*;
 import java.util.*;
 import java.io.*;
 
-public class NameServer implements NameServerInterface {
+public class NameServer extends RemoteServer implements NameServerInterface {
 
 	private static final long serialVersionUID = 1L;
 	private NameServerInterface nameServer;
 	private GroupLeaderInterface groupLeader;
 	private static String Name = "NamingService";
-	private HashMap<String, ArrayList<String>> groupList = new HashMap<String, ArrayList<String>>();
-	private HashMap<String, ArrayList<String>> groupLeaderInfo = new HashMap<String, ArrayList<String>>();
-	private HashMap<String, ArrayList<String>> clientInfo = new HashMap<String, ArrayList<String>>();
+
+	private HashMap<String, String> LeaderInfo = new HashMap<String, String>();
+	private HashMap<String, ArrayList<String>> MemberInGroup = new HashMap<String, ArrayList<String>>();
+	private HashMap<String, ArrayList<String>> ClientInfo = new HashMap<String, ArrayList<String>>();
 
 	public NameServer() throws RemoteException, AlreadyBoundException {
 		bind();
@@ -73,41 +74,39 @@ public class NameServer implements NameServerInterface {
 
 	}
 
-	public void registerChatClient(String name) throws RemoteException, ServerNotActiveException {
-		System.out.println(RemoteServer.getClientHost());
-		//this.get.add(name);
+	public void registerChatClient1(String name) throws RemoteException {
+		this.clientList.add(name);
+		try {
+			System.out.println(getClientHost());
+		} catch (Exception e) {
+			// TODO: handle exception
+		}
 	}
 
-	public void createGroup(String groupName, String name)
+	public void createGroup(String groupName, String userName)
 			throws RemoteException {
 
-		int portNumber = 8080;
 		ArrayList<String> clientList = new ArrayList<String>();
-		ArrayList<String> info = new ArrayList<String>();
-		for (String groupN : this.groupList.keySet()) {
+		String address = getClientHost();
+
+		for (String groupN : this.LeaderInfo.keySet()) {
 			if (groupN == groupName) {
 				System.out.println("The group existed");
 				return;
 			}
 		}
 
-		this.groupLeader = (GroupLeaderInterface) UnicastRemoteObject
-				.exportObject(this, 0);
-		portNumber++;
-		// register a name service
-		Registry registry = LocateRegistry.createRegistry(portNumber);
 		try {
-			registry.bind(groupName, groupLeader);
-		} catch (AlreadyBoundException e) {
-			e.printStackTrace();
+			String hostAddress = getClientHost();
+		} catch (Exception e) {
+			// TODO: handle exception
 		}
-		// add this client to this group
-		clientList.add(name); // add this client to the group
-		// add port number and naming service to this group info
-		info.add(groupName);
-		String port = String.valueOf(portNumber);
-		info.add(port);
-		this.groupList.put(groupName, info);
+
+		LeaderInfo.put(groupName, userName);
+		clientList.add(userName);
+		MemberInGroup.put(groupName,clientList);
+
+
 		System.out.println("Naming Service Running on port " + portNumber);
 		System.out.println("Group Leader " + groupName + " Started");
 	}
@@ -143,7 +142,13 @@ public class NameServer implements NameServerInterface {
 	@Override
 	public void deleteGroup(GroupLeaderInterface groupName)
 			throws RemoteException {
-		//ArrayList<ClientInterface> clientList = this.groupList.get(groupName);
+
+	}
+
+	@Override
+	public void registerChatClient(String name) throws RemoteException,
+			ServerNotActiveException {
+		// TODO Auto-generated method stub
 
 	}
 

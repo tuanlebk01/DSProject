@@ -136,6 +136,7 @@ public class GUI {
 					try {
 						client.createGroup(input, userName);
 					} catch (RemoteException e) {
+
 						e.printStackTrace();
 					}
 					JOptionPane.showMessageDialog(null, "Group created with name: " + input);
