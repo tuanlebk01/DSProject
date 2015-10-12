@@ -41,7 +41,7 @@ public class NameServer implements NameServerInterface {
 		//myMap.remove("group2");
 		ArrayList<String> key = myMap.get(1);
 		ArrayList<String> obj3 = myMap.get("group2");
-		
+
 		System.out.println(obj1 + obj2 + obj3 + key);
 		*/
 
@@ -111,7 +111,7 @@ public class NameServer implements NameServerInterface {
 			throws RemoteException {
 		ArrayList<ClientInterface> clientList = this.groupList.get(groupName);
 		return (ClientInterface) clientList;
-		
-		
+
+
 	}
 }
