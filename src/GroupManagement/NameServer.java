@@ -10,8 +10,10 @@ public class NameServer implements NameServerInterface {
 
 	private static final long serialVersionUID = 1L;
 	private NameServerInterface nameServer;
+	private GroupLeaderInterface groupLeader;
 	private static String Name = "NamingService";
-	private HashMap<GroupLeaderInterface, ArrayList<ClientInterface>> groupList = new HashMap<GroupLeaderInterface, ArrayList<ClientInterface>>();
+	private HashMap<String, ArrayList<String>> groupList = new HashMap<String, ArrayList<String>>();
+	private HashMap<String, ArrayList<String>> groupLeaderInfo = new HashMap<String, ArrayList<String>>();
 	private ArrayList<ClientInterface> clientList;
 
 	public NameServer() throws RemoteException, AlreadyBoundException {
@@ -26,6 +28,7 @@ public class NameServer implements NameServerInterface {
 		Registry registry = LocateRegistry.createRegistry(port);
 		registry.bind(NameServer.Name, nameServer);
 		System.out.println("Naming Service Running on port " + port);
+<<<<<<< HEAD
 		/*
 		Map<String, ArrayList<String>> myMap = new HashMap<String, ArrayList<String>>();
 		ArrayList<String> list = new ArrayList<String>();
@@ -44,6 +47,8 @@ public class NameServer implements NameServerInterface {
 
 		System.out.println(obj1 + obj2 + obj3 + key);
 		*/
+=======
+>>>>>>> e611aa0e2ba78ca99018e38f65eae1f7daff23e3
 
 	}
 
@@ -74,44 +79,81 @@ public class NameServer implements NameServerInterface {
 		this.clientList.add(name);
 	}
 
-	public void createGroup(GroupLeaderInterface groupName, ClientInterface name)
+	public void createGroup(String groupName, String name)
 			throws RemoteException {
-		for (GroupLeaderInterface groupN : this.groupList.keySet()) {
+
+		int portNumber = 8080;
+		ArrayList<String> clientList = new ArrayList<String>();
+		ArrayList<String> info = new ArrayList<String>();
+		for (String groupN : this.groupList.keySet()) {
 			if (groupN == groupName) {
 				System.out.println("The group existed");
 				return;
 			}
 		}
-		ArrayList<ClientInterface> clientList = new ArrayList<ClientInterface>();
-		clientList.add(name);
-		this.groupList.put(groupName, clientList);
+
+		this.groupLeader = (GroupLeaderInterface) UnicastRemoteObject
+				.exportObject(this, 0);
+		portNumber++;
+		// register a name service
+		Registry registry = LocateRegistry.createRegistry(portNumber);
+		registry.bind(groupName, groupLeader);
+		// add this client to this group
+		clientList.add(name); // add this client to the group
+		// add port number and naming service to this group info
+		info.add(groupName);
+		String port = String.valueOf(portNumber);
+		info.add(port);
+		this.groupList.put(groupName, info);
+		System.out.println("Naming Service Running on port " + portNumber);
+		System.out.println("Group Leader " + groupName + " Started");
 	}
 
-	public void deleteGroup(GroupLeaderInterface groupName)
+	public void deleteGroup(String groupName)
 			throws RemoteException {
 		this.groupList.remove(groupName);
 	}
 
-	public void addMember(GroupLeaderInterface groupName, ClientInterface member)
+	public void addMember(String groupName, String member)
 			throws RemoteException {
-		ArrayList<ClientInterface> clientList = this.groupList.get(groupName);
+		ArrayList<String> clientList = this.groupList.get(groupName);
 		clientList.add(member);
 		this.groupList.put(groupName, clientList);
 	}
 
-	public void removeMember(GroupLeaderInterface groupName,
-			ClientInterface member) throws RemoteException {
-		ArrayList<ClientInterface> clientList = this.groupList.get(groupName);
+	public void removeMember(String groupName,
+			String member) throws RemoteException {
+		ArrayList<String> clientList = this.groupList.get(groupName);
 		clientList.remove(member);
 		this.groupList.put(groupName, clientList);
 
 	}
 
-	public ClientInterface getMemberOfGroup(GroupLeaderInterface groupName)
+	public ArrayList<String> getMemberOfGroup(String groupName)
 			throws RemoteException {
-		ArrayList<ClientInterface> clientList = this.groupList.get(groupName);
-		return (ClientInterface) clientList;
+		ArrayList<String> clientList = this.groupList.get(groupName);
+		return (ArrayList<String>) clientList;
 
 
 	}
+
+	@Override
+	public void registerChatClient(String name) throws RemoteException {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	public void deleteGroup(GroupLeaderInterface groupName)
+			throws RemoteException {
+<<<<<<< HEAD
+		ArrayList<ClientInterface> clientList = this.groupList.get(groupName);
+		return (ClientInterface) clientList;
+
+=======
+		// TODO Auto-generated method stub
+>>>>>>> e611aa0e2ba78ca99018e38f65eae1f7daff23e3
+
+	}
+
 }
