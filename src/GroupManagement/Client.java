@@ -1,9 +1,11 @@
 package GroupManagement;
 
 import java.rmi.AlreadyBoundException;
+import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
+import java.rmi.server.ServerNotActiveException;
 import java.rmi.server.UnicastRemoteObject;
 import Application.GUI;
 
@@ -22,21 +24,13 @@ public class Client extends UnicastRemoteObject implements ClientInterface {
 		GUI.writeMsg(message);
 	}
 
-	public void connectToNameServer(int portNr) throws RemoteException, AlreadyBoundException {
+	public void connectToNameServer(String userName, int portNr) throws RemoteException, AlreadyBoundException, ServerNotActiveException, NotBoundException {
 
+			this.registry = LocateRegistry.getRegistry("Harry.cs.umu.se", portNr);
+			this.ns = (NameServerInterface) registry.lookup("NamingService");
 
-		try {
+			ns.registerChatClient(userName);
 
-			this.registry = LocateRegistry.getRegistry("localhost", portNr);
-			System.out.println("reg: " + registry);
-			this.ns = (NameServerInterface) registry
-					.lookup("NamingService");
-
-			ns.registerChatClient("client1");
-
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
 	}
 
 	public void createGroup(String groupName, String userName) throws RemoteException {

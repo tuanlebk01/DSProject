@@ -73,7 +73,7 @@ public class NameServer implements NameServerInterface {
 
 	}
 
-	public void registerChatClient(ClientInterface name) throws RemoteException, ServerNotActiveException  {
+	public void registerChatClient(String name) throws RemoteException, ServerNotActiveException {
 		System.out.println(RemoteServer.getClientHost());
 		//this.get.add(name);
 	}
@@ -141,15 +141,10 @@ public class NameServer implements NameServerInterface {
 	}
 
 	@Override
-	public void registerChatClient(String name) throws RemoteException {
-		// TODO Auto-generated method stub
-
-	}
-
-	@Override
 	public void deleteGroup(GroupLeaderInterface groupName)
 			throws RemoteException {
 		//ArrayList<ClientInterface> clientList = this.groupList.get(groupName);
 
 	}
+
 }

@@ -190,17 +190,18 @@ public class GUI {
 
 				client = new Client();
 				connectButton.setText("Disconnect");
-				System.out.println("connecting to nameserver");
-				client.connectToNameServer(portNr);
+				System.out.println("Trying to connect to nameserver");
+				client.connectToNameServer(userName, portNr);
+				System.out.println("Connected");
 
 			} catch (Exception ex) {
-				ex.printStackTrace();
+//				ex.printStackTrace();
 				System.out.println("Error, could not connect.");
 				JOptionPane.showMessageDialog(frame, "Error, could not connect.");
 
 			}
 		} else {
-			updateUsers(null);
+//			updateUsers(null);
 			connectButton.setText("Connect");
 		}
 	}
@@ -221,20 +222,20 @@ public class GUI {
 		else chatArea.append(message + "\n");
 	}
 
-	private void updateUsers(Vector connected) {
-
-		DefaultListModel listModel = new DefaultListModel();
-
-		if (connected != null)
-			for (int i = 0; i < connected.size(); i++) {
-				try {
-					String temp = "asd";//((Client) connected.get(i)).getName();
-					listModel.addElement(temp);
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
-			}
-		userList.setModel(listModel);
-
-	}
+//	private void updateUsers(Vector connected) {
+//
+//		DefaultListModel listModel = new DefaultListModel();
+//
+//		if (connected != null)
+//			for (int i = 0; i < connected.size(); i++) {
+//				try {
+//					String temp = "asd";//((Client) connected.get(i)).getName();
+//					listModel.addElement(temp);
+//				} catch (Exception e) {
+//					e.printStackTrace();
+//				}
+//			}
+//		userList.setModel(listModel);
+//
+//	}
 }
