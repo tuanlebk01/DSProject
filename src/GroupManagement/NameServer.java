@@ -74,6 +74,7 @@ public class NameServer extends RemoteServer implements NameServerInterface {
 
 	}
 
+
 	public void registerChatClient1(String name) throws RemoteException {
 		this.clientList.add(name);
 		try {
@@ -95,6 +96,7 @@ public class NameServer extends RemoteServer implements NameServerInterface {
 				return;
 			}
 		}
+
 
 		try {
 			String hostAddress = getClientHost();
@@ -142,13 +144,6 @@ public class NameServer extends RemoteServer implements NameServerInterface {
 	@Override
 	public void deleteGroup(GroupLeaderInterface groupName)
 			throws RemoteException {
-
-	}
-
-	@Override
-	public void registerChatClient(String name) throws RemoteException,
-			ServerNotActiveException {
-		// TODO Auto-generated method stub
 
 	}
 
