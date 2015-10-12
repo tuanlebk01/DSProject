@@ -6,7 +6,7 @@ import java.rmi.server.*;
 import java.util.*;
 import java.io.*;
 
-public class NameServer implements NameServerInterface {
+public class NameServer extends RemoteServer implements NameServerInterface {
 
 	private static final long serialVersionUID = 1L;
 	private NameServerInterface nameServer;
@@ -14,7 +14,7 @@ public class NameServer implements NameServerInterface {
 	private static String Name = "NamingService";
 	private HashMap<String, ArrayList<String>> groupList = new HashMap<String, ArrayList<String>>();
 	private HashMap<String, ArrayList<String>> groupLeaderInfo = new HashMap<String, ArrayList<String>>();
-	private ArrayList<ClientInterface> clientList;
+	private ArrayList<String> clientList;
 
 	public NameServer() throws RemoteException, AlreadyBoundException {
 		bind();
@@ -54,14 +54,18 @@ public class NameServer implements NameServerInterface {
 
 	}
 
-	public void registerChatClient(ClientInterface name) throws RemoteException {
+	public void registerChatClient1(String name) throws RemoteException {
 		this.clientList.add(name);
+		try {
+			System.out.println(getClientHost());
+		} catch (Exception e) {
+			// TODO: handle exception
+		}
 	}
 
 	public void createGroup(String groupName, String name)
 			throws RemoteException {
 
-		int portNumber = 8080;
 		ArrayList<String> clientList = new ArrayList<String>();
 		ArrayList<String> info = new ArrayList<String>();
 		for (String groupN : this.groupList.keySet()) {
@@ -71,19 +75,6 @@ public class NameServer implements NameServerInterface {
 			}
 		}
 
-		this.groupLeader = (GroupLeaderInterface) UnicastRemoteObject
-				.exportObject(this, 0);
-		portNumber++;
-		// register a name service
-		Registry registry = LocateRegistry.createRegistry(portNumber);
-		registry.bind(groupName, groupLeader);
-		// add this client to this group
-		clientList.add(name); // add this client to the group
-		// add port number and naming service to this group info
-		info.add(groupName);
-		String port = String.valueOf(portNumber);
-		info.add(port);
-		this.groupList.put(groupName, info);
 		System.out.println("Naming Service Running on port " + portNumber);
 		System.out.println("Group Leader " + groupName + " Started");
 	}
