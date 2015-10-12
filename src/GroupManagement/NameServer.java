@@ -65,9 +65,9 @@ public class NameServer extends RemoteServer implements NameServerInterface {
 	}
 
 	@Override
-	public void updateGroupLeaderInfo(String Groupname) throws RemoteException {
-		// TODO Auto-generated method stub
-
+	public void updateGroupLeaderInfo(String groupName, String username) throws RemoteException {
+		String client = this.LeaderInfo.get(groupName);
+		String leaderInfo = this.ClientInfo.get(client);
 	}
 
 	public ArrayList<String> registerChatClient1(String userName) throws RemoteException,
@@ -127,16 +127,18 @@ public class NameServer extends RemoteServer implements NameServerInterface {
 
 	}
 
-	@Override
 	public void deleteGroup(GroupLeaderInterface groupName)
 			throws RemoteException {
+		this.LeaderInfo.remove(groupName);
+		this.MemberInGroup.remove(groupName);
 
 	}
 
 
-	@Override
-	public void getLeaderInfo() throws RemoteException {
-		// TODO Auto-generated method stub
+	public String getLeaderInfo(String groupName) throws RemoteException {
+		String client = this.LeaderInfo.get(groupName);
+		String leaderInfo = this.ClientInfo.get(client);
+		return leaderInfo;
 
 	}
 
