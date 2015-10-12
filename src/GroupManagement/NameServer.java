@@ -79,10 +79,9 @@ public class NameServer extends RemoteServer implements NameServerInterface {
 	}
 
 	public void createGroup(String groupName, String userName)
-			throws RemoteException {
+			throws RemoteException, ServerNotActiveException {
 
 		ArrayList<String> clientList = new ArrayList<String>();
-		String address = getClientHost();
 
 		for (String groupN : this.LeaderInfo.keySet()) {
 			if (groupN == groupName) {
@@ -91,42 +90,39 @@ public class NameServer extends RemoteServer implements NameServerInterface {
 			}
 		}
 
-		try {
-			String hostAddress = getClientHost();
-		} catch (Exception e) {
-			// TODO: handle exception
-		}
-
 		this.LeaderInfo.put(groupName, userName);
 		clientList.add(userName);
 		this.MemberInGroup.put(groupName, clientList);
 
-		System.out.println("Naming Service Running on port " + portNumber);
-		System.out.println("Group Leader " + groupName + " Started");
+		System.out.println("Group Leader of " + groupName + " is created");
 	}
 
 	public void deleteGroup(String groupName) throws RemoteException {
 		this.LeaderInfo.remove(groupName);
-		this.MemberInGroup(groupName);
+		this.MemberInGroup.remove(groupName);
 	}
 
-	public void addMember(String groupName, String member)
+	public void addMember(String groupName, String userName)
 			throws RemoteException {
-		ArrayList<String> clientList = this.groupList.get(groupName);
-		clientList.add(member);
-		this.groupList.put(groupName, clientList);
+		ArrayList<String> clientList = getMemberInGroup(groupName);
+		for (String groupN : clientList) {
+			if (groupN == userName) {
+				System.out.println("The user name existed");
+				return;
+			}
+		clientList.add(userName);
+		}
 	}
 
-	public void removeMember(String groupName, String member)
+	public void removeMember(String groupName, String userName)
 			throws RemoteException {
-		ArrayList<String> clientList = this.groupList.get(groupName);
-		clientList.remove(member);
-		this.groupList.put(groupName, clientList);
-
+		ArrayList<String> clientList = getMemberInGroup(groupName);
+		clientList.remove(userName);
+		this.MemberInGroup.put(groupName,clientList);
 	}
 
-	public ArrayList<String> getMemberOfGroup(String groupName) {
-		ArrayList<String> clientList = this.groupList.get(groupName);
+	public ArrayList<String> getMemberInGroup(String groupName) {
+		ArrayList<String> clientList = this.MemberInGroup.get(groupName);
 		return (ArrayList<String>) clientList;
 
 	}
@@ -150,7 +146,6 @@ public class NameServer extends RemoteServer implements NameServerInterface {
 
 	}
 
-	@Override
 	public ArrayList<String> getGroupList() {
 		ArrayList<String> groupList = new ArrayList<String>();
 		for (String groupN : this.MemberInGroup.keySet()) {
