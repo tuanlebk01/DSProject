@@ -28,6 +28,27 @@ public class NameServer extends RemoteServer implements NameServerInterface {
 		Registry registry = LocateRegistry.createRegistry(port);
 		registry.bind(NameServer.Name, nameServer);
 		System.out.println("Naming Service Running on port " + port);
+<<<<<<< HEAD
+		/*
+		Map<String, ArrayList<String>> myMap = new HashMap<String, ArrayList<String>>();
+		ArrayList<String> list = new ArrayList<String>();
+		list.add("client1");
+		list.add("client2");
+		myMap.put("group1", list); // stores list containing instances #1 and #2 under key "key1"
+		ArrayList<String> list2 = new ArrayList<String>();
+		list2.add("client3");
+		myMap.put("group2", list2); // stores list2 containing instance #3 under key "key2"
+
+		String obj1 = myMap.get("group1").get(1); // returns instance #1
+		ArrayList<String> obj2 = myMap.get("group1");
+		//myMap.remove("group2");
+		ArrayList<String> key = myMap.get(1);
+		ArrayList<String> obj3 = myMap.get("group2");
+
+		System.out.println(obj1 + obj2 + obj3 + key);
+		*/
+=======
+>>>>>>> e611aa0e2ba78ca99018e38f65eae1f7daff23e3
 
 	}
 
@@ -116,7 +137,13 @@ public class NameServer extends RemoteServer implements NameServerInterface {
 	@Override
 	public void deleteGroup(GroupLeaderInterface groupName)
 			throws RemoteException {
+<<<<<<< HEAD
+		ArrayList<ClientInterface> clientList = this.groupList.get(groupName);
+		return (ClientInterface) clientList;
+
+=======
 		// TODO Auto-generated method stub
+>>>>>>> e611aa0e2ba78ca99018e38f65eae1f7daff23e3
 
 	}
 
