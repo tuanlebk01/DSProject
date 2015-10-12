@@ -5,12 +5,8 @@ import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
-import java.util.ArrayList;
-import java.util.Scanner;
-
 import Application.GUI;
 
-import com.sun.org.apache.xalan.internal.xsltc.runtime.Hashtable;
 
 public class Client extends UnicastRemoteObject implements ClientInterface {
 
@@ -30,16 +26,20 @@ public class Client extends UnicastRemoteObject implements ClientInterface {
 
 
 		try {
+
 			this.registry = LocateRegistry.getRegistry("localhost", portNr);
+			System.out.println("reg: " + registry);
 			this.ns = (NameServerInterface) registry
 					.lookup("NamingService");
+
+			ns.registerChatClient("client1");
 
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 	}
 
-	public void createGroup(String groupName, String userName) {
+	public void createGroup(String groupName, String userName) throws RemoteException {
 
 		ns.createGroup(groupName, userName);
 

@@ -14,7 +14,7 @@ public class NameServer implements NameServerInterface {
 	private static String Name = "NamingService";
 	private HashMap<String, ArrayList<String>> groupList = new HashMap<String, ArrayList<String>>();
 	private HashMap<String, ArrayList<String>> groupLeaderInfo = new HashMap<String, ArrayList<String>>();
-	private ArrayList<ClientInterface> clientList;
+	private HashMap<String, ArrayList<String>> clientInfo = new HashMap<String, ArrayList<String>>();
 
 	public NameServer() throws RemoteException, AlreadyBoundException {
 		bind();
@@ -73,8 +73,9 @@ public class NameServer implements NameServerInterface {
 
 	}
 
-	public void registerChatClient(ClientInterface name) throws RemoteException {
-		this.clientList.add(name);
+	public void registerChatClient(ClientInterface name) throws RemoteException, ServerNotActiveException  {
+		System.out.println(RemoteServer.getClientHost());
+		//this.get.add(name);
 	}
 
 	public void createGroup(String groupName, String name)
@@ -148,7 +149,7 @@ public class NameServer implements NameServerInterface {
 	@Override
 	public void deleteGroup(GroupLeaderInterface groupName)
 			throws RemoteException {
-		ArrayList<ClientInterface> clientList = this.groupList.get(groupName);
+		//ArrayList<ClientInterface> clientList = this.groupList.get(groupName);
 
 	}
 }
