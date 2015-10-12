@@ -28,7 +28,7 @@ public class NameServer implements NameServerInterface {
 		Registry registry = LocateRegistry.createRegistry(port);
 		registry.bind(NameServer.Name, nameServer);
 		System.out.println("Naming Service Running on port " + port);
-<<<<<<< HEAD
+
 		/*
 		Map<String, ArrayList<String>> myMap = new HashMap<String, ArrayList<String>>();
 		ArrayList<String> list = new ArrayList<String>();
@@ -47,8 +47,6 @@ public class NameServer implements NameServerInterface {
 
 		System.out.println(obj1 + obj2 + obj3 + key);
 		*/
-=======
->>>>>>> e611aa0e2ba78ca99018e38f65eae1f7daff23e3
 
 	}
 
@@ -97,7 +95,11 @@ public class NameServer implements NameServerInterface {
 		portNumber++;
 		// register a name service
 		Registry registry = LocateRegistry.createRegistry(portNumber);
-		registry.bind(groupName, groupLeader);
+		try {
+			registry.bind(groupName, groupLeader);
+		} catch (AlreadyBoundException e) {
+			e.printStackTrace();
+		}
 		// add this client to this group
 		clientList.add(name); // add this client to the group
 		// add port number and naming service to this group info
@@ -146,14 +148,7 @@ public class NameServer implements NameServerInterface {
 	@Override
 	public void deleteGroup(GroupLeaderInterface groupName)
 			throws RemoteException {
-<<<<<<< HEAD
 		ArrayList<ClientInterface> clientList = this.groupList.get(groupName);
-		return (ClientInterface) clientList;
-
-=======
-		// TODO Auto-generated method stub
->>>>>>> e611aa0e2ba78ca99018e38f65eae1f7daff23e3
 
 	}
-
 }
