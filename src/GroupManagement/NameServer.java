@@ -70,19 +70,18 @@ public class NameServer extends RemoteServer implements NameServerInterface {
 
 	}
 
-	public void registerChatClient1(String userName) throws RemoteException,
+	public ArrayList<String> registerChatClient1(String userName) throws RemoteException,
 			ServerNotActiveException {
 
 		String hostAddress = getClientHost();
 		this.ClientInfo.put(userName, hostAddress);
-		getGroupList();
+		return getGroupList();
 	}
 
 	public void createGroup(String groupName, String userName)
-			throws RemoteException {
+			throws RemoteException, ServerNotActiveException {
 
 		ArrayList<String> clientList = new ArrayList<String>();
-		String address = getClientHost();
 
 		for (String groupN : this.LeaderInfo.keySet()) {
 			if (groupN == groupName) {
@@ -91,18 +90,10 @@ public class NameServer extends RemoteServer implements NameServerInterface {
 			}
 		}
 
-
-		try {
-			String hostAddress = getClientHost();
-		} catch (Exception e) {
-			// TODO: handle exception
-		}
-
 		this.LeaderInfo.put(groupName, userName);
 		clientList.add(userName);
 		this.MemberInGroup.put(groupName, clientList);
 
-		System.out.println("Naming Service Running on port " + portNumber);
 		System.out.println("Group Leader " + groupName + " Started");
 	}
 
@@ -138,12 +129,6 @@ public class NameServer extends RemoteServer implements NameServerInterface {
 
 	}
 
-	@Override
-	public void registerChatClient(String name) throws RemoteException,
-			ServerNotActiveException {
-		// TODO Auto-generated method stub
-
-	}
 
 	@Override
 	public void getLeaderInfo() throws RemoteException {

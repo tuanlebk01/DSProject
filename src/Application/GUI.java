@@ -16,6 +16,8 @@ import javax.swing.JButton;
 import java.awt.List;
 import java.rmi.Naming;
 import java.rmi.RemoteException;
+import java.rmi.server.ServerNotActiveException;
+import java.util.ArrayList;
 import java.util.Vector;
 
 import javax.swing.JTextArea;
@@ -50,6 +52,7 @@ public class GUI {
 	private JTextArea msgField;
 	private static String userName;
 	private static int portNr;
+	private ArrayList <String> listOfGroups = new ArrayList <String> ();
 
 	public static void main(String[] args) {
 		new GUI();
@@ -135,19 +138,16 @@ public class GUI {
 
 					try {
 						client.createGroup(input, userName);
-					} catch (RemoteException e) {
-
+					} catch (RemoteException | ServerNotActiveException e) {
+						JOptionPane.showMessageDialog(null, "Group not created");
 						e.printStackTrace();
 					}
 					JOptionPane.showMessageDialog(null, "Group created with name: " + input);
 					System.out.println(input);
 
 				} else {
-
 					JOptionPane.showMessageDialog(null, "Group not created");
 				}
-
-
 			}
 		});
 
@@ -193,6 +193,11 @@ public class GUI {
 				connectButton.setText("Disconnect");
 				System.out.println("Trying to connect to nameserver");
 				client.connectToNameServer(userName, portNr);
+				listOfGroups = client.getAl();
+
+				for(int i = 0; i < listOfGroups.size(); i++) {
+					groupList.add(listOfGroups.get(i));
+				}
 				System.out.println("Connected");
 
 			} catch (Exception ex) {
@@ -202,7 +207,6 @@ public class GUI {
 
 			}
 		} else {
-//			updateUsers(null);
 			connectButton.setText("Connect");
 		}
 	}
@@ -222,21 +226,4 @@ public class GUI {
 			chatArea.append(userName + ": " + message + "\n");
 		else chatArea.append(message + "\n");
 	}
-
-//	private void updateUsers(Vector connected) {
-//
-//		DefaultListModel listModel = new DefaultListModel();
-//
-//		if (connected != null)
-//			for (int i = 0; i < connected.size(); i++) {
-//				try {
-//					String temp = "asd";//((Client) connected.get(i)).getName();
-//					listModel.addElement(temp);
-//				} catch (Exception e) {
-//					e.printStackTrace();
-//				}
-//			}
-//		userList.setModel(listModel);
-//
-//	}
 }
