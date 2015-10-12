@@ -1,34 +1,30 @@
 package Application;
 
 
-import javax.swing.DefaultListModel;
-import javax.swing.JFrame;
-import javax.swing.JLabel;
-import javax.swing.JOptionPane;
-import javax.swing.JScrollPane;
-import javax.swing.JTextField;
-
 import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Component;
 import java.awt.Font;
-
-import javax.swing.JButton;
-
 import java.awt.List;
-import java.rmi.Naming;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.rmi.RemoteException;
 import java.rmi.server.ServerNotActiveException;
 import java.util.ArrayList;
-import java.util.Vector;
 
-import javax.swing.JTextArea;
+import javax.swing.DefaultListCellRenderer;
+import javax.swing.DefaultListModel;
+import javax.swing.JButton;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
 import javax.swing.JList;
-import javax.swing.JLayeredPane;
-
-import java.awt.event.ActionListener;
-import java.awt.event.ActionEvent;
-import java.awt.event.FocusListener;
-
-import javax.swing.JTextPane;
+import javax.swing.JOptionPane;
+import javax.swing.JScrollPane;
+import javax.swing.JTextArea;
+import javax.swing.JTextField;
+import javax.swing.ListSelectionModel;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
 
 import GroupManagement.Client;
 
@@ -45,8 +41,10 @@ public class GUI {
 	private JButton connectButton;
 	private JButton sendButton;
 	private JButton createNewGroupButton;
-	private JList userList = new JList();
-	private JList groupList = new JList();
+	private DefaultListModel groupList = new DefaultListModel();
+	private DefaultListModel userList = new DefaultListModel();
+	private JList listGroup = new JList(groupList);
+	private JList listUser = new JList(userList);
 	private JFrame frame = new JFrame();
 	private static JTextArea chatArea;
 	private JTextArea msgField;
@@ -86,17 +84,15 @@ public class GUI {
 		usersOnlineLabel.setBounds(557, 242, 73, 22);
 		frame.getContentPane().add(usersOnlineLabel);
 
-		userList = new JList();
-		userList.setBounds(524, 275, 136, 200);
-		frame.getContentPane().add(userList);
+		listUser.setBounds(524, 275, 136, 200);
+		frame.getContentPane().add(listUser);
 
 		sendButton = new JButton("Send");
 		sendButton.setBounds(384, 377, 104, 97);
 		frame.getContentPane().add(sendButton);
 
-		groupList = new JList();
-		groupList.setBounds(524, 100, 136, 124);
-		frame.getContentPane().add(groupList);
+		listGroup.setBounds(524, 100, 136, 124);
+		frame.getContentPane().add(listGroup);
 
 		groupsLabel = new JLabel("Groups");
 		groupsLabel.setFont(new Font("Tahoma", Font.PLAIN, 12));
@@ -193,11 +189,13 @@ public class GUI {
 				connectButton.setText("Disconnect");
 				System.out.println("Trying to connect to nameserver");
 				client.connectToNameServer(userName, portNr);
-				listOfGroups = client.getAl();
+				listOfGroups = client.getGroupList();
 
 				for(int i = 0; i < listOfGroups.size(); i++) {
-					groupList.add(listOfGroups.get(i), null);
+					System.out.println(listOfGroups.get(i));
+					groupList.add(i, listOfGroups.get(i));
 				}
+
 				System.out.println("Connected");
 
 			} catch (Exception ex) {
@@ -226,4 +224,39 @@ public class GUI {
 			chatArea.append(userName + ": " + message + "\n");
 		else chatArea.append(message + "\n");
 	}
+
+	//https://docs.oracle.com/javase/tutorial/uiswing/events/listselectionlistener.html
+
+	class SharedListSelectionHandler implements ListSelectionListener {
+
+	    public void valueChanged(ListSelectionEvent e) {
+
+	    	System.out.println("E rätt");
+
+	    	ListSelectionModel lsm = (ListSelectionModel)e.getSource();
+
+	        int firstIndex = e.getFirstIndex();
+	        int lastIndex = e.getLastIndex();
+	        boolean isAdjusting = e.getValueIsAdjusting();
+	        chatArea.append("Event for indexes "
+	                      + firstIndex + " - " + lastIndex
+	                      + "; isAdjusting is " + isAdjusting
+	                      + "; selected indexes:");
+
+	        if (lsm.isSelectionEmpty()) {
+	        	chatArea.append(" <none>");
+	        } else {
+	            // Find out which indexes are selected.
+	            int minIndex = lsm.getMinSelectionIndex();
+	            int maxIndex = lsm.getMaxSelectionIndex();
+	            for (int i = minIndex; i <= maxIndex; i++) {
+	                if (lsm.isSelectedIndex(i)) {
+	                	chatArea.append(" " + i);
+	                }
+	            }
+	        }
+	        chatArea.append("\n");
+	    }
+	}
+
 }

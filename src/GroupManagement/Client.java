@@ -17,7 +17,8 @@ public class Client extends UnicastRemoteObject implements ClientInterface {
 	private static final long serialVersionUID = 1L;
 	private Registry registry;
 	private NameServerInterface ns;
-	private ArrayList <String> al = new ArrayList<String>();
+	private ArrayList <String> groupList = new ArrayList<String>();
+	private ArrayList <String> memberList = new ArrayList<String>();
 
 	public Client() throws RemoteException {
 		super();
@@ -31,8 +32,9 @@ public class Client extends UnicastRemoteObject implements ClientInterface {
 
 			this.registry = LocateRegistry.getRegistry("Harry.cs.umu.se", portNr);
 			this.ns = (NameServerInterface) registry.lookup("NamingService");
+			ns.registerChatClient1(userName);
+			groupList = ns.getGroupList();
 
-			al = ns.registerChatClient1(userName);
 	}
 
 	public void createGroup(String groupName, String userName) throws RemoteException, ServerNotActiveException {
@@ -46,8 +48,12 @@ public class Client extends UnicastRemoteObject implements ClientInterface {
 
 	}
 
-	public ArrayList<String> getAl() {
-		return al;
+	public ArrayList<String> getGroupList() {
+		return groupList;
 	}
 
+	public ArrayList<String> getGroupMembers(String groupName) throws RemoteException {
+		return memberList = ns.getMemberInGroup("Group 1");
+
+	}
 }

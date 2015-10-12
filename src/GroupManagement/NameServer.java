@@ -1,13 +1,14 @@
 package GroupManagement;
 
-import java.net.InetAddress;
-import java.rmi.*;
-import java.rmi.registry.*;
-import java.rmi.server.*;
-import java.util.*;
-import java.io.*;
-
-import sun.security.krb5.internal.HostAddress;
+import java.rmi.AlreadyBoundException;
+import java.rmi.RemoteException;
+import java.rmi.registry.LocateRegistry;
+import java.rmi.registry.Registry;
+import java.rmi.server.RemoteServer;
+import java.rmi.server.ServerNotActiveException;
+import java.rmi.server.UnicastRemoteObject;
+import java.util.ArrayList;
+import java.util.HashMap;
 
 public class NameServer extends RemoteServer implements NameServerInterface {
 
@@ -19,6 +20,7 @@ public class NameServer extends RemoteServer implements NameServerInterface {
 	private HashMap<String, String> LeaderInfo = new HashMap<String, String>();
 	private HashMap<String, ArrayList<String>> MemberInGroup = new HashMap<String, ArrayList<String>>();
 	private HashMap<String, String> ClientInfo = new HashMap<String, String>();
+	private ArrayList<String> groupList = new ArrayList<String>();
 
 	public NameServer() throws RemoteException, AlreadyBoundException {
 		bind();
@@ -32,23 +34,6 @@ public class NameServer extends RemoteServer implements NameServerInterface {
 		Registry registry = LocateRegistry.createRegistry(port);
 		registry.bind(NameServer.Name, nameServer);
 		System.out.println("Naming Service Running on port " + port);
-
-		/*
-		 * Map<String, ArrayList<String>> myMap = new HashMap<String,
-		 * ArrayList<String>>(); ArrayList<String> list = new
-		 * ArrayList<String>(); list.add("client1"); list.add("client2");
-		 * myMap.put("group1", list); // stores list containing instances #1 and
-		 * #2 under key "key1" ArrayList<String> list2 = new
-		 * ArrayList<String>(); list2.add("client3"); myMap.put("group2",
-		 * list2); // stores list2 containing instance #3 under key "key2"
-		 *
-		 * String obj1 = myMap.get("group1").get(1); // returns instance #1
-		 * ArrayList<String> obj2 = myMap.get("group1");
-		 * //myMap.remove("group2"); ArrayList<String> key = myMap.get(1);
-		 * ArrayList<String> obj3 = myMap.get("group2");
-		 *
-		 * System.out.println(obj1 + obj2 + obj3 + key);
-		 */
 
 	}
 
@@ -66,16 +51,16 @@ public class NameServer extends RemoteServer implements NameServerInterface {
 
 	@Override
 	public void updateGroupLeaderInfo(String Groupname) throws RemoteException {
-		// TODO Auto-generated method stub
 
 	}
 
-	public ArrayList<String> registerChatClient1(String userName) throws RemoteException,
+	public void registerChatClient1(String userName) throws RemoteException,
 			ServerNotActiveException {
+
+		System.out.println("Connected: " + getClientHost());
 
 		String hostAddress = getClientHost();
 		this.ClientInfo.put(userName, hostAddress);
-		return getGroupList();
 	}
 
 	public void createGroup(String groupName, String userName)
@@ -123,6 +108,11 @@ public class NameServer extends RemoteServer implements NameServerInterface {
 
 	public ArrayList<String> getMemberInGroup(String groupName) {
 		ArrayList<String> clientList = this.MemberInGroup.get(groupName);
+
+		clientList.add("User 2");
+		clientList.add("User 3");
+		clientList.add("User 4");
+
 		return (ArrayList<String>) clientList;
 
 	}
@@ -141,10 +131,20 @@ public class NameServer extends RemoteServer implements NameServerInterface {
 	}
 
 	public ArrayList<String> getGroupList() {
-		ArrayList<String> groupList = new ArrayList<String>();
+
 		for (String groupN : this.MemberInGroup.keySet()) {
 			groupList.add(groupN);
 		}
+
+		groupList.add("Group 1");
+		groupList.add("Group 2");
+		groupList.add("Group 3");
+
+		return groupList;
+	}
+
+	public ArrayList<String> getGroupLists() {
+
 		return groupList;
 	}
 }
