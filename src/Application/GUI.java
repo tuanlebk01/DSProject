@@ -46,7 +46,7 @@ public class GUI {
 	private JButton sendButton;
 	private JButton createNewGroupButton;
 	private JList userList = new JList();
-	private List groupList;
+	private JList groupList = new JList();
 	private JFrame frame = new JFrame();
 	private static JTextArea chatArea;
 	private JTextArea msgField;
@@ -94,7 +94,7 @@ public class GUI {
 		sendButton.setBounds(384, 377, 104, 97);
 		frame.getContentPane().add(sendButton);
 
-		groupList = new List();
+		groupList = new JList();
 		groupList.setBounds(524, 100, 136, 124);
 		frame.getContentPane().add(groupList);
 
@@ -196,7 +196,7 @@ public class GUI {
 				listOfGroups = client.getAl();
 
 				for(int i = 0; i < listOfGroups.size(); i++) {
-					groupList.add(listOfGroups.get(i));
+					groupList.add(listOfGroups.get(i), null);
 				}
 				System.out.println("Connected");
 
