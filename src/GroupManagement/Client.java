@@ -18,15 +18,15 @@ public class Client extends UnicastRemoteObject implements ClientInterface {
 	}
 
 	private static final long serialVersionUID = 1L;
-	private 
+	private
 
 	public  void main(String[] args) throws RemoteException, AlreadyBoundException {
-		
+
 		try {
 			Registry registry = LocateRegistry.getRegistry("localhost", 1111);
 			NameServerInterface ns = (NameServerInterface) registry
 					.lookup("NamingService");
-			
+
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
