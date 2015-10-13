@@ -53,6 +53,7 @@ public class GUI {
 	private static String userName;
 	private static int portNr;
 	private ArrayList <String> listOfGroups = new ArrayList <String> ();
+	private ArrayList <String> listOfMembers = new ArrayList <String> ();
 
 	public static void main(String[] args) {
 		try {
@@ -173,7 +174,11 @@ public class GUI {
 					JList source = (JList) evt.getSource();
 					System.out.println(source.getSelectedValue().toString());
 					try {
-						client.getGroupMembers(source.getSelectedValue().toString());
+						listOfMembers.clear();
+						listOfMembers = client.getGroupMembers(source.getSelectedValue().toString());
+						for(int i = 0; i < listOfMembers.size(); i++) {
+							userList.add(i, listOfMembers.get(i));
+						}
 					} catch (RemoteException ex) {
 						ex.printStackTrace();
 					}

@@ -21,7 +21,8 @@ public class NameServer extends RemoteServer implements NameServerInterface {
 	private HashMap<String, ArrayList<String>> MemberInGroup = new HashMap<String, ArrayList<String>>();
 	private HashMap<String, String> ClientInfo = new HashMap<String, String>();
 	private ArrayList<String> groupList = new ArrayList<String>();
-
+	private ArrayList<String> clientList = new ArrayList<String>();
+	
 	public NameServer() throws RemoteException, AlreadyBoundException {
 		bind();
 		System.out.println("Naming Service Started");
@@ -107,13 +108,13 @@ public class NameServer extends RemoteServer implements NameServerInterface {
 	}
 
 	public ArrayList<String> getMemberInGroup(String groupName) {
-		ArrayList<String> clientList = this.MemberInGroup.get(groupName);
-
+		System.out.println(this.MemberInGroup.get(groupName));
+//		ArrayList<String> clientList = this.MemberInGroup.get(groupName);
 		clientList.add("User 2");
 		clientList.add("User 3");
 		clientList.add("User 4");
 
-		return (ArrayList<String>) clientList;
+		return clientList;
 
 	}
 
