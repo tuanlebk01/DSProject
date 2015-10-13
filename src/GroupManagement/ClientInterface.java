@@ -19,7 +19,7 @@ public interface ClientInterface extends Remote {
 			AlreadyBoundException;
 
 	public boolean createGroup(String groupName, String userName)
-			throws RemoteException, ServerNotActiveException;
+			throws RemoteException, ServerNotActiveException, NotBoundException;
 
 	public HashMap<String, ArrayList<String>> getGroups()
 			throws RemoteException;

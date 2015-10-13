@@ -17,6 +17,7 @@ public class Client extends UnicastRemoteObject implements ClientInterface {
 	private static final long serialVersionUID = 1L;
 	private Registry registry;
 	private NameServerInterface ns;
+	private ClientInterface client;
 	private HashMap<String, ArrayList<String>> groupMap = new HashMap<String, ArrayList<String>>();
 	private int clientID;
 	private boolean groupCreated;
@@ -33,7 +34,7 @@ public class Client extends UnicastRemoteObject implements ClientInterface {
 			throws RemoteException, AlreadyBoundException,
 			ServerNotActiveException, NotBoundException {
 
-		this.registry = LocateRegistry.getRegistry("Localhost", portNr);
+		this.registry = LocateRegistry.getRegistry("localhost", portNr);
 		this.ns = (NameServerInterface) registry.lookup("NamingService");
 		ns.registerChatClient(userName);
 		return clientID;
@@ -41,7 +42,12 @@ public class Client extends UnicastRemoteObject implements ClientInterface {
 	}
 
 	public boolean createGroup(String groupName, String userName)
-			throws RemoteException, ServerNotActiveException {
+			throws RemoteException, ServerNotActiveException, NotBoundException {
+
+		this.registry = LocateRegistry.getRegistry("localhost", 1112);
+		System.out.println("1");
+		this.client = (ClientInterface) registry.lookup("userName");
+		System.out.println("2");
 
 		groupCreated = ns.createGroup(groupName, userName);
 
