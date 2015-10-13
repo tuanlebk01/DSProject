@@ -149,6 +149,27 @@ public class GUI {
 
 						groupCreated = client.createGroup(input, userName);
 						if (groupCreated) {
+
+							groupMap = client.getGroups();
+
+							listOfGroups.clear();
+							listOfMembers.clear();
+
+							Iterator it = groupMap.entrySet().iterator();
+							while (it.hasNext()) {
+								Map.Entry pair = (Map.Entry) it.next();
+								listOfGroups.add(pair.getKey().toString());
+								listOfMembers.add(pair.getValue().toString());
+								System.out.println(pair.getKey() + " = " + pair.getValue());
+								it.remove();
+							}
+
+							groupList.clear();
+
+							for (int i = 0; i < listOfGroups.size(); i++) {
+								groupList.add(i, listOfGroups.get(i));
+							}
+
 							JOptionPane.showMessageDialog(null,
 									"Group created with name: " + input);
 
