@@ -2,18 +2,17 @@ package Application;
 
 
 import java.awt.BorderLayout;
-import java.awt.Color;
-import java.awt.Component;
 import java.awt.Font;
-import java.awt.List;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.rmi.AlreadyBoundException;
 import java.rmi.RemoteException;
 import java.rmi.server.ServerNotActiveException;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
 
-import javax.swing.DefaultListCellRenderer;
 import javax.swing.DefaultListModel;
 import javax.swing.JButton;
 import javax.swing.JFrame;
@@ -23,7 +22,6 @@ import javax.swing.JOptionPane;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
-import javax.swing.ListSelectionModel;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
@@ -43,6 +41,7 @@ public class GUI {
 	private JButton connectButton;
 	private JButton sendButton;
 	private JButton createNewGroupButton;
+	private JButton joinGroupButton;
 	private DefaultListModel groupList = new DefaultListModel();
 	private DefaultListModel userList = new DefaultListModel();
 	private JList listGroup = new JList(groupList);
@@ -54,12 +53,16 @@ public class GUI {
 	private static int portNr;
 	private ArrayList <String> listOfGroups = new ArrayList <String> ();
 	private ArrayList <String> listOfMembers = new ArrayList <String> ();
+	private HashMap<String, ArrayList<String>> groupMap = new HashMap<String, ArrayList<String>>();
+	private int clientID;
+	private boolean groupCreated;
+
 
 	public static void main(String[] args) {
 		try {
 			new NameServer();
 		} catch (RemoteException | AlreadyBoundException ex) {
-			ex.printStackTrace();
+			System.out.println("NameServer already running");
 		}
 		new GUI();
 	}
@@ -80,11 +83,15 @@ public class GUI {
 		userNameTextField.setText("User1");
 
 		createNewGroupButton = new JButton("Create group");
-		createNewGroupButton.setBounds(524, 26, 135, 23);
+		createNewGroupButton.setBounds(524, 0, 135, 23);
 		frame.getContentPane().add(createNewGroupButton);
 
+		joinGroupButton = new JButton("Join group");
+		joinGroupButton.setBounds(524, 35, 135, 23);
+		frame.getContentPane().add(joinGroupButton);
+
 		connectButton = new JButton("Connect");
-		connectButton.setBounds(365, 26, 119, 23);
+		connectButton.setBounds(365, 25, 119, 23);
 		frame.getContentPane().add(connectButton);
 
 		usersOnlineLabel = new JLabel("Online users");
@@ -133,27 +140,34 @@ public class GUI {
    		frame.getContentPane().add(msgField);
 
 
-   		createNewGroupButton.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent a) {
+	   		createNewGroupButton.addActionListener(new ActionListener() {
+				public void actionPerformed(ActionEvent a) {
 
-				String input = JOptionPane.showInputDialog(frame, "Enter group name");
+					String input = JOptionPane.showInputDialog(frame, "Enter group name");
 
-				if(input != null && (input.length() > 1)) {
+					if(input != null && (input.length() > 1)) {
 
-					try {
-						client.createGroup(input, userName);
-					} catch (RemoteException | ServerNotActiveException e) {
+						try {
+							System.out.println("creating group");
+
+							groupCreated = client.createGroup(input, userName);
+							if(groupCreated) {
+								JOptionPane.showMessageDialog(null, "Group created with name: " + input);
+
+							} else {
+								JOptionPane.showMessageDialog(null, "Group not created");
+							}
+
+						} catch (RemoteException | ServerNotActiveException e) {
+							JOptionPane.showMessageDialog(null, "Group not created");
+							e.printStackTrace();
+						}
+
+					} else {
 						JOptionPane.showMessageDialog(null, "Group not created");
-						e.printStackTrace();
 					}
-					JOptionPane.showMessageDialog(null, "Group created with name: " + input);
-					System.out.println(input);
-
-				} else {
-					JOptionPane.showMessageDialog(null, "Group not created");
 				}
-			}
-		});
+			});
 
 		sendButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent a) {
@@ -166,27 +180,47 @@ public class GUI {
 				connect();
 			}
 		});
-		
-		
+
 		listGroup.addListSelectionListener(new ListSelectionListener() {
 			public void valueChanged(ListSelectionEvent evt) {
 				if (evt.getValueIsAdjusting()) {
-					JList source = (JList) evt.getSource();
-					System.out.println(source.getSelectedValue().toString());
+					final JList source = (JList) evt.getSource();
 					try {
+
+						groupMap = client.getGroups();
+
 						listOfMembers.clear();
-						listOfMembers = client.getGroupMembers(source.getSelectedValue().toString());
-						for(int i = 0; i < listOfMembers.size(); i++) {
+						listOfMembers = groupMap.get(source.getSelectedValue()
+								.toString());
+
+						userList.clear();
+
+						for (int i = 0; i < listOfMembers.size(); i++) {
 							userList.add(i, listOfMembers.get(i));
 						}
+
+						joinGroupButton.addActionListener(new ActionListener() {
+							public void actionPerformed(ActionEvent a) {
+
+								try {
+									client.joinGroup(source.getSelectedValue()
+											.toString());
+								} catch (RemoteException
+										| ServerNotActiveException e) {
+									JOptionPane.showMessageDialog(null, "Select a group");
+									e.printStackTrace();
+								}
+							}
+						});
 					} catch (RemoteException ex) {
 						ex.printStackTrace();
 					}
+
 				}
 			}
 		});
-		
 
+		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.setSize(700, 530);
 		frame.setLocationRelativeTo(null);
 		frame.setVisible(true);
@@ -216,13 +250,24 @@ public class GUI {
 				client = new Client();
 				connectButton.setText("Disconnect");
 				System.out.println("Trying to connect to nameserver");
-				client.connectToNameServer(userName, portNr);
-				listOfGroups = client.getGroupList();
+				clientID = client.connectToNameServer(userName, portNr);
 
-//				clear gui of old groups before filling with new ones.
-//				this has to be done in nameserver
-//				so all items are unique.
-				
+				groupMap = client.getGroups();
+
+				listOfGroups.clear();
+				listOfMembers.clear();
+
+				Iterator it = groupMap.entrySet().iterator();
+			    while (it.hasNext()) {
+			        Map.Entry pair = (Map.Entry)it.next();
+			        listOfGroups.add(pair.getKey().toString());
+			        listOfMembers.add(pair.getValue().toString());
+			        System.out.println(pair.getKey() + " = " + pair.getValue());
+			        it.remove();
+			    }
+
+			    groupList.clear();
+
 				for(int i = 0; i < listOfGroups.size(); i++) {
 					groupList.add(i, listOfGroups.get(i));
 				}
@@ -256,5 +301,11 @@ public class GUI {
 		else chatArea.append(message + "\n");
 	}
 
-//	http://www.java2s.com/Code/Java/Swing-JFC/JListselectionchangedlistener.htm
+	public int getClientID() {
+		return clientID;
+	}
+
+	public void setClientID(int clientID) {
+		this.clientID = clientID;
+	}
 }

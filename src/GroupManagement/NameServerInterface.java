@@ -3,18 +3,17 @@ import java.io.*;
 import java.rmi.*;
 import java.rmi.server.ServerNotActiveException;
 import java.util.ArrayList;
+import java.util.HashMap;
 
 public interface NameServerInterface extends Remote, Serializable {
 
-	public void registerChatClient1(String userName) throws RemoteException,
+	public int registerChatClient(String userName) throws RemoteException,
 	ServerNotActiveException;
-    public void createGroup(String goupName, String client) throws RemoteException, ServerNotActiveException;
-    public void deleteGroup(GroupLeaderInterface groupName) throws RemoteException;
+    public boolean createGroup(String goupName, String client) throws RemoteException, ServerNotActiveException;
     public void addMember(String groupName,String userName) throws RemoteException;
     public void removeMember(String groupName, String userName) throws RemoteException;
-    public ArrayList<String> getMemberInGroup(String groupName) throws RemoteException;
     public void updateGroupLeaderInfo(String Groupname) throws RemoteException;
-    public void getLeaderInfo() throws RemoteException;
-    public ArrayList<String> getGroupList() throws RemoteException;
+    public HashMap<String, ArrayList<String>> getGroupsInfo() throws RemoteException;
+	public ArrayList<String> getMemberInGroup(String groupName) throws RemoteException;
 
 }

@@ -8,6 +8,7 @@ import java.rmi.registry.Registry;
 import java.rmi.server.ServerNotActiveException;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.ArrayList;
+import java.util.HashMap;
 
 import Application.GUI;
 
@@ -17,8 +18,9 @@ public class Client extends UnicastRemoteObject implements ClientInterface {
 	private static final long serialVersionUID = 1L;
 	private Registry registry;
 	private NameServerInterface ns;
-	private ArrayList <String> groupList = new ArrayList<String>();
-	private ArrayList <String> memberList = new ArrayList<String>();
+	private HashMap<String, ArrayList<String>> groupMap = new HashMap<String, ArrayList<String>>();
+	private int clientID;
+	private boolean groupCreated;
 
 	public Client() throws RemoteException {
 		super();
@@ -28,18 +30,20 @@ public class Client extends UnicastRemoteObject implements ClientInterface {
 		GUI.writeMsg(message);
 	}
 
-	public void connectToNameServer(String userName, int portNr) throws RemoteException, AlreadyBoundException, ServerNotActiveException, NotBoundException {
+	public int connectToNameServer(String userName, int portNr) throws RemoteException, AlreadyBoundException, ServerNotActiveException, NotBoundException {
 
 			this.registry = LocateRegistry.getRegistry("Localhost", portNr);
 			this.ns = (NameServerInterface) registry.lookup("NamingService");
-			ns.registerChatClient1(userName);
-			groupList = ns.getGroupList();
+			ns.registerChatClient(userName);
+			return clientID;
 
 	}
 
-	public void createGroup(String groupName, String userName) throws RemoteException, ServerNotActiveException {
+	public boolean createGroup(String groupName, String userName) throws RemoteException, ServerNotActiveException {
 
-		ns.createGroup(groupName, userName);
+		groupCreated = ns.createGroup(groupName, userName);
+
+		return groupCreated;
 
 	}
 
@@ -48,12 +52,18 @@ public class Client extends UnicastRemoteObject implements ClientInterface {
 
 	}
 
-	public ArrayList<String> getGroupList() {
-		return groupList;
-	}
+	public HashMap<String, ArrayList<String>> getGroups() throws RemoteException {
 
-	public ArrayList<String> getGroupMembers(String groupName) throws RemoteException {
-		return memberList = ns.getMemberInGroup("Group 1");
+		return groupMap = ns.getGroupsInfo();
 
 	}
+
+	public void joinGroup(String groupName) throws RemoteException, ServerNotActiveException {
+
+	}
+
+	public void broadcastMessage() {
+
+	}
+
 }

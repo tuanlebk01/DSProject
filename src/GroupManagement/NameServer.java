@@ -14,29 +14,12 @@ public class NameServer extends RemoteServer implements NameServerInterface {
 
 	private static final long serialVersionUID = 1L;
 	private NameServerInterface nameServer;
-	private GroupLeaderInterface groupLeader;
 	private static String Name = "NamingService";
 
 	private HashMap<String, String> LeaderInfo = new HashMap<String, String>();
-	private HashMap<String, ArrayList<String>> MemberInGroup = new HashMap<String, ArrayList<String>>();
+	private HashMap<String, ArrayList<String>> groupInfo = new HashMap<String, ArrayList<String>>();
 	private HashMap<String, String> ClientInfo = new HashMap<String, String>();
-	private ArrayList<String> groupList = new ArrayList<String>();
-	private ArrayList<String> clientList = new ArrayList<String>();
-	
-	public NameServer() throws RemoteException, AlreadyBoundException {
-		bind();
-		System.out.println("Naming Service Started");
-	}
-
-	private void bind() throws RemoteException, AlreadyBoundException {
-		int port = 1111;
-		this.nameServer = (NameServerInterface) UnicastRemoteObject
-				.exportObject(this, 0);
-		Registry registry = LocateRegistry.createRegistry(port);
-		registry.bind(NameServer.Name, nameServer);
-		System.out.println("Naming Service Running on port " + port);
-
-	}
+	private int clientID = 0;
 
 	public static void main(String args[]) {
 		try {
@@ -50,42 +33,81 @@ public class NameServer extends RemoteServer implements NameServerInterface {
 		}
 	}
 
+	public NameServer() throws RemoteException, AlreadyBoundException {
+		bind();
+	}
+
+	private void bind() throws RemoteException, AlreadyBoundException {
+
+		int port = 1111;
+		this.nameServer = (NameServerInterface) UnicastRemoteObject
+				.exportObject(this, 0);
+		Registry registry = LocateRegistry.createRegistry(port);
+		registry.bind(NameServer.Name, nameServer);
+		System.out.println("Naming Service Running on port " + port);
+
+		ArrayList<String> tempList = new ArrayList<String>();
+
+		if (!(groupInfo.containsKey("Group 1"))) {
+
+			tempList.add("User 1");
+			tempList.add("User 2");
+			tempList.add("User 3");
+			groupInfo.put("Group 1", tempList);
+		}
+
+		tempList = new ArrayList<String>();
+
+		if (!(groupInfo.containsKey("Group 2"))) {
+			tempList.add("User 4");
+			tempList.add("User 5");
+			tempList.add("User 6");
+			groupInfo.put("Group 2", tempList);
+		}
+
+		System.out.println("Group 1: " + groupInfo.get("Group 1"));
+		System.out.println("Group 2: " + groupInfo.get("Group 2"));
+
+	}
+
+
 	@Override
 	public void updateGroupLeaderInfo(String Groupname) throws RemoteException {
 
 	}
 
-	public void registerChatClient1(String userName) throws RemoteException,
+	public int registerChatClient(String userName) throws RemoteException,
 			ServerNotActiveException {
 
-		System.out.println("Connected: " + getClientHost());
-
+		clientID++;
 		String hostAddress = getClientHost();
+		hostAddress = hostAddress.concat("*" + clientID);
+
+
+
 		this.ClientInfo.put(userName, hostAddress);
+		System.out.println("Connected: " + ClientInfo.get(userName));
+		return clientID;
 	}
 
-	public void createGroup(String groupName, String userName)
+
+	public boolean createGroup(String groupName, String userName)
 			throws RemoteException, ServerNotActiveException {
 
-		ArrayList<String> clientList = new ArrayList<String>();
+		ArrayList<String> tempList = new ArrayList<String>();
 
-		for (String groupN : this.LeaderInfo.keySet()) {
-			if (groupN == groupName) {
-				System.out.println("The group existed");
-				return;
-			}
+		if(!groupInfo.containsKey(groupName)) {
+			tempList.add(userName);
+			groupInfo.put(groupName, tempList);
+
+			return true;
 		}
-
-		this.LeaderInfo.put(groupName, userName);
-		clientList.add(userName);
-		this.MemberInGroup.put(groupName, clientList);
-
-		System.out.println("Group Leader of " + groupName + " is created");
+		return false;
 	}
 
 	public void deleteGroup(String groupName) throws RemoteException {
 		this.LeaderInfo.remove(groupName);
-		this.MemberInGroup.remove(groupName);
+		this.groupInfo.remove(groupName);
 	}
 
 	public void addMember(String groupName, String userName)
@@ -104,48 +126,19 @@ public class NameServer extends RemoteServer implements NameServerInterface {
 			throws RemoteException {
 		ArrayList<String> clientList = getMemberInGroup(groupName);
 		clientList.remove(userName);
-		this.MemberInGroup.put(groupName,clientList);
+		this.groupInfo.put(groupName,clientList);
 	}
 
-	public ArrayList<String> getMemberInGroup(String groupName) {
-		System.out.println(this.MemberInGroup.get(groupName));
-//		ArrayList<String> clientList = this.MemberInGroup.get(groupName);
-		clientList.add("User 2");
-		clientList.add("User 3");
-		clientList.add("User 4");
 
-		return clientList;
+	public HashMap<String, ArrayList<String>> getGroupsInfo() {
 
+		return groupInfo;
 	}
 
 	@Override
-	public void deleteGroup(GroupLeaderInterface groupName)
+	public ArrayList<String> getMemberInGroup(String groupName)
 			throws RemoteException {
-
-	}
-
-
-	@Override
-	public void getLeaderInfo() throws RemoteException {
 		// TODO Auto-generated method stub
-
-	}
-
-	public ArrayList<String> getGroupList() {
-
-		for (String groupN : this.MemberInGroup.keySet()) {
-			groupList.add(groupN);
-		}
-
-		groupList.add("Group 1");
-		groupList.add("Group 2");
-		groupList.add("Group 3");
-
-		return groupList;
-	}
-
-	public ArrayList<String> getGroupLists() {
-
-		return groupList;
+		return null;
 	}
 }
