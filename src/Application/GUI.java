@@ -1,6 +1,5 @@
 package Application;
 
-
 import java.awt.BorderLayout;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
@@ -28,7 +27,6 @@ import javax.swing.event.ListSelectionListener;
 import GroupManagement.Client;
 import GroupManagement.NameServer;
 
-
 public class GUI {
 
 	private Client client;
@@ -51,12 +49,11 @@ public class GUI {
 	private JTextArea msgField;
 	private static String userName;
 	private static int portNr;
-	private ArrayList <String> listOfGroups = new ArrayList <String> ();
-	private ArrayList <String> listOfMembers = new ArrayList <String> ();
+	private ArrayList<String> listOfGroups = new ArrayList<String>();
+	private ArrayList<String> listOfMembers = new ArrayList<String>();
 	private HashMap<String, ArrayList<String>> groupMap = new HashMap<String, ArrayList<String>>();
 	private int clientID;
 	private boolean groupCreated;
-
 
 	public static void main(String[] args) {
 		try {
@@ -131,43 +128,46 @@ public class GUI {
 		chatArea.setLineWrap(true);
 		chatArea.setBounds(28, 76, 456, 294);
 		frame.add(new JScrollPane(chatArea), BorderLayout.CENTER);
-   		frame.getContentPane().add(chatArea);
+		frame.getContentPane().add(chatArea);
 
-   		msgField = new JTextArea();
-   		msgField.setBounds(28, 377, 350, 97);
-   		msgField.setColumns(10);
-   		frame.add(new JScrollPane(msgField), BorderLayout.CENTER);
-   		frame.getContentPane().add(msgField);
+		msgField = new JTextArea();
+		msgField.setBounds(28, 377, 350, 97);
+		msgField.setColumns(10);
+		frame.add(new JScrollPane(msgField), BorderLayout.CENTER);
+		frame.getContentPane().add(msgField);
 
+		createNewGroupButton.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent a) {
 
-	   		createNewGroupButton.addActionListener(new ActionListener() {
-				public void actionPerformed(ActionEvent a) {
+				String input = JOptionPane.showInputDialog(frame,
+						"Enter group name");
 
-					String input = JOptionPane.showInputDialog(frame, "Enter group name");
+				if (input != null && (input.length() > 1)) {
 
-					if(input != null && (input.length() > 1)) {
+					try {
+						System.out.println("creating group");
 
-						try {
-							System.out.println("creating group");
+						groupCreated = client.createGroup(input, userName);
+						if (groupCreated) {
+							JOptionPane.showMessageDialog(null,
+									"Group created with name: " + input);
 
-							groupCreated = client.createGroup(input, userName);
-							if(groupCreated) {
-								JOptionPane.showMessageDialog(null, "Group created with name: " + input);
-
-							} else {
-								JOptionPane.showMessageDialog(null, "Group not created");
-							}
-
-						} catch (RemoteException | ServerNotActiveException e) {
-							JOptionPane.showMessageDialog(null, "Group not created");
-							e.printStackTrace();
+						} else {
+							JOptionPane.showMessageDialog(null,
+									"Group not created");
 						}
 
-					} else {
-						JOptionPane.showMessageDialog(null, "Group not created");
+					} catch (RemoteException | ServerNotActiveException e) {
+						JOptionPane
+								.showMessageDialog(null, "Group not created");
+						e.printStackTrace();
 					}
+
+				} else {
+					JOptionPane.showMessageDialog(null, "Group not created");
 				}
-			});
+			}
+		});
 
 		sendButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent a) {
@@ -183,10 +183,10 @@ public class GUI {
 
 		listGroup.addListSelectionListener(new ListSelectionListener() {
 			public void valueChanged(ListSelectionEvent evt) {
+
 				if (evt.getValueIsAdjusting()) {
 					final JList source = (JList) evt.getSource();
 					try {
-
 						groupMap = client.getGroups();
 
 						listOfMembers.clear();
@@ -205,10 +205,12 @@ public class GUI {
 								try {
 									client.joinGroup(source.getSelectedValue()
 											.toString());
+
 								} catch (RemoteException
 										| ServerNotActiveException e) {
-									JOptionPane.showMessageDialog(null, "Select a group");
-									e.printStackTrace();
+									JOptionPane.showMessageDialog(null,
+											"Select a group");
+									// e.printStackTrace();
 								}
 							}
 						});
@@ -231,7 +233,7 @@ public class GUI {
 		if (connectButton.getText().equals("Connect")) {
 			if (userNameTextField.getText().length() < 1) {
 				JOptionPane
-				.showMessageDialog(frame, "You need to type a name.");
+						.showMessageDialog(frame, "You need to type a name.");
 				return;
 			} else {
 				userName = userNameTextField.getText();
@@ -239,7 +241,8 @@ public class GUI {
 			}
 
 			if (portNrField.getText().length() < 1) {
-				JOptionPane.showMessageDialog(frame, "You need to type a port.");
+				JOptionPane
+						.showMessageDialog(frame, "You need to type a port.");
 				return;
 			} else {
 				portNr = Integer.parseInt(portNrField.getText());
@@ -258,26 +261,27 @@ public class GUI {
 				listOfMembers.clear();
 
 				Iterator it = groupMap.entrySet().iterator();
-			    while (it.hasNext()) {
-			        Map.Entry pair = (Map.Entry)it.next();
-			        listOfGroups.add(pair.getKey().toString());
-			        listOfMembers.add(pair.getValue().toString());
-			        System.out.println(pair.getKey() + " = " + pair.getValue());
-			        it.remove();
-			    }
+				while (it.hasNext()) {
+					Map.Entry pair = (Map.Entry) it.next();
+					listOfGroups.add(pair.getKey().toString());
+					listOfMembers.add(pair.getValue().toString());
+					System.out.println(pair.getKey() + " = " + pair.getValue());
+					it.remove();
+				}
 
-			    groupList.clear();
+				groupList.clear();
 
-				for(int i = 0; i < listOfGroups.size(); i++) {
+				for (int i = 0; i < listOfGroups.size(); i++) {
 					groupList.add(i, listOfGroups.get(i));
 				}
 
 				System.out.println("Connected");
 
 			} catch (Exception ex) {
-//				ex.printStackTrace();
-				System.out.println("Error, could not connect.");
-				JOptionPane.showMessageDialog(frame, "Error, could not connect.");
+				// ex.printStackTrace();
+				// System.out.println("Error, could not connect.");
+				JOptionPane.showMessageDialog(frame,
+						"Error, could not connect.");
 
 			}
 		} else {
@@ -298,11 +302,9 @@ public class GUI {
 	public static void writeMsg(String message) {
 		if (!userName.equals(""))
 			chatArea.append(userName + ": " + message + "\n");
-		else chatArea.append(message + "\n");
-	}
-
-	public int getClientID() {
-		return clientID;
+		else {
+			chatArea.append(message + "\n");
+		}
 	}
 
 	public void setClientID(int clientID) {

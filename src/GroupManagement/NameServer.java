@@ -64,12 +64,7 @@ public class NameServer extends RemoteServer implements NameServerInterface {
 			tempList.add("User 6");
 			groupInfo.put("Group 2", tempList);
 		}
-
-		System.out.println("Group 1: " + groupInfo.get("Group 1"));
-		System.out.println("Group 2: " + groupInfo.get("Group 2"));
-
 	}
-
 
 	@Override
 	public void updateGroupLeaderInfo(String Groupname) throws RemoteException {
@@ -83,20 +78,17 @@ public class NameServer extends RemoteServer implements NameServerInterface {
 		String hostAddress = getClientHost();
 		hostAddress = hostAddress.concat("*" + clientID);
 
-
-
 		this.ClientInfo.put(userName, hostAddress);
 		System.out.println("Connected: " + ClientInfo.get(userName));
 		return clientID;
 	}
-
 
 	public boolean createGroup(String groupName, String userName)
 			throws RemoteException, ServerNotActiveException {
 
 		ArrayList<String> tempList = new ArrayList<String>();
 
-		if(!groupInfo.containsKey(groupName)) {
+		if (!groupInfo.containsKey(groupName)) {
 			tempList.add(userName);
 			groupInfo.put(groupName, tempList);
 
@@ -118,7 +110,7 @@ public class NameServer extends RemoteServer implements NameServerInterface {
 				System.out.println("The user name existed");
 				return;
 			}
-		clientList.add(userName);
+			clientList.add(userName);
 		}
 	}
 
@@ -126,9 +118,8 @@ public class NameServer extends RemoteServer implements NameServerInterface {
 			throws RemoteException {
 		ArrayList<String> clientList = getMemberInGroup(groupName);
 		clientList.remove(userName);
-		this.groupInfo.put(groupName,clientList);
+		this.groupInfo.put(groupName, clientList);
 	}
-
 
 	public HashMap<String, ArrayList<String>> getGroupsInfo() {
 

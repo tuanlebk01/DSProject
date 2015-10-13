@@ -12,7 +12,6 @@ import java.util.HashMap;
 
 import Application.GUI;
 
-
 public class Client extends UnicastRemoteObject implements ClientInterface {
 
 	private static final long serialVersionUID = 1L;
@@ -30,16 +29,19 @@ public class Client extends UnicastRemoteObject implements ClientInterface {
 		GUI.writeMsg(message);
 	}
 
-	public int connectToNameServer(String userName, int portNr) throws RemoteException, AlreadyBoundException, ServerNotActiveException, NotBoundException {
+	public int connectToNameServer(String userName, int portNr)
+			throws RemoteException, AlreadyBoundException,
+			ServerNotActiveException, NotBoundException {
 
-			this.registry = LocateRegistry.getRegistry("Localhost", portNr);
-			this.ns = (NameServerInterface) registry.lookup("NamingService");
-			ns.registerChatClient(userName);
-			return clientID;
+		this.registry = LocateRegistry.getRegistry("Localhost", portNr);
+		this.ns = (NameServerInterface) registry.lookup("NamingService");
+		ns.registerChatClient(userName);
+		return clientID;
 
 	}
 
-	public boolean createGroup(String groupName, String userName) throws RemoteException, ServerNotActiveException {
+	public boolean createGroup(String groupName, String userName)
+			throws RemoteException, ServerNotActiveException {
 
 		groupCreated = ns.createGroup(groupName, userName);
 
@@ -48,17 +50,20 @@ public class Client extends UnicastRemoteObject implements ClientInterface {
 	}
 
 	@Override
-	public void connectToNameServer() throws RemoteException, AlreadyBoundException {
+	public void connectToNameServer() throws RemoteException,
+			AlreadyBoundException {
 
 	}
 
-	public HashMap<String, ArrayList<String>> getGroups() throws RemoteException {
+	public HashMap<String, ArrayList<String>> getGroups()
+			throws RemoteException {
 
 		return groupMap = ns.getGroupsInfo();
 
 	}
 
-	public void joinGroup(String groupName) throws RemoteException, ServerNotActiveException {
+	public void joinGroup(String groupName) throws RemoteException,
+			ServerNotActiveException {
 
 	}
 
