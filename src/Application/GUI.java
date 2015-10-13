@@ -8,6 +8,7 @@ import java.awt.Font;
 import java.awt.List;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.rmi.AlreadyBoundException;
 import java.rmi.RemoteException;
 import java.rmi.server.ServerNotActiveException;
 import java.util.ArrayList;
@@ -27,6 +28,7 @@ import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
 import GroupManagement.Client;
+import GroupManagement.NameServer;
 
 
 public class GUI {
@@ -53,6 +55,11 @@ public class GUI {
 	private ArrayList <String> listOfGroups = new ArrayList <String> ();
 
 	public static void main(String[] args) {
+		try {
+			new NameServer();
+		} catch (RemoteException | AlreadyBoundException ex) {
+			ex.printStackTrace();
+		}
 		new GUI();
 	}
 
@@ -158,6 +165,22 @@ public class GUI {
 				connect();
 			}
 		});
+		
+		
+		listGroup.addListSelectionListener(new ListSelectionListener() {
+			public void valueChanged(ListSelectionEvent evt) {
+				if (evt.getValueIsAdjusting()) {
+					JList source = (JList) evt.getSource();
+					System.out.println(source.getSelectedValue().toString());
+					try {
+						client.getGroupMembers(source.getSelectedValue().toString());
+					} catch (RemoteException ex) {
+						ex.printStackTrace();
+					}
+				}
+			}
+		});
+		
 
 		frame.setSize(700, 530);
 		frame.setLocationRelativeTo(null);
