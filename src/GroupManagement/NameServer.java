@@ -95,26 +95,16 @@ public class NameServer extends RemoteServer implements NameServerInterface {
 		return false;
 	}
 
-	public void addMember(String groupName, String userName)
+	public ArrayList<String> addMember(String groupName, String userName)
 			throws RemoteException {
 
 		ArrayList<String> tempList = groupInfo.get(groupName);
 
-		tempList.add("abc");
-
-		if (tempList.contains("abc")) {
-			System.out.println("#sadjsaidsajid");
+		if (!(tempList.contains(userName))) {
+			tempList.add(userName);
+			groupInfo.put(groupName, tempList);
 		}
-
-//		for(int i = 0; i < tempList.size(); i++) {
-//			if(tempList.get(i). {
-//
-//			}
-//		}
-//			tempList.add(userName);
-//
-//		groupInfo.put(groupName, value)
-
+		return tempList;
 	}
 
 	public void removeMember(String groupName, String userName)

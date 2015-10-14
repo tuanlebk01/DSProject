@@ -14,7 +14,7 @@ public interface NameServerInterface extends Remote, Serializable {
 	public boolean createGroup(String goupName, String client)
 			throws RemoteException, ServerNotActiveException;
 
-	public void addMember(String groupName, String userName)
+	public ArrayList<String> addMember(String groupName, String userName)
 			throws RemoteException;
 
 	public void removeMember(String groupName, String userName)

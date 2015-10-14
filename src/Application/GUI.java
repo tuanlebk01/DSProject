@@ -231,6 +231,7 @@ public class GUI {
 						for (int i = 0; i < listOfMembers.size(); i++) {
 							userList.add(i, listOfMembers.get(i));
 						}
+
 						fancyPrinting2 = true;
 						if (fancyPrinting2 && fancyPrinting1) {
 							joinGroupButton
@@ -244,11 +245,22 @@ public class GUI {
 												String leader = leaders.get(group);
 												leaderOfMyGroup = client.joinGroup(group, leader);
 												myGroupName = group;
-//System.out.println("1");
+
+												System.out
+														.println("asd");
 												client.connectToGroupLeader(leader);
-//												connectUserToGroup(myGroupName, userName);
-//												client.getUsersInGroup(group);
-//												client.getUsersIPs(group);
+												System.out
+												.println("22222");
+												listOfMembers = client.getClients();
+
+												for(int i = 0; i < listOfMembers.size(); i++) {
+													System.out
+															.println(listOfMembers.get(i));
+												}
+
+												for (int i = 0; i < listOfMembers.size(); i++) {
+													userList.add(i, listOfMembers.get(i));
+												}
 
 											} catch (RemoteException
 													| ServerNotActiveException | AlreadyBoundException | NotBoundException e) {

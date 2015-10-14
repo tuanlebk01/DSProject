@@ -20,6 +20,7 @@ public class Client implements ClientInterface {
 	private ClientInterface ci;
 	private HashMap<String, ArrayList<String>> groupsInfo = new HashMap<String, ArrayList<String>>();
 	private HashMap<String, String> leaders = new HashMap<String, String>();
+	private ArrayList<String> clients = new ArrayList<String>();
 	private int clientID;
 	private String myUserName;
 	private String myGroup;
@@ -67,14 +68,23 @@ public class Client implements ClientInterface {
 	public void connectToGroupLeader(String groupLeader) throws RemoteException, AlreadyBoundException, NotBoundException {
 
 		this.registry = LocateRegistry.getRegistry("localhost", 1234);
-		this.ci = (ClientInterface) registry.lookup("groupLeader");
+		this.ci = (ClientInterface) registry.lookup(groupLeader);
 		System.out.println("connected to groupleader: " + groupLeader);
 		ci.addMemberToGroup(myUserName);
 	}
 
-	public void addMemberToGroup(String userName) throws RemoteException {
+	public ArrayList<String> getClients() {
+		return clients;
+	}
 
-		ns.addMember(myGroup, userName);
+	public ArrayList<String> addMemberToGroup(String userName) throws RemoteException {
+
+		clients = ns.addMember(myGroup, userName);
+		for(int i = 0; i < clients.size(); i++) {
+			System.out
+					.println("in client: " + clients.get(i));
+		}
+		return clients;
 
 	}
 
