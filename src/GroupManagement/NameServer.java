@@ -17,8 +17,8 @@ public class NameServer extends RemoteServer implements NameServerInterface {
 	private static String Name = "NamingService";
 
 	private HashMap<String, String> LeaderInfo = new HashMap<String, String>();
-	private HashMap<String, ArrayList<String>> groupInfo = new HashMap<String, ArrayList<String>>();
 	private HashMap<String, String> ClientInfo = new HashMap<String, String>();
+	private HashMap<String, ArrayList<String>> groupInfo = new HashMap<String, ArrayList<String>>();
 	private int clientID = 0;
 
 	public static void main(String args[]) {
@@ -39,7 +39,7 @@ public class NameServer extends RemoteServer implements NameServerInterface {
 
 	private void bind() throws RemoteException, AlreadyBoundException {
 
-		int port = 1111;
+		int port = 1115;
 		this.nameServer = (NameServerInterface) UnicastRemoteObject
 				.exportObject(this, 0);
 		Registry registry = LocateRegistry.createRegistry(port);
@@ -66,10 +66,6 @@ public class NameServer extends RemoteServer implements NameServerInterface {
 		}
 	}
 
-	@Override
-	public void updateGroupLeaderInfo(String Groupname) throws RemoteException {
-
-	}
 
 	public int registerChatClient(String userName) throws RemoteException,
 			ServerNotActiveException {
@@ -95,11 +91,6 @@ public class NameServer extends RemoteServer implements NameServerInterface {
 			return true;
 		}
 		return false;
-	}
-
-	public void deleteGroup(String groupName) throws RemoteException {
-		this.LeaderInfo.remove(groupName);
-		this.groupInfo.remove(groupName);
 	}
 
 	public void addMember(String groupName, String userName)
@@ -132,4 +123,16 @@ public class NameServer extends RemoteServer implements NameServerInterface {
 		// TODO Auto-generated method stub
 		return null;
 	}
+
+	public void deleteGroup(String groupName) throws RemoteException {
+
+//		If group is empty, remove
+
+	}
+
+	@Override
+	public void updateGroupLeaderInfo(String Groupname) throws RemoteException {
+
+	}
+
 }

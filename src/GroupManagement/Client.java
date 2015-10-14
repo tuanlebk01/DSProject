@@ -46,7 +46,7 @@ public class Client extends UnicastRemoteObject implements ClientInterface {
 
 		this.registry = LocateRegistry.getRegistry("localhost", 1112);
 		System.out.println("1");
-		this.client = (ClientInterface) registry.lookup("userName");
+		this.client = (ClientInterface) registry.lookup("Clientlookup");
 		System.out.println("2");
 
 		groupCreated = ns.createGroup(groupName, userName);
