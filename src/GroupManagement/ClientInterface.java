@@ -15,16 +15,22 @@ public interface ClientInterface extends Remote {
 			throws RemoteException, AlreadyBoundException,
 			ServerNotActiveException, NotBoundException;
 
-	public void connectToNameServer() throws RemoteException,
-			AlreadyBoundException;
-
 	public boolean createGroup(String groupName, String userName)
-			throws RemoteException, ServerNotActiveException, NotBoundException;
+			throws RemoteException, ServerNotActiveException,
+			NotBoundException, AlreadyBoundException;
 
 	public HashMap<String, ArrayList<String>> getGroups()
 			throws RemoteException;
 
-	public void joinGroup(String groupName) throws RemoteException,
-			ServerNotActiveException;
+	public String joinGroup(String groupName, String leaderName)
+			throws RemoteException, ServerNotActiveException, AlreadyBoundException, NotBoundException;
+
+	public void getUsersInGroup(String group) throws RemoteException;
+
+	public void getUsersIPs(String group) throws RemoteException;
+
+	public void connectToGroupLeader(String groupLeader) throws RemoteException, AlreadyBoundException, NotBoundException;
+
+	public void addMemberToGroup(String user) throws RemoteException;
 
 }

@@ -12,42 +12,51 @@ import java.util.HashMap;
 
 import Application.GUI;
 
-public class Client extends UnicastRemoteObject implements ClientInterface {
+public class Client implements ClientInterface {
 
 	private static final long serialVersionUID = 1L;
 	private Registry registry;
 	private NameServerInterface ns;
-	private ClientInterface client;
-	private HashMap<String, ArrayList<String>> groupMap = new HashMap<String, ArrayList<String>>();
+	private ClientInterface ci;
+	private HashMap<String, ArrayList<String>> groupsInfo = new HashMap<String, ArrayList<String>>();
+	private HashMap<String, String> leaders = new HashMap<String, String>();
 	private int clientID;
+	private String myUserName;
+	private String myGroup;
+	private String myLeader;
 	private boolean groupCreated;
 
 	public Client() throws RemoteException {
 		super();
 	}
 
-	public void retrieveMessage(String message) throws RemoteException {
-		GUI.writeMsg(message);
-	}
-
 	public int connectToNameServer(String userName, int portNr)
 			throws RemoteException, AlreadyBoundException,
 			ServerNotActiveException, NotBoundException {
 
+		this.myUserName = userName;
+
 		this.registry = LocateRegistry.getRegistry("localhost", portNr);
 		this.ns = (NameServerInterface) registry.lookup("NamingService");
-		ns.registerChatClient(userName);
+		clientID = ns.registerChatClient(userName);
 		return clientID;
 
 	}
 
 	public boolean createGroup(String groupName, String userName)
-			throws RemoteException, ServerNotActiveException, NotBoundException {
+			throws RemoteException, ServerNotActiveException,
+			NotBoundException, AlreadyBoundException {
 
-		this.registry = LocateRegistry.getRegistry("localhost", 1112);
-		System.out.println("1");
-		this.client = (ClientInterface) registry.lookup("Clientlookup");
-		System.out.println("2");
+		this.myGroup = groupName;
+		this.myLeader = userName;
+
+		this.ci = (ClientInterface) UnicastRemoteObject.exportObject(this, 0);
+		Registry registry2 = LocateRegistry.createRegistry(1234);
+		registry2.bind(userName, ci);
+		System.out.println("Groupleader running on port " + "1234");
+
+		this.registry = LocateRegistry.getRegistry("localhost", 1234);
+		this.ci = (ClientInterface) registry.lookup(userName);
 
 		groupCreated = ns.createGroup(groupName, userName);
 
@@ -55,26 +64,59 @@ public class Client extends UnicastRemoteObject implements ClientInterface {
 
 	}
 
-	@Override
-	public void connectToNameServer() throws RemoteException,
-			AlreadyBoundException {
+	public void connectToGroupLeader(String groupLeader) throws RemoteException, AlreadyBoundException, NotBoundException {
+
+		this.registry = LocateRegistry.getRegistry("localhost", 1234);
+		this.ci = (ClientInterface) registry.lookup("groupLeader");
+		System.out.println("connected to groupleader: " + groupLeader);
+		ci.addMemberToGroup(myUserName);
+	}
+
+	public void addMemberToGroup(String userName) throws RemoteException {
+
+		ns.addMember(myGroup, userName);
 
 	}
 
 	public HashMap<String, ArrayList<String>> getGroups()
 			throws RemoteException {
 
-		return groupMap = ns.getGroupsInfo();
+		return groupsInfo = ns.getGroupsInfo();
 
 	}
 
-	public void joinGroup(String groupName) throws RemoteException,
-			ServerNotActiveException {
+	public HashMap<String, String> getGroupLeaders() throws RemoteException {
 
+		return leaders = ns.getGroupLeaders();
+
+	}
+
+	public String joinGroup(String groupName, String leaderName)
+			throws RemoteException, ServerNotActiveException, AlreadyBoundException, NotBoundException {
+
+		this.myGroup = groupName;
+		this.myLeader = leaderName;
+		System.out.println("Group: " + myGroup);
+		System.out.println("Leader: " + myLeader);
+		connectToGroupLeader(myLeader);
+		return myLeader;
+
+	}
+
+	public void retrieveMessage(String message) throws RemoteException {
+		GUI.writeMsg(message);
 	}
 
 	public void broadcastMessage() {
 
 	}
 
+	public void getUsersInGroup(String group) throws RemoteException {
+
+	}
+
+	public void getUsersIPs(String group) throws RemoteException {
+		// TODO Auto-generated method stub
+
+	}
 }
