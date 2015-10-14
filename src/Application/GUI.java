@@ -5,6 +5,7 @@ import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.rmi.AlreadyBoundException;
+import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import java.rmi.server.ServerNotActiveException;
 import java.util.ArrayList;
@@ -54,6 +55,7 @@ public class GUI {
 	private HashMap<String, ArrayList<String>> groupMap = new HashMap<String, ArrayList<String>>();
 	private int clientID;
 	private boolean groupCreated;
+	private boolean isLeader;
 
 	public static void main(String[] args) {
 		try {
@@ -173,12 +175,14 @@ public class GUI {
 							JOptionPane.showMessageDialog(null,
 									"Group created with name: " + input);
 
+							isLeader = true;
+
 						} else {
 							JOptionPane.showMessageDialog(null,
 									"Group not created");
 						}
 
-					} catch (RemoteException | ServerNotActiveException e) {
+					} catch (RemoteException | ServerNotActiveException | NotBoundException e) {
 						JOptionPane
 								.showMessageDialog(null, "Group not created");
 						e.printStackTrace();
