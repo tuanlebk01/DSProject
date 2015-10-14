@@ -7,21 +7,21 @@ package Communication;
 public class TextMessage {
 
     private int seqNr;
-    private String textMessage;
+    private String message;
     private String senderUserName;
 
 
-    public  TextMessage(int seqNr, String textMessage, String senderUserName){
+    public  TextMessage(int seqNr, String message, String senderUserName){
         this.seqNr = seqNr;
-        this.textMessage = textMessage;
+        this.message = message;
         this.senderUserName = senderUserName;
     }
     public int getSeqNr(){
         return seqNr;
     }
 
-    public String getTextMessage(){
-        return textMessage;
+    public String getMessage(){
+        return message;
     }
 
     public String getSenderUserName() {
