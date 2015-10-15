@@ -15,7 +15,7 @@ public class CommunicationModule {
     private int clientID;
     private HashMap<String, ArrayList<String>> groupsInfo;
     private HashMap <Integer, ArrayList<TextMessage>> clientBuffers;
-    private Map<Integer, ClientInterface> clientInterfaces;
+    private HashMap<Integer, ClientInterface> clientInterfaces;
     private HashMap <Integer, Integer> lastAcceptedSeqNr;
 
 
@@ -25,7 +25,6 @@ public class CommunicationModule {
         this.groupsInfo = groupsInfo;
         this.clientID = clientID;
 
-        
     }
 
     public void updateGroupsInfo(HashMap<String, ArrayList<String>> groupsInfo){
@@ -83,6 +82,7 @@ public class CommunicationModule {
         }
     }
 
-
-
+    public void setClientInterface(HashMap<Integer, ClientInterface> clientInterfaces){
+        this.clientInterfaces = clientInterfaces;
+    }
 }
