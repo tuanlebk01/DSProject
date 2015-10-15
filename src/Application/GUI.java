@@ -56,8 +56,6 @@ public class GUI {
 	private ArrayList<String> listOfMembers = new ArrayList<String>();
 	private HashMap<String, ArrayList<String>> mapOfGroups = new HashMap<String, ArrayList<String>>();
 	private HashMap<String, String> leaders = new HashMap<String, String>();
-	private HashMap<String, Integer> userIDs = new HashMap<String, Integer>();
-	private HashMap<String, InetAddress> userIPs = new HashMap<String, InetAddress>();
 	private int clientID;
 	private boolean groupCreated;
 	private boolean isLeader = false;
@@ -162,7 +160,7 @@ public class GUI {
 
 		connectButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent a) {
-				connect();
+				connect(connectButton.getText());
 			}
 		});
 
@@ -183,7 +181,6 @@ public class GUI {
 
 						listOfMembers.clear();
 						listOfMembers = mapOfGroups.get(source.getSelectedValue().toString());
-						System.out.println("size1: " + listOfMembers.size());
 						userList.clear();
 
 						for (int i = 0; i < listOfMembers.size(); i++) {
@@ -205,19 +202,22 @@ public class GUI {
 
 											groupJoined = client.isGroupJoined();
 
-											if(!groupJoined) {
-												JOptionPane.showMessageDialog(
-														null, "Failed to join group, Username exists");
-											}
-											listOfMembers = client.getGroupList(myGroupName);
+											if(groupJoined) {
+												listOfMembers = client.getGroupList(myGroupName);
 
-											userList.clear();
-											for (int i = 0; i < listOfMembers.size(); i++) {
-												userList.add(i,listOfMembers.get(i));
-											}
+												userList.clear();
+												for (int i = 0; i < listOfMembers.size(); i++) {
+													userList.add(i,listOfMembers.get(i));
+												}
 
-											JOptionPane.showMessageDialog(null,
-													"Joined group: " + myGroupName);
+												JOptionPane.showMessageDialog(null,
+														"Joined group: " + myGroupName);
+											} else {
+
+											JOptionPane.showMessageDialog(
+													null, "Failed to join group, Username exists");
+
+											}
 
 									} catch (RemoteException
 											| ServerNotActiveException
@@ -301,7 +301,7 @@ public class GUI {
 		});
 	}
 
-	public void connect() {
+	public void connect(String connect) {
 
 		if (connectButton.getText().equals("Connect")) {
 			if (userNameTextField.getText().length() < 1) {
@@ -326,7 +326,6 @@ public class GUI {
 				client = new Client();
 				connectButton.setText("Disconnect");
 				clientID = client.connectToNameServer(userName, portNr);
-
 				mapOfGroups = client.getGroups();
 
 				listOfGroups.clear();
@@ -358,6 +357,14 @@ public class GUI {
 
 			}
 		} else {
+			try {
+				client.disconnect(myGroupName, userName);
+			} catch (RemoteException e) {
+				e.printStackTrace();
+			}
+			chatArea.setText("");
+			userList.clear();
+			groupList.clear();
 			connectButton.setText("Connect");
 		}
 	}

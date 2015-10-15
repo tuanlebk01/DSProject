@@ -75,7 +75,7 @@ public class NameServer extends RemoteServer implements NameServerInterface {
 		String hostAddress = getClientHost();
 		hostAddress = hostAddress.concat("*" + clientID);
 
-		this.ClientInfo.put(userName, hostAddress);
+		ClientInfo.put(userName, hostAddress);
 		System.out.println("NS: Connected: " + ClientInfo.get(userName));
 		return clientID;
 	}
@@ -108,11 +108,15 @@ public class NameServer extends RemoteServer implements NameServerInterface {
 		return false;
 	}
 
-	public void removeMember(String groupName, String userName)
+	public void removeMemberFromGroup(String groupName, String userName)
 			throws RemoteException {
-		ArrayList<String> clientList = getMemberInGroup(groupName);
+
+		ArrayList<String> clientList = groupInfo.get(groupName);
+
 		clientList.remove(userName);
-		this.groupInfo.put(groupName, clientList);
+		groupInfo.put(groupName, clientList);
+
+		System.out.println("NS: User: " + userName + " left group: " + groupName);
 	}
 
 	public HashMap<String, ArrayList<String>> getGroupsInfo() {
@@ -123,6 +127,19 @@ public class NameServer extends RemoteServer implements NameServerInterface {
 	public HashMap<String, String> getGroupLeaders() {
 
 		return leaderInfo;
+	}
+
+	public void leaveServer(String userName) throws RemoteException {
+
+		System.out.println(groupInfo.keySet().isEmpty());
+
+		if(groupInfo.keySet().isEmpty()) {
+			System.out.println("NS: The following user left the server: " + userName + " and group: " + "ASD" + " was removed");
+			groupInfo.remove(ClientInfo);
+
+		} else {
+		System.out.println("NS: The following user left the server: " + userName);
+		}
 	}
 
 	@Override

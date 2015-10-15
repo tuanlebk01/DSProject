@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 public interface ClientInterface extends Remote {
+
 	public void retrieveMessage(String message) throws RemoteException;
 
 	public int connectToNameServer(String userName, int portNr)
@@ -34,5 +35,9 @@ public interface ClientInterface extends Remote {
 	public boolean addMemberToGroup(String user) throws RemoteException;
 
 	public ArrayList<String> getGroupList(String myGroup) throws RemoteException;
+
+	public void disconnect(String groupName, String userName) throws RemoteException;
+
+	public void removeFromGroup(String groupName, String userName) throws RemoteException;
 
 }

@@ -17,7 +17,7 @@ public interface NameServerInterface extends Remote, Serializable {
 	public boolean addMember(String groupName, String userName)
 			throws RemoteException;
 
-	public void removeMember(String groupName, String userName)
+	public void removeMemberFromGroup(String groupName, String userName)
 			throws RemoteException;
 
 	public void updateGroupLeaderInfo(String Groupname) throws RemoteException;
@@ -29,5 +29,7 @@ public interface NameServerInterface extends Remote, Serializable {
 			throws RemoteException;
 
 	public HashMap<String, String> getGroupLeaders() throws RemoteException;
+
+	public void leaveServer(String userName) throws RemoteException;
 
 }

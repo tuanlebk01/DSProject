@@ -52,13 +52,13 @@ public class Client implements ClientInterface {
 		this.myGroup = groupName;
 		this.myLeader = userName;
 
-		this.ci = (ClientInterface) UnicastRemoteObject.exportObject(this, 0);
-		Registry registry2 = LocateRegistry.createRegistry(1234);
-		registry2.bind(userName, ci);
-		System.out.println("CLIENT: Groupleader running on port " + "1234");
+		ci = (ClientInterface) UnicastRemoteObject.exportObject(this, 0);
+		registry = LocateRegistry.createRegistry(1234);
+		registry.bind(userName, ci);
+		System.out.println("CLIENT: Groupleader: " + userName + " running on port " + "1234");
 
-		this.registry = LocateRegistry.getRegistry("localhost", 1234);
-		this.ci = (ClientInterface) registry.lookup(userName);
+		registry = LocateRegistry.getRegistry("localhost", 1234);
+		ci = (ClientInterface) registry.lookup(userName);
 
 		groupCreated = ns.createGroup(groupName, userName);
 
@@ -68,10 +68,9 @@ public class Client implements ClientInterface {
 
 	public boolean connectToGroupLeader(String groupLeader) throws RemoteException, AlreadyBoundException, NotBoundException {
 
-		this.registry = LocateRegistry.getRegistry("Bellatrix.cs.umu.se", 1234);
-		this.ci = (ClientInterface) registry.lookup(groupLeader);
-		System.out.println("CLIENT: connected to groupleader: " + groupLeader);
-		System.out.println("client: my userName: " + myUserName);
+		registry = LocateRegistry.getRegistry("Bellatrix.cs.umu.se", 1234);
+		ci = (ClientInterface) registry.lookup(groupLeader);
+		System.out.println("CLIENT: connected to groupleader: " + groupLeader + " : with username: " + myUserName);
 		return groupJoined = ci.addMemberToGroup(myUserName);
 	}
 
@@ -132,5 +131,22 @@ public class Client implements ClientInterface {
 
 	public boolean isGroupJoined() {
 		return groupJoined;
+	}
+
+	public void disconnect(String groupName, String userName) throws RemoteException {
+
+			if(groupName == null) {
+				ns.leaveServer(userName);
+			} else if(userName.equals(myLeader)) {
+				System.out.println("leader leaving its own group");
+				ns.leaveServer(userName);
+				// new leader or disbannish group
+			} else {
+				ci.removeFromGroup(groupName, userName);
+			}
+	}
+
+	public void removeFromGroup(String groupName, String userName) throws RemoteException {
+		ns.removeMemberFromGroup(groupName, userName);
 	}
 }
