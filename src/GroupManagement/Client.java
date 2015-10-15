@@ -37,7 +37,7 @@ public class Client implements ClientInterface {
 
 		this.myUserName = userName;
 
-		this.registry = LocateRegistry.getRegistry("localhost", portNr);
+		this.registry = LocateRegistry.getRegistry("Bellatrix.cs.umu.se", portNr);
 		this.ns = (NameServerInterface) registry.lookup("NamingService");
 		clientID = ns.registerChatClient(userName);
 		return clientID;
@@ -54,7 +54,7 @@ public class Client implements ClientInterface {
 		this.ci = (ClientInterface) UnicastRemoteObject.exportObject(this, 0);
 		Registry registry2 = LocateRegistry.createRegistry(1234);
 		registry2.bind(userName, ci);
-		System.out.println("Groupleader running on port " + "1234");
+		System.out.println("CLIENT: Groupleader running on port " + "1234");
 
 		this.registry = LocateRegistry.getRegistry("localhost", 1234);
 		this.ci = (ClientInterface) registry.lookup(userName);
@@ -67,9 +67,9 @@ public class Client implements ClientInterface {
 
 	public void connectToGroupLeader(String groupLeader) throws RemoteException, AlreadyBoundException, NotBoundException {
 
-		this.registry = LocateRegistry.getRegistry("localhost", 1234);
+		this.registry = LocateRegistry.getRegistry("Bellatrix.cs.umu.se", 1234);
 		this.ci = (ClientInterface) registry.lookup(groupLeader);
-		System.out.println("connected to groupleader: " + groupLeader);
+		System.out.println("CLIENT: connected to groupleader: " + groupLeader);
 		ci.addMemberToGroup(myUserName);
 	}
 
@@ -80,10 +80,6 @@ public class Client implements ClientInterface {
 	public ArrayList<String> addMemberToGroup(String userName) throws RemoteException {
 
 		clients = ns.addMember(myGroup, userName);
-		for(int i = 0; i < clients.size(); i++) {
-			System.out
-					.println("in client: " + clients.get(i));
-		}
 		return clients;
 
 	}
@@ -106,8 +102,7 @@ public class Client implements ClientInterface {
 
 		this.myGroup = groupName;
 		this.myLeader = leaderName;
-		System.out.println("Group: " + myGroup);
-		System.out.println("Leader: " + myLeader);
+		System.out.println("CLIENT: Group: " + myGroup + " : Leader: " + myLeader);
 		connectToGroupLeader(myLeader);
 		return myLeader;
 

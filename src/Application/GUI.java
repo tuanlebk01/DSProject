@@ -23,6 +23,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
+import javax.swing.SwingUtilities;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
@@ -53,7 +54,7 @@ public class GUI {
 	private static int portNr;
 	private ArrayList<String> listOfGroups = new ArrayList<String>();
 	private ArrayList<String> listOfMembers = new ArrayList<String>();
-	private HashMap<String, ArrayList<String>> groupMap = new HashMap<String, ArrayList<String>>();
+	private HashMap<String, ArrayList<String>> mapOfGroups = new HashMap<String, ArrayList<String>>();
 	private HashMap<String, String> leaders = new HashMap<String, String>();
 	private HashMap<String, Integer> userIDs = new HashMap<String, Integer>();
 	private HashMap<String, InetAddress> userIPs = new HashMap<String, InetAddress>();
@@ -68,9 +69,13 @@ public class GUI {
 		try {
 			new NameServer();
 		} catch (RemoteException | AlreadyBoundException ex) {
-			System.out.println("NameServer already running");
+			System.out.println("GUI: NameServer already running");
 		}
-		new GUI();
+		SwingUtilities.invokeLater(new Runnable() {
+		    public void run() {
+		    	new GUI();
+	        }
+	 	});
 	}
 
 	public GUI() {
@@ -145,6 +150,88 @@ public class GUI {
 		frame.add(new JScrollPane(msgField), BorderLayout.CENTER);
 		frame.getContentPane().add(msgField);
 
+		createGroup();
+		joinGroup();
+
+		sendButton.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent a) {
+				sendMessage();
+			}
+		});
+
+		connectButton.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent a) {
+				connect();
+			}
+		});
+
+		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		frame.setSize(700, 530);
+		frame.setLocationRelativeTo(null);
+		frame.setVisible(true);
+	}
+
+	private void joinGroup() {
+		listGroup.addListSelectionListener(new ListSelectionListener() {
+			public void valueChanged(ListSelectionEvent evt) {
+				boolean fancyPrinting2;
+				if (evt.getValueIsAdjusting()) {
+					final JList source = (JList) evt.getSource();
+					try {
+						mapOfGroups = client.getGroups();
+
+						listOfMembers.clear();
+						listOfMembers = mapOfGroups.get(source.getSelectedValue().toString());
+
+						userList.clear();
+
+						for (int i = 0; i < listOfMembers.size(); i++) {
+							userList.add(i, listOfMembers.get(i));
+						}
+
+						fancyPrinting2 = true;
+						if (fancyPrinting2 && fancyPrinting1) {
+							joinGroupButton.addActionListener(new ActionListener() {
+								public void actionPerformed(ActionEvent a) {
+										try {
+
+										leaders = client.getGroupLeaders();
+										String group = source.getSelectedValue().toString();
+										String leader = leaders.get(group);
+										leaderOfMyGroup = client.joinGroup(group, leader);
+										myGroupName = group;
+										client.connectToGroupLeader(leader);
+										listOfMembers = client.getClients();
+
+										for (int i = 0; i < listOfMembers.size(); i++) {
+										userList.add(i,listOfMembers.get(i));
+										}
+
+										JOptionPane.showMessageDialog(null,
+												"Joined group: " + myGroupName);
+
+									} catch (RemoteException
+											| ServerNotActiveException
+											| AlreadyBoundException
+											| NotBoundException e) {
+											JOptionPane.showMessageDialog(
+											null, "Failed to join group, Exception error");
+											e.printStackTrace();
+										}
+									}
+								});
+							fancyPrinting2 = false;
+							fancyPrinting1 = false;
+						}
+					} catch (RemoteException ex) {
+						ex.printStackTrace();
+					}
+				}
+			}
+		});
+	}
+
+	private void createGroup() {
 		createNewGroupButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent a) {
 
@@ -154,21 +241,22 @@ public class GUI {
 				if (input != null && (input.length() > 1)) {
 
 					try {
-						System.out.println("creating group");
+						System.out.println("GUI: Creating group");
 
 						groupCreated = client.createGroup(input, userName);
 						if (groupCreated) {
 
-							groupMap = client.getGroups();
+							mapOfGroups = client.getGroups();
 
 							listOfGroups.clear();
 							listOfMembers.clear();
 
-							Iterator it = groupMap.entrySet().iterator();
+							Iterator it = mapOfGroups.entrySet().iterator();
 							while (it.hasNext()) {
 								Map.Entry pair = (Map.Entry) it.next();
 								listOfGroups.add(pair.getKey().toString());
 								listOfMembers.add(pair.getValue().toString());
+								System.out.println("GUI:");
 								System.out.println(pair.getKey() + " = "
 										+ pair.getValue());
 								it.remove();
@@ -187,104 +275,21 @@ public class GUI {
 
 						} else {
 							JOptionPane.showMessageDialog(null,
-									"Group not created");
+									"Group not created, Nameserver error");
 						}
 
 					} catch (RemoteException | ServerNotActiveException
 							| NotBoundException | AlreadyBoundException e) {
 						JOptionPane
-								.showMessageDialog(null, "Group not created");
+								.showMessageDialog(null, "Group not created, Exception error");
 						// e.printStackTrace();
 					}
 
 				} else {
-					JOptionPane.showMessageDialog(null, "Group not created");
+					JOptionPane.showMessageDialog(null, "Group not created, wrong input, no error");
 				}
 			}
 		});
-
-		sendButton.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent a) {
-				sendMessage();
-			}
-		});
-
-		connectButton.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent a) {
-				connect();
-			}
-		});
-		listGroup.addListSelectionListener(new ListSelectionListener() {
-			public void valueChanged(ListSelectionEvent evt) {
-				boolean fancyPrinting2;
-				if (evt.getValueIsAdjusting()) {
-					final JList source = (JList) evt.getSource();
-					try {
-						groupMap = client.getGroups();
-
-						listOfMembers.clear();
-						listOfMembers = groupMap.get(source.getSelectedValue()
-								.toString());
-
-						userList.clear();
-
-						for (int i = 0; i < listOfMembers.size(); i++) {
-							userList.add(i, listOfMembers.get(i));
-						}
-
-						fancyPrinting2 = true;
-						if (fancyPrinting2 && fancyPrinting1) {
-							joinGroupButton
-									.addActionListener(new ActionListener() {
-										public void actionPerformed(
-												ActionEvent a) {
-											try {
-
-												leaders = client.getGroupLeaders();
-												String group = source.getSelectedValue().toString();
-												String leader = leaders.get(group);
-												leaderOfMyGroup = client.joinGroup(group, leader);
-												myGroupName = group;
-
-												System.out
-														.println("asd");
-												client.connectToGroupLeader(leader);
-												System.out
-												.println("22222");
-												listOfMembers = client.getClients();
-
-												for(int i = 0; i < listOfMembers.size(); i++) {
-													System.out
-															.println(listOfMembers.get(i));
-												}
-
-												for (int i = 0; i < listOfMembers.size(); i++) {
-													userList.add(i, listOfMembers.get(i));
-												}
-
-											} catch (RemoteException
-													| ServerNotActiveException | AlreadyBoundException | NotBoundException e) {
-												JOptionPane.showMessageDialog(
-														null, "Select a group");
-												 e.printStackTrace();
-											}
-										}
-									});
-							fancyPrinting2 = false;
-							fancyPrinting1 = false;
-						}
-					} catch (RemoteException ex) {
-						ex.printStackTrace();
-					}
-
-				}
-			}
-		});
-
-		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		frame.setSize(700, 530);
-		frame.setLocationRelativeTo(null);
-		frame.setVisible(true);
 	}
 
 	public void connect() {
@@ -296,7 +301,7 @@ public class GUI {
 				return;
 			} else {
 				userName = userNameTextField.getText();
-				System.out.println("username: " + userName);
+				System.out.println("GUI: Username: " + userName);
 			}
 
 			if (portNrField.getText().length() < 1) {
@@ -313,16 +318,17 @@ public class GUI {
 				connectButton.setText("Disconnect");
 				clientID = client.connectToNameServer(userName, portNr);
 
-				groupMap = client.getGroups();
+				mapOfGroups = client.getGroups();
 
 				listOfGroups.clear();
 				listOfMembers.clear();
 
-				Iterator it = groupMap.entrySet().iterator();
+				Iterator it = mapOfGroups.entrySet().iterator();
 				while (it.hasNext()) {
 					Map.Entry pair = (Map.Entry) it.next();
 					listOfGroups.add(pair.getKey().toString());
 					listOfMembers.add(pair.getValue().toString());
+					System.out.println("GUI:");
 					System.out.println(pair.getKey() + " = " + pair.getValue());
 					it.remove();
 				}
@@ -333,7 +339,7 @@ public class GUI {
 					groupList.add(i, listOfGroups.get(i));
 				}
 
-				System.out.println("Connected");
+				System.out.println("GUI: Connected to nameserver");
 
 			} catch (Exception ex) {
 				// ex.printStackTrace();
