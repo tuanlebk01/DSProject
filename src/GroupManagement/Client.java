@@ -26,6 +26,7 @@ public class Client implements ClientInterface {
 	private String myGroup;
 	private String myLeader;
 	private boolean groupCreated;
+	private boolean groupJoined;
 
 	public Client() throws RemoteException {
 		super();
@@ -65,23 +66,27 @@ public class Client implements ClientInterface {
 
 	}
 
-	public void connectToGroupLeader(String groupLeader) throws RemoteException, AlreadyBoundException, NotBoundException {
+	public boolean connectToGroupLeader(String groupLeader) throws RemoteException, AlreadyBoundException, NotBoundException {
 
 		this.registry = LocateRegistry.getRegistry("Bellatrix.cs.umu.se", 1234);
 		this.ci = (ClientInterface) registry.lookup(groupLeader);
 		System.out.println("CLIENT: connected to groupleader: " + groupLeader);
-		ci.addMemberToGroup(myUserName);
+		System.out.println("client: my userName: " + myUserName);
+		return groupJoined = ci.addMemberToGroup(myUserName);
 	}
 
-	public ArrayList<String> getClients() {
-		return clients;
+	public boolean addMemberToGroup(String userName) throws RemoteException {
+
+		groupJoined = ns.addMember(myGroup, userName);
+		getGroupList(myGroup);
+		return groupJoined;
+
 	}
 
-	public ArrayList<String> addMemberToGroup(String userName) throws RemoteException {
-
-		clients = ns.addMember(myGroup, userName);
+	public ArrayList<String> getGroupList(String myGroup) throws RemoteException {
+		groupsInfo = getGroups();
+		clients = groupsInfo.get(myGroup);
 		return clients;
-
 	}
 
 	public HashMap<String, ArrayList<String>> getGroups()
@@ -123,5 +128,9 @@ public class Client implements ClientInterface {
 	public void getUsersIPs(String group) throws RemoteException {
 		// TODO Auto-generated method stub
 
+	}
+
+	public boolean isGroupJoined() {
+		return groupJoined;
 	}
 }

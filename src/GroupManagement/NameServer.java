@@ -95,7 +95,7 @@ public class NameServer extends RemoteServer implements NameServerInterface {
 		return false;
 	}
 
-	public ArrayList<String> addMember(String groupName, String userName)
+	public boolean addMember(String groupName, String userName)
 			throws RemoteException {
 
 		ArrayList<String> tempList = groupInfo.get(groupName);
@@ -103,8 +103,9 @@ public class NameServer extends RemoteServer implements NameServerInterface {
 		if (!(tempList.contains(userName))) {
 			tempList.add(userName);
 			groupInfo.put(groupName, tempList);
+			return true;
 		}
-		return tempList;
+		return false;
 	}
 
 	public void removeMember(String groupName, String userName)
