@@ -25,7 +25,7 @@ public class CommunicationModule {
         this.groupsInfo = groupsInfo;
         this.clientID = clientID;
 
-        
+
     }
 
     public void updateGroupsInfo(HashMap<String, ArrayList<String>> groupsInfo){
@@ -52,7 +52,7 @@ public class CommunicationModule {
             // Static call to client
             int acceptedSeqNr = lastAcceptedSeqNr.get(id);
             acceptedSeqNr++;
-            lastAcceptedSeqNr.replace(id, acceptedSeqNr-1, acceptedSeqNr);
+//            lastAcceptedSeqNr.replace(id, acceptedSeqNr-1, acceptedSeqNr);
 
         } else {
             ArrayList<TextMessage> buffer = clientBuffers.get(id);
@@ -67,21 +67,21 @@ public class CommunicationModule {
         }
     }
 
-    public void checkBuffer(ArrayList<TextMessage> buffer, int id){
-        int seqNr = lastAcceptedSeqNr.get(id);
-        for (int i=0; i<buffer.size(); i++){
-            if(buffer.get(i).getSeqNr() <= (seqNr+1)){
-                // Static call to client
-                int acceptedSeqNr = lastAcceptedSeqNr.get(buffer.get(i).getClientID());
-                acceptedSeqNr++;
-
-                lastAcceptedSeqNr.replace(buffer.get(i).getClientID(), acceptedSeqNr-1, acceptedSeqNr);
-                buffer.remove(i);
-            }else {
-
-            }
-        }
-    }
+//    public void checkBuffer(ArrayList<TextMessage> buffer, int id){
+//        int seqNr = lastAcceptedSeqNr.get(id);
+//        for (int i=0; i<buffer.size(); i++){
+//            if(buffer.get(i).getSeqNr() <= (seqNr+1)){
+//                // Static call to client
+//                int acceptedSeqNr = lastAcceptedSeqNr.get(buffer.get(i).getClientID());
+//                acceptedSeqNr++;
+//
+//                lastAcceptedSeqNr.replace(buffer.get(i).getClientID(), acceptedSeqNr-1, acceptedSeqNr);
+//                buffer.remove(i);
+//            }else {
+//
+//            }
+//        }
+//    }
 
 
 

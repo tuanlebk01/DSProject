@@ -15,9 +15,8 @@ public class NameServer extends RemoteServer implements NameServerInterface {
 	private static final long serialVersionUID = 1L;
 	private NameServerInterface nameServer;
 	private static String Name = "NamingService";
-
 	private HashMap<String, String> leaderInfo = new HashMap<String, String>();
-	private HashMap<String, String> ClientInfo = new HashMap<String, String>();
+	private HashMap<Integer, String> ClientInfo = new HashMap<Integer, String>();
 	private HashMap<String, ArrayList<String>> groupInfo = new HashMap<String, ArrayList<String>>();
 	private int clientID = 0;
 
@@ -72,10 +71,7 @@ public class NameServer extends RemoteServer implements NameServerInterface {
 			ServerNotActiveException {
 
 		clientID++;
-		String hostAddress = getClientHost();
-		hostAddress = hostAddress.concat("*" + clientID);
-
-		ClientInfo.put(userName, hostAddress);
+		ClientInfo.put(clientID, userName);
 		System.out.println("NS: Connected: " + ClientInfo.get(userName));
 		return clientID;
 	}
@@ -133,6 +129,8 @@ public class NameServer extends RemoteServer implements NameServerInterface {
 
 		System.out.println(groupInfo.keySet().isEmpty());
 
+		//LOOK AT THIS AND FIX IT SOMEHOW
+
 		if(groupInfo.keySet().isEmpty()) {
 			System.out.println("NS: The following user left the server: " + userName + " and group: " + "ASD" + " was removed");
 			groupInfo.remove(ClientInfo);
@@ -140,6 +138,10 @@ public class NameServer extends RemoteServer implements NameServerInterface {
 		} else {
 		System.out.println("NS: The following user left the server: " + userName);
 		}
+	}
+
+	public HashMap<Integer, String> getClientInfo() {
+		return ClientInfo;
 	}
 
 	@Override

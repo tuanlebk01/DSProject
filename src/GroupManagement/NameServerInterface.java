@@ -32,4 +32,6 @@ public interface NameServerInterface extends Remote, Serializable {
 
 	public void leaveServer(String userName) throws RemoteException;
 
+	public HashMap<Integer, String> getClientInfo() throws RemoteException;
+
 }

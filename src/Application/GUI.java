@@ -377,6 +377,7 @@ public class GUI {
 		String message = msgField.getText();
 		message = "[" + userNameTextField.getText() + "] " + message;
 		msgField.setText("");
+		client.broadcastMessage(message);
 	}
 
 	public static void writeMsg(String message) {

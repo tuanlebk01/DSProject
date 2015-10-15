@@ -9,8 +9,11 @@ import java.rmi.server.ServerNotActiveException;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
 
 import Application.GUI;
+import Communication.CommunicationModule;
 
 public class Client implements ClientInterface {
 
@@ -18,8 +21,11 @@ public class Client implements ClientInterface {
 	private Registry registry;
 	private NameServerInterface ns;
 	private ClientInterface ci;
+	private CommunicationModule cm;
 	private HashMap<String, ArrayList<String>> groupsInfo = new HashMap<String, ArrayList<String>>();
 	private HashMap<String, String> leaders = new HashMap<String, String>();
+	private HashMap<Integer, ClientInterface> clientInterfaces = new HashMap<Integer, ClientInterface>();
+	private HashMap<Integer, String> clientInfo = new HashMap<Integer, String>();
 	private ArrayList<String> clients = new ArrayList<String>();
 	private int clientID;
 	private String myUserName;
@@ -41,6 +47,7 @@ public class Client implements ClientInterface {
 		this.registry = LocateRegistry.getRegistry("Bellatrix.cs.umu.se", portNr);
 		this.ns = (NameServerInterface) registry.lookup("NamingService");
 		clientID = ns.registerChatClient(userName);
+
 		return clientID;
 
 	}
@@ -71,7 +78,8 @@ public class Client implements ClientInterface {
 		registry = LocateRegistry.getRegistry("Bellatrix.cs.umu.se", 1234);
 		ci = (ClientInterface) registry.lookup(groupLeader);
 		System.out.println("CLIENT: connected to groupleader: " + groupLeader + " : with username: " + myUserName);
-		return groupJoined = ci.addMemberToGroup(myUserName);
+		groupJoined = ci.addMemberToGroup(myUserName);
+		return groupJoined;
 	}
 
 	public boolean addMemberToGroup(String userName) throws RemoteException {
@@ -108,6 +116,29 @@ public class Client implements ClientInterface {
 		this.myLeader = leaderName;
 		System.out.println("CLIENT: Group: " + myGroup + " : Leader: " + myLeader);
 		connectToGroupLeader(myLeader);
+
+		System.out.println("CLIENT: nr of clients in list: " + clients.size());
+
+
+		clientInfo = ns.getClientInfo();
+		ArrayList<Integer> temp = new ArrayList<Integer>();
+
+		Iterator it = clientInfo.entrySet().iterator();
+		while (it.hasNext()) {
+			Map.Entry pair = (Map.Entry) it.next();
+			temp.add(Integer.parseInt(pair.getKey().toString()));
+			it.remove();
+		}
+
+
+
+		for (int i = 0; i < temp.size(); i++) {
+			System.out.println("ASDSA: " + temp.get(i));
+			//LOOK AT THIS AND FIX IT SOMEHOW
+			ci = (ClientInterface) UnicastRemoteObject.exportObject(this, 0);
+			clientInterfaces.put(temp.get(i), ci);
+		}
+
 		return myLeader;
 
 	}
@@ -116,7 +147,8 @@ public class Client implements ClientInterface {
 		GUI.writeMsg(message);
 	}
 
-	public void broadcastMessage() {
+	public void broadcastMessage(String message) {
+
 
 	}
 
