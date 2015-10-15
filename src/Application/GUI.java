@@ -63,7 +63,8 @@ public class GUI {
 	private boolean isLeader = false;
 	private String leaderOfMyGroup;
 	private String myGroupName;
-	boolean fancyPrinting1 = true;
+	private boolean fancyPrinting1 = true;
+	private boolean groupJoined;
 
 	public static void main(String[] args) {
 		try {
@@ -182,33 +183,41 @@ public class GUI {
 
 						listOfMembers.clear();
 						listOfMembers = mapOfGroups.get(source.getSelectedValue().toString());
-
+						System.out.println("size1: " + listOfMembers.size());
 						userList.clear();
 
 						for (int i = 0; i < listOfMembers.size(); i++) {
 							userList.add(i, listOfMembers.get(i));
 						}
-
 						fancyPrinting2 = true;
 						if (fancyPrinting2 && fancyPrinting1) {
 							joinGroupButton.addActionListener(new ActionListener() {
 								public void actionPerformed(ActionEvent a) {
 										try {
 
-										leaders = client.getGroupLeaders();
-										String group = source.getSelectedValue().toString();
-										String leader = leaders.get(group);
-										leaderOfMyGroup = client.joinGroup(group, leader);
-										myGroupName = group;
-										client.connectToGroupLeader(leader);
-										listOfMembers = client.getClients();
+											leaders = client.getGroupLeaders();
+											String group = source.getSelectedValue().toString();
+											String leader = leaders.get(group);
 
-										for (int i = 0; i < listOfMembers.size(); i++) {
-										userList.add(i,listOfMembers.get(i));
-										}
 
-										JOptionPane.showMessageDialog(null,
-												"Joined group: " + myGroupName);
+											leaderOfMyGroup = client.joinGroup(group, leader);
+											myGroupName = group;
+
+											groupJoined = client.isGroupJoined();
+
+											if(!groupJoined) {
+												JOptionPane.showMessageDialog(
+														null, "Failed to join group, Username exists");
+											}
+											listOfMembers = client.getGroupList(myGroupName);
+
+											userList.clear();
+											for (int i = 0; i < listOfMembers.size(); i++) {
+												userList.add(i,listOfMembers.get(i));
+											}
+
+											JOptionPane.showMessageDialog(null,
+													"Joined group: " + myGroupName);
 
 									} catch (RemoteException
 											| ServerNotActiveException
