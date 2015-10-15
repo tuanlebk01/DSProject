@@ -17,7 +17,7 @@ public class NameServer extends RemoteServer implements NameServerInterface {
 	private static String Name = "NamingService";
 
 	private HashMap<String, String> leaderInfo = new HashMap<String, String>();
-	private HashMap<String, String> ClientInfo = new HashMap<String, String>();
+	private HashMap<String, Integer> ClientInfo = new HashMap<String, Integer>();
 	private HashMap<String, ArrayList<String>> groupInfo = new HashMap<String, ArrayList<String>>();
 	private int clientID = 0;
 
@@ -72,10 +72,8 @@ public class NameServer extends RemoteServer implements NameServerInterface {
 			ServerNotActiveException {
 
 		clientID++;
-		String hostAddress = getClientHost();
-		hostAddress = hostAddress.concat("*" + clientID);
 
-		this.ClientInfo.put(userName, hostAddress);
+		this.ClientInfo.put(userName, clientID);
 		System.out.println("NS: Connected: " + ClientInfo.get(userName));
 		return clientID;
 	}
@@ -140,5 +138,10 @@ public class NameServer extends RemoteServer implements NameServerInterface {
 	@Override
 	public void updateGroupLeaderInfo(String Groupname) throws RemoteException {
 
+	}
+
+	@Override
+	public HashMap<String, Integer> getClientInfo() throws RemoteException {
+		return ClientInfo;
 	}
 }

@@ -31,6 +31,9 @@ public interface ClientInterface extends Remote {
 
 	public void connectToGroupLeader(String groupLeader) throws RemoteException, AlreadyBoundException, NotBoundException;
 
-	public ArrayList<String> addMemberToGroup(String user) throws RemoteException;
+	public ArrayList<String> addMemberToGroup(String user)
+			throws RemoteException;
+
+	public void startElection() throws RemoteException;
 
 }

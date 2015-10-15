@@ -8,6 +8,7 @@ import java.rmi.registry.Registry;
 import java.rmi.server.ServerNotActiveException;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 
 import Application.GUI;
@@ -37,7 +38,8 @@ public class Client implements ClientInterface {
 
 		this.myUserName = userName;
 
-		this.registry = LocateRegistry.getRegistry("Bellatrix.cs.umu.se", portNr);
+		this.registry = LocateRegistry.getRegistry("Bellatrix.cs.umu.se",
+				portNr);
 		this.ns = (NameServerInterface) registry.lookup("NamingService");
 		clientID = ns.registerChatClient(userName);
 		return clientID;
@@ -65,8 +67,8 @@ public class Client implements ClientInterface {
 
 	}
 
-	public void connectToGroupLeader(String groupLeader) throws RemoteException, AlreadyBoundException, NotBoundException {
-
+	public void connectToGroupLeader(String groupLeader)
+			throws RemoteException, AlreadyBoundException, NotBoundException {
 		this.registry = LocateRegistry.getRegistry("Bellatrix.cs.umu.se", 1234);
 		this.ci = (ClientInterface) registry.lookup(groupLeader);
 		System.out.println("CLIENT: connected to groupleader: " + groupLeader);
@@ -77,7 +79,8 @@ public class Client implements ClientInterface {
 		return clients;
 	}
 
-	public ArrayList<String> addMemberToGroup(String userName) throws RemoteException {
+	public ArrayList<String> addMemberToGroup(String userName)
+			throws RemoteException {
 
 		clients = ns.addMember(myGroup, userName);
 		return clients;
@@ -98,11 +101,13 @@ public class Client implements ClientInterface {
 	}
 
 	public String joinGroup(String groupName, String leaderName)
-			throws RemoteException, ServerNotActiveException, AlreadyBoundException, NotBoundException {
+			throws RemoteException, ServerNotActiveException,
+			AlreadyBoundException, NotBoundException {
 
 		this.myGroup = groupName;
 		this.myLeader = leaderName;
-		System.out.println("CLIENT: Group: " + myGroup + " : Leader: " + myLeader);
+		System.out.println("CLIENT: Group: " + myGroup + " : Leader: "
+				+ myLeader);
 		connectToGroupLeader(myLeader);
 		return myLeader;
 
@@ -124,4 +129,32 @@ public class Client implements ClientInterface {
 		// TODO Auto-generated method stub
 
 	}
+
+	public void startElection() throws RemoteException {
+		ArrayList<Integer> ID = new ArrayList<Integer>();
+		HashMap<String, Integer> clientInfo = ns.getClientInfo();
+		clients.remove(myLeader);
+
+		for (int i = 0; i < this.clients.size(); i++) {
+			String client = this.clients.get(i);
+			ID.add(clientInfo.get(client));
+		}
+
+		Collections.sort(ID);
+		int leaderID = ID.get(0);
+		for (int i = 0; i < clients.size(); i++) {
+			String tempClient = clients.get(i);
+			int tempID = clientInfo.get(tempClient);
+			if (leaderID == tempID) {
+				this.myLeader = tempClient;
+			}
+
+		}
+	}
+
 }
+
+
+
+
+

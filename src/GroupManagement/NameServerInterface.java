@@ -30,4 +30,6 @@ public interface NameServerInterface extends Remote, Serializable {
 
 	public HashMap<String, String> getGroupLeaders() throws RemoteException;
 
+	public HashMap<String, Integer> getClientInfo() throws RemoteException;
+
 }
