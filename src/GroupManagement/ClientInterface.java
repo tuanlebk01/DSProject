@@ -29,11 +29,17 @@ public interface ClientInterface extends Remote {
 
 	public void getUsersIPs(String group) throws RemoteException;
 
-	public void connectToGroupLeader(String groupLeader) throws RemoteException, AlreadyBoundException, NotBoundException;
+	public boolean connectToGroupLeader(String groupLeader) throws RemoteException, AlreadyBoundException, NotBoundException;
 
+<<<<<<< HEAD
 	public ArrayList<String> addMemberToGroup(String user)
 			throws RemoteException;
 
 	public void startElection() throws RemoteException;
+=======
+	public boolean addMemberToGroup(String user) throws RemoteException;
+
+	public ArrayList<String> getGroupList(String myGroup) throws RemoteException;
+>>>>>>> d7f29d7de72560490f2d3da304e0bf5d26074360
 
 }
