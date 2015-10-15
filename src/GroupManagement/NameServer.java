@@ -72,6 +72,8 @@ public class NameServer extends RemoteServer implements NameServerInterface {
 
 		clientID++;
 		ClientInfo.put(clientID, userName);
+
+		this.ClientInfo.put(clientID, userName);
 		System.out.println("NS: Connected: " + ClientInfo.get(userName));
 		return clientID;
 	}
@@ -161,4 +163,5 @@ public class NameServer extends RemoteServer implements NameServerInterface {
 	public void updateGroupLeaderInfo(String Groupname) throws RemoteException {
 
 	}
+
 }

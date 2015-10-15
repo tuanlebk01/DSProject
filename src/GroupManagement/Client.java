@@ -8,6 +8,7 @@ import java.rmi.registry.Registry;
 import java.rmi.server.ServerNotActiveException;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
@@ -44,7 +45,8 @@ public class Client implements ClientInterface {
 
 		this.myUserName = userName;
 
-		this.registry = LocateRegistry.getRegistry("Bellatrix.cs.umu.se", portNr);
+		this.registry = LocateRegistry.getRegistry("Bellatrix.cs.umu.se",
+				portNr);
 		this.ns = (NameServerInterface) registry.lookup("NamingService");
 		clientID = ns.registerChatClient(userName);
 
@@ -80,10 +82,10 @@ public class Client implements ClientInterface {
 		System.out.println("CLIENT: connected to groupleader: " + groupLeader + " : with username: " + myUserName);
 		groupJoined = ci.addMemberToGroup(myUserName);
 		return groupJoined;
+
 	}
 
 	public boolean addMemberToGroup(String userName) throws RemoteException {
-
 		groupJoined = ns.addMember(myGroup, userName);
 		getGroupList(myGroup);
 		return groupJoined;
@@ -110,11 +112,13 @@ public class Client implements ClientInterface {
 	}
 
 	public String joinGroup(String groupName, String leaderName)
-			throws RemoteException, ServerNotActiveException, AlreadyBoundException, NotBoundException {
+			throws RemoteException, ServerNotActiveException,
+			AlreadyBoundException, NotBoundException {
 
 		this.myGroup = groupName;
 		this.myLeader = leaderName;
-		System.out.println("CLIENT: Group: " + myGroup + " : Leader: " + myLeader);
+		System.out.println("CLIENT: Group: " + myGroup + " : Leader: "
+				+ myLeader);
 		connectToGroupLeader(myLeader);
 
 		System.out.println("CLIENT: nr of clients in list: " + clients.size());
@@ -161,6 +165,31 @@ public class Client implements ClientInterface {
 
 	}
 
+	public void startElection() throws RemoteException {
+		ArrayList<Integer> ID = new ArrayList<Integer>();
+		HashMap<Integer, String> clientInfo = ns.getClientInfo();
+		clients.remove(myLeader);
+
+
+//		THIS NEED TO BE FIXED SINCE HASHMAP IS <INTEGER, STRING> NOW
+
+		for (int i = 0; i < this.clients.size(); i++) {
+			String client = this.clients.get(i);
+			ID.add(clientInfo.get(client));
+		}
+
+		Collections.sort(ID);
+		int leaderID = ID.get(0);
+		for (int i = 0; i < clients.size(); i++) {
+			String tempClient = clients.get(i);
+			int tempID = clientInfo.get(tempClient);
+			if (leaderID == tempID) {
+				this.myLeader = tempClient;
+			}
+
+		}
+	}
+
 	public boolean isGroupJoined() {
 		return groupJoined;
 	}
@@ -182,3 +211,7 @@ public class Client implements ClientInterface {
 		ns.removeMemberFromGroup(groupName, userName);
 	}
 }
+
+
+
+
