@@ -46,7 +46,9 @@ public class Client implements ClientInterface {
 
 		this.myUserName = userName;
 
-		this.registry = LocateRegistry.getRegistry("Bellatrix.cs.umu.se",
+//		this.registry = LocateRegistry.getRegistry("Bellatrix.cs.umu.se",
+//				portNr);
+		this.registry = LocateRegistry.getRegistry("localhost",
 				portNr);
 		this.ns = (NameServerInterface) registry.lookup("NamingService");
 		clientID = ns.registerChatClient(userName);
@@ -81,7 +83,8 @@ public class Client implements ClientInterface {
 
 	public boolean connectToGroupLeader(String groupLeader) throws RemoteException, AlreadyBoundException, NotBoundException {
 
-		registry = LocateRegistry.getRegistry("Bellatrix.cs.umu.se", 1234);
+//		registry = LocateRegistry.getRegistry("Bellatrix.cs.umu.se", 1234);
+		registry = LocateRegistry.getRegistry("localhost", 1234);
 		ci = (ClientInterface) registry.lookup(groupLeader);
 		System.out.println("CLIENT: connected to groupleader: " + groupLeader + " : with username: " + myUserName);
 		groupJoined = ci.addMemberToGroup(myUserName);
@@ -144,11 +147,12 @@ public class Client implements ClientInterface {
 		// maps one interface to each client
 		// some rmi exception, haven't looked at it
 		// this is to get messaging to work
-
+		
+		System.out.println("HERE IT ALL GOES TO HELL");
 		for (int i = 0; i < temp.size(); i++) {
-//			System.out.println("ASDSA: " + temp.get(i));
-//			ci = (ClientInterface) UnicastRemoteObject.exportObject(this, 0);
-//			clientInterfaces.put(temp.get(i), ci);
+			System.out.println("temp: " + temp.get(i));
+			ci = (ClientInterface) UnicastRemoteObject.exportObject(this, 0);
+			clientInterfaces.put(temp.get(i), ci);
 		}
 
 		return myLeader;
