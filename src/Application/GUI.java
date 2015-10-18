@@ -250,7 +250,7 @@ public class GUI {
 				if (input != null && (input.length() > 1)) {
 
 					try {
-						System.out.println("GUI: Creating group");
+						System.out.println("GUI: Trying to create group");
 
 						groupCreated = client.createGroup(input, userName);
 						if (groupCreated) {
@@ -265,9 +265,9 @@ public class GUI {
 								Map.Entry pair = (Map.Entry) it.next();
 								listOfGroups.add(pair.getKey().toString());
 								listOfMembers.add(pair.getValue().toString());
-								System.out.println("GUI:");
-								System.out.println(pair.getKey() + " = "
-										+ pair.getValue());
+//								System.out.println("GUI:");
+//								System.out.println(pair.getKey() + " = "
+//										+ pair.getValue());
 								it.remove();
 							}
 
@@ -277,32 +277,35 @@ public class GUI {
 								groupList.add(i, listOfGroups.get(i));
 							}
 
-							JOptionPane.showMessageDialog(null,
-									"Group created with name: " + input);
+//							JOptionPane.showMessageDialog(null,
+//									"Group created with name: " + input);
+							System.out.println("GUI: Group created: " + input);
 							myGroupName = input;
 							isLeader = true;
 
 						} else {
-							JOptionPane.showMessageDialog(null,
-									"Group not created, Nameserver error");
+//							JOptionPane.showMessageDialog(null,
+//									"Group not created, Nameserver error");
+							System.out.println("GUI: Failed to create group");
 						}
 
 					} catch (RemoteException | ServerNotActiveException
 							| NotBoundException | AlreadyBoundException e) {
-						JOptionPane
-								.showMessageDialog(null, "Group not created, Exception error");
-						// e.printStackTrace();
+//						JOptionPane
+//								.showMessageDialog(null, "Group not created, Exception error");
+						 e.printStackTrace();
+						System.out.println("GUI: Failed to create group, Exception error");
 					}
 
 				} else {
-					JOptionPane.showMessageDialog(null, "Group not created, wrong input, no error");
+//					JOptionPane.showMessageDialog(null, "Group not created, wrong input, no error");
+					System.out.println("GUI: Failed to create group, wrong input, no error");
 				}
 			}
 		});
 	}
 
 	public void connect(String connect) {
-
 		if (connectButton.getText().equals("Connect")) {
 			if (userNameTextField.getText().length() < 1) {
 				JOptionPane
@@ -336,8 +339,8 @@ public class GUI {
 					Map.Entry pair = (Map.Entry) it.next();
 					listOfGroups.add(pair.getKey().toString());
 					listOfMembers.add(pair.getValue().toString());
-					System.out.println("GUI:");
-					System.out.println(pair.getKey() + " = " + pair.getValue());
+//					System.out.println("GUI:");
+//					System.out.println(pair.getKey() + " = " + pair.getValue());
 					it.remove();
 				}
 

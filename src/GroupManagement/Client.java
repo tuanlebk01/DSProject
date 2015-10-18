@@ -71,6 +71,9 @@ public class Client implements ClientInterface {
 
 		groupCreated = ns.createGroup(groupName, userName);
 
+		clientInfo = ns.getClientInfo();
+		groupsInfo = ns.getGroupsInfo();
+
 		return groupCreated;
 
 	}
@@ -95,6 +98,7 @@ public class Client implements ClientInterface {
 	public ArrayList<String> getGroupList(String myGroup) throws RemoteException {
 		groupsInfo = getGroups();
 		clients = groupsInfo.get(myGroup);
+		clientInfo = ns.getClientInfo();
 		return clients;
 	}
 
@@ -139,8 +143,8 @@ public class Client implements ClientInterface {
 		for (int i = 0; i < temp.size(); i++) {
 			System.out.println("ASDSA: " + temp.get(i));
 			//LOOK AT THIS AND FIX IT SOMEHOW
-			ci = (ClientInterface) UnicastRemoteObject.exportObject(this, 0);
-			clientInterfaces.put(temp.get(i), ci);
+//			ci = (ClientInterface) UnicastRemoteObject.exportObject(this);
+//			clientInterfaces.put(temp.get(i), ci);
 		}
 
 		return myLeader;
@@ -156,6 +160,7 @@ public class Client implements ClientInterface {
 
 	}
 
+<<<<<<< HEAD
 	public void getUsersInGroup(String group) throws RemoteException {
 
 	}
@@ -166,6 +171,9 @@ public class Client implements ClientInterface {
 	}
 
 	public String startElection(ArrayList<String> clients) throws RemoteException {
+=======
+	public void startElection() throws RemoteException {
+>>>>>>> ac4c7cc6c50c85a98074d1956bae6e3bf7dc977c
 		ArrayList<Integer> ID = new ArrayList<Integer>();
 		ArrayList<String> tempClients = new ArrayList<String>();
 		ArrayList<Integer> tempID = new ArrayList<Integer>();
@@ -195,6 +203,7 @@ public class Client implements ClientInterface {
 			tempClientInfo.put(str, l);
 		}
 
+<<<<<<< HEAD
 		for (int i = 0; i < this.clients.size(); i++) {
 			String client = this.clients.get(i);
 			tempID.add(tempClientInfo.get(client));
@@ -211,6 +220,23 @@ public class Client implements ClientInterface {
 
 		}
 		return newLeaderName;
+=======
+//		for (int i = 0; i < this.clients.size(); i++) {
+//			String client = this.clients.get(i);
+//			ID.add(clientInfo.get(client));
+//		}
+//
+//		Collections.sort(ID);
+//		int leaderID = ID.get(0);
+//		for (int i = 0; i < clients.size(); i++) {
+//			String tempClient = clients.get(i);
+//			int tempID = clientInfo.get(tempClient);
+//			if (leaderID == tempID) {
+//				this.myLeader = tempClient;
+//			}
+//
+//		}
+>>>>>>> ac4c7cc6c50c85a98074d1956bae6e3bf7dc977c
 	}
 
 	public boolean isGroupJoined() {
@@ -219,18 +245,39 @@ public class Client implements ClientInterface {
 
 	public void disconnect(String groupName, String userName) throws RemoteException {
 
+		System.out.println("asdsad: " + groupName + " : " + userName);
+
 			if(groupName == null) {
-				ns.leaveServer(userName);
+
+				ns.leaveServer(groupName, clientID);
+				clientInfo = ns.getClientInfo();
+
 			} else if(userName.equals(myLeader)) {
-				System.out.println("leader leaving its own group");
-				ns.leaveServer(userName);
-				// new leader or disbannish group
+
+				System.out.println("c size: " + clientInfo.size());
+
+				if(clientInfo.size() == 1) {
+
+				System.out.println("Leader leaving its own group and it was empty");
+
+				ns.removeGroup(groupName);
+
+				} else {
+
+					removeFromGroup(groupName, userName);
+					groupsInfo = ci.getGroups();
+
+				}
+
 			} else {
+
 				ci.removeFromGroup(groupName, userName);
+				groupsInfo = ci.getGroups();
 			}
 	}
 
 	public void removeFromGroup(String groupName, String userName) throws RemoteException {
+
 		ns.removeMemberFromGroup(groupName, userName);
 	}
 }

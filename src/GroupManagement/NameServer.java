@@ -9,6 +9,8 @@ import java.rmi.server.ServerNotActiveException;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
 
 public class NameServer extends RemoteServer implements NameServerInterface {
 
@@ -75,7 +77,7 @@ public class NameServer extends RemoteServer implements NameServerInterface {
 		ClientInfo.put(clientID, userName);
 
 		this.ClientInfo.put(clientID, userName);
-		System.out.println("NS: Connected: " + ClientInfo.get(userName));
+		System.out.println("NS: Connected: " + ClientInfo.get(clientID));
 		return clientID;
 	}
 
@@ -88,7 +90,8 @@ public class NameServer extends RemoteServer implements NameServerInterface {
 			tempList.add(userName);
 			groupInfo.put(groupName, tempList);
 			leaderInfo.put(groupName, userName);
-
+			System.out.println("NS: Group created with name: " + groupName);
+			System.out.println("Groups: " + groupInfo.keySet());
 			return true;
 		}
 		return false;
@@ -128,19 +131,26 @@ public class NameServer extends RemoteServer implements NameServerInterface {
 		return leaderInfo;
 	}
 
-	public void leaveServer(String userName) throws RemoteException {
+	public void leaveServer(String groupName, int ID) throws RemoteException {
 
-		System.out.println(groupInfo.keySet().isEmpty());
 
-		//LOOK AT THIS AND FIX IT SOMEHOW
+		if(groupName == null) {
 
-		if(groupInfo.keySet().isEmpty()) {
-			System.out.println("NS: The following user left the server: " + userName + " and group: " + "ASD" + " was removed");
-			groupInfo.remove(ClientInfo);
+			System.out.println("NS: The following user left the server: " + ClientInfo.get(ID));
+			ClientInfo.remove(ID);
 
 		} else {
-		System.out.println("NS: The following user left the server: " + userName);
+			ClientInfo.remove(ID);
+			System.out.println("NS: Leader: " + ClientInfo.get(ID) + " left in group: " + groupName + ". Start election");
+
 		}
+	}
+
+	public void removeGroup(String groupName) throws RemoteException {
+
+		groupInfo.remove(groupName);
+		System.out.println("Group: " + groupName + " was removed");
+
 	}
 
 	public HashMap<Integer, String> getClientInfo() {
@@ -148,21 +158,14 @@ public class NameServer extends RemoteServer implements NameServerInterface {
 	}
 
 	@Override
-	public ArrayList<String> getMemberInGroup(String groupName)
-			throws RemoteException {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	public void deleteGroup(String groupName) throws RemoteException {
-
-		// If group is empty, remove
+	public void updateGroupLeaderInfo(String Groupname) throws RemoteException {
 
 	}
 
 	@Override
-	public void updateGroupLeaderInfo(String Groupname) throws RemoteException {
-
+	public ArrayList<String> getMemberInGroup(String groupName)
+			throws RemoteException {
+		return null;
 	}
 
 }
