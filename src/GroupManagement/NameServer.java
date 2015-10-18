@@ -139,8 +139,8 @@ public class NameServer extends RemoteServer implements NameServerInterface {
 			ClientInfo.remove(ID);
 
 		} else {
-			ClientInfo.remove(ID);
 			System.out.println("NS: Leader: " + ClientInfo.get(ID) + " left in group: " + groupName + ". Start election");
+			ClientInfo.remove(ID);
 
 		}
 	}

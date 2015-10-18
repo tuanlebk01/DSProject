@@ -125,10 +125,9 @@ public class Client implements ClientInterface {
 				+ myLeader);
 		connectToGroupLeader(myLeader);
 
+		clientInfo = ns.getClientInfo();
 		System.out.println("CLIENT: nr of clients in list: " + clients.size());
 
-
-		clientInfo = ns.getClientInfo();
 		ArrayList<Integer> temp = new ArrayList<Integer>();
 
 		Iterator it = clientInfo.entrySet().iterator();
@@ -191,16 +190,12 @@ public class Client implements ClientInterface {
 
 	public void disconnect(String groupName, String userName) throws RemoteException {
 
-		System.out.println("asdsad: " + groupName + " : " + userName);
-
 			if(groupName == null) {
 
 				ns.leaveServer(groupName, clientID);
 				clientInfo = ns.getClientInfo();
 
 			} else if(userName.equals(myLeader)) {
-
-				System.out.println("c size: " + clientInfo.size());
 
 				if(clientInfo.size() == 1) {
 
@@ -210,8 +205,9 @@ public class Client implements ClientInterface {
 
 				} else {
 
-					removeFromGroup(groupName, userName);
+					ns.removeMemberFromGroup(groupName, userName);
 					groupsInfo = ci.getGroups();
+					ci.startElection();
 
 				}
 
