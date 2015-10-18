@@ -18,6 +18,7 @@ public class NameServer extends RemoteServer implements NameServerInterface {
 	private NameServerInterface nameServer;
 	private static String Name = "NamingService";
 	private HashMap<String, String> leaderInfo = new HashMap<String, String>();
+	// the first column is ClientID, the second column is user name
 	private HashMap<Integer, String> ClientInfo = new HashMap<Integer, String>();
 	private HashMap<String, ArrayList<String>> groupInfo = new HashMap<String, ArrayList<String>>();
 	private int clientID = 0;
