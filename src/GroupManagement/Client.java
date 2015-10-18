@@ -12,6 +12,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import Application.GUI;
 import Communication.CommunicationModule;
@@ -164,7 +165,6 @@ public class Client implements ClientInterface {
 		for (int i = 0; i < clients.size(); i++) {
 			System.out.println(clients.get(i));
 		}
-
 
 
 		ArrayList<Integer> ID = new ArrayList<Integer>();
