@@ -165,29 +165,52 @@ public class Client implements ClientInterface {
 
 	}
 
-	public void startElection() throws RemoteException {
+	public String startElection(ArrayList<String> clients) throws RemoteException {
 		ArrayList<Integer> ID = new ArrayList<Integer>();
+		ArrayList<String> tempClients = new ArrayList<String>();
+		ArrayList<Integer> tempID = new ArrayList<Integer>();
 		HashMap<Integer, String> clientInfo = ns.getClientInfo();
+		HashMap<String, Integer> tempClientInfo = new HashMap<String, Integer>();
+		String newLeaderName = null;
+
 		clients.remove(myLeader);
 
 
-//		THIS NEED TO BE FIXED SINCE HASHMAP IS <INTEGER, STRING> NOW
+		Iterator it = clientInfo.entrySet().iterator();
+		while (it.hasNext()) {
+
+			Map.Entry pair = (Map.Entry) it.next();
+			// temp.add(Integer.parseInt(pair.getKey().toString()));
+			System.out.println("key: " + pair.getKey() + " User: "
+					+ pair.getValue());
+			ID.add(Integer.parseInt(pair.getKey().toString()));
+			tempClients.add((String) pair.getValue());
+			// tempClientInfo.put((String) pair.getKey(),
+			// Integer.parseInt(pair.getKey().toString()));
+		}
+
+		for (int i = 0; i < ID.size(); i++) {
+			int l = ID.get(i);
+			String str = tempClients.get(i);
+			tempClientInfo.put(str, l);
+		}
 
 		for (int i = 0; i < this.clients.size(); i++) {
 			String client = this.clients.get(i);
-			ID.add(clientInfo.get(client));
+			tempID.add(tempClientInfo.get(client));
 		}
 
-		Collections.sort(ID);
-		int leaderID = ID.get(0);
+		Collections.sort(tempID);
+		int leaderID = tempID.get(0);
 		for (int i = 0; i < clients.size(); i++) {
 			String tempClient = clients.get(i);
-			int tempID = clientInfo.get(tempClient);
-			if (leaderID == tempID) {
-				this.myLeader = tempClient;
+			int tempLeaderID = tempClientInfo.get(tempClient);
+			if (leaderID == tempLeaderID) {
+				newLeaderName = tempClient;
 			}
 
 		}
+		return newLeaderName;
 	}
 
 	public boolean isGroupJoined() {
