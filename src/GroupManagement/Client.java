@@ -140,7 +140,7 @@ public class Client implements ClientInterface {
 
 
 		for (int i = 0; i < temp.size(); i++) {
-			System.out.println("ASDSA: " + temp.get(i));
+//			System.out.println("ASDSA: " + temp.get(i));
 			//LOOK AT THIS AND FIX IT SOMEHOW
 //			ci = (ClientInterface) UnicastRemoteObject.exportObject(this);
 //			clientInterfaces.put(temp.get(i), ci);
@@ -159,29 +159,20 @@ public class Client implements ClientInterface {
 
 	}
 
-<<<<<<< HEAD
-	public void getUsersInGroup(String group) throws RemoteException {
-
-	}
-
-	public void getUsersIPs(String group) throws RemoteException {
-		// TODO Auto-generated method stub
-
-	}
-
 	public String startElection(ArrayList<String> clients) throws RemoteException {
-=======
-	public void startElection() throws RemoteException {
->>>>>>> ac4c7cc6c50c85a98074d1956bae6e3bf7dc977c
+
+		for (int i = 0; i < clients.size(); i++) {
+			System.out.println(clients.get(i));
+		}
+
+
+
 		ArrayList<Integer> ID = new ArrayList<Integer>();
 		ArrayList<String> tempClients = new ArrayList<String>();
 		ArrayList<Integer> tempID = new ArrayList<Integer>();
 		HashMap<Integer, String> clientInfo = ns.getClientInfo();
 		HashMap<String, Integer> tempClientInfo = new HashMap<String, Integer>();
 		String newLeaderName = null;
-
-		clients.remove(myLeader);
-
 
 		Iterator it = clientInfo.entrySet().iterator();
 		while (it.hasNext()) {
@@ -202,7 +193,6 @@ public class Client implements ClientInterface {
 			tempClientInfo.put(str, l);
 		}
 
-<<<<<<< HEAD
 		for (int i = 0; i < this.clients.size(); i++) {
 			String client = this.clients.get(i);
 			tempID.add(tempClientInfo.get(client));
@@ -218,24 +208,9 @@ public class Client implements ClientInterface {
 			}
 
 		}
+		System.out.println(newLeaderName);
 		return newLeaderName;
-=======
-//		for (int i = 0; i < this.clients.size(); i++) {
-//			String client = this.clients.get(i);
-//			ID.add(clientInfo.get(client));
-//		}
-//
-//		Collections.sort(ID);
-//		int leaderID = ID.get(0);
-//		for (int i = 0; i < clients.size(); i++) {
-//			String tempClient = clients.get(i);
-//			int tempID = clientInfo.get(tempClient);
-//			if (leaderID == tempID) {
-//				this.myLeader = tempClient;
-//			}
-//
-//		}
->>>>>>> ac4c7cc6c50c85a98074d1956bae6e3bf7dc977c
+
 	}
 
 	public boolean isGroupJoined() {
@@ -261,7 +236,8 @@ public class Client implements ClientInterface {
 
 					ns.removeMemberFromGroup(groupName, userName);
 					groupsInfo = ci.getGroups();
-					ci.startElection();
+					clientInfo = ns.getClientInfo();
+					ci.startElection(groupsInfo.get(groupName));
 
 				}
 
