@@ -17,7 +17,7 @@ import java.util.Map.Entry;
 import Application.GUI;
 import Communication.CommunicationModule;
 
-public class Client extends UnicastRemoteObject implements ClientInterface {
+public class Client implements ClientInterface {
 
 	private static final long serialVersionUID = 1L;
 	private Registry registry;
