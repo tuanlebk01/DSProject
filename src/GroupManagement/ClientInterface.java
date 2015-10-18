@@ -1,5 +1,6 @@
 package GroupManagement;
 
+import java.io.Serializable;
 import java.rmi.AlreadyBoundException;
 import java.rmi.NotBoundException;
 import java.rmi.Remote;
@@ -8,7 +9,7 @@ import java.rmi.server.ServerNotActiveException;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-public interface ClientInterface extends Remote {
+public interface ClientInterface extends Remote, Serializable {
 
 	public void retrieveMessage(String message) throws RemoteException;
 

@@ -17,7 +17,7 @@ import java.util.Map.Entry;
 import Application.GUI;
 import Communication.CommunicationModule;
 
-public class Client implements ClientInterface {
+public class Client extends UnicastRemoteObject implements ClientInterface {
 
 	private static final long serialVersionUID = 1L;
 	private Registry registry;
@@ -54,6 +54,8 @@ public class Client implements ClientInterface {
 		clientID = ns.registerChatClient(userName);
 
 		return clientID;
+		
+		
 
 	}
 
@@ -148,13 +150,15 @@ public class Client implements ClientInterface {
 		// some rmi exception, haven't looked at it
 		// this is to get messaging to work
 		
+		// commented by Tuan
+	// Error here: Because we export object when someone join a group, it makes a duplicated name service here
+		// By exporting object when connecting to the name server, this error will be avoided
 		System.out.println("HERE IT ALL GOES TO HELL");
 		for (int i = 0; i < temp.size(); i++) {
 			System.out.println("temp: " + temp.get(i));
 			ci = (ClientInterface) UnicastRemoteObject.exportObject(this, 0);
 			clientInterfaces.put(temp.get(i), ci);
 		}
-
 		return myLeader;
 
 	}
@@ -201,18 +205,19 @@ public class Client implements ClientInterface {
 			tempClientInfo.put(str, l);
 		}
 
-		for (int i = 0; i < this.clients.size(); i++) {
-			String client = this.clients.get(i);
+			System.out.println(tempClientInfo.keySet());
+		for (int i = 0; i < clients.size(); i++) {
+			String client = clients.get(i);
 			tempID.add(tempClientInfo.get(client));
 		}
-
+		System.out.println(tempID);
 		Collections.sort(tempID);
 		int leaderID = tempID.get(0);
+		System.out.println(leaderID);
 		for (int i = 0; i < clients.size(); i++) {
-			String tempClient = clients.get(i);
-			int tempLeaderID = tempClientInfo.get(tempClient);
+			int tempLeaderID = tempClientInfo.get(clients.get(i));
 			if (leaderID == tempLeaderID) {
-				newLeaderName = tempClient;
+				newLeaderName = clients.get(i);
 			}
 
 		}
