@@ -26,10 +26,6 @@ public interface ClientInterface extends Remote {
 	public String joinGroup(String groupName, String leaderName)
 			throws RemoteException, ServerNotActiveException, AlreadyBoundException, NotBoundException;
 
-	public void getUsersInGroup(String group) throws RemoteException;
-
-	public void getUsersIPs(String group) throws RemoteException;
-
 	public boolean connectToGroupLeader(String groupLeader) throws RemoteException, AlreadyBoundException, NotBoundException;
 
 	public void startElection() throws RemoteException;
