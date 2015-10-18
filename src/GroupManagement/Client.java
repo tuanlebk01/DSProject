@@ -139,11 +139,15 @@ public class Client implements ClientInterface {
 		}
 
 
+		//LOOK AT THIS AND FIX IT SOMEHOW
+		// Loops through array with all clients
+		// maps one interface to each client
+		// some rmi exception, haven't looked at it
+		// this is to get messaging to work
 
 		for (int i = 0; i < temp.size(); i++) {
 //			System.out.println("ASDSA: " + temp.get(i));
-			//LOOK AT THIS AND FIX IT SOMEHOW
-//			ci = (ClientInterface) UnicastRemoteObject.exportObject(this);
+//			ci = (ClientInterface) UnicastRemoteObject.exportObject(this, 0);
 //			clientInterfaces.put(temp.get(i), ci);
 		}
 
