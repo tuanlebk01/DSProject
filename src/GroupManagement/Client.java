@@ -1,5 +1,6 @@
 package GroupManagement;
 
+import java.net.UnknownHostException;
 import java.rmi.AlreadyBoundException;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
@@ -43,7 +44,7 @@ public class Client implements ClientInterface {
 
 	public int connectToNameServer(String userName, int portNr)
 			throws RemoteException, AlreadyBoundException,
-			ServerNotActiveException, NotBoundException {
+			ServerNotActiveException, NotBoundException, UnknownHostException {
 
 		this.myUserName = userName;
 
@@ -92,8 +93,8 @@ public class Client implements ClientInterface {
 		ci = (ClientInterface) registry.lookup(groupLeader);
 		System.out.println("CLIENT: connected to groupleader: " + groupLeader + " : with username: " + myUserName);
 		groupJoined = ci.addMemberToGroup(myUserName);
-		ci = (ClientInterface) UnicastRemoteObject.exportObject(this, 0);
-		clientInterfaces.put(clientID, ci);
+		//ci = (ClientInterface) UnicastRemoteObject.exportObject(this, 0);
+		//clientInterfaces.put(clientID, ci);
 		return groupJoined;
 
 	}
@@ -149,13 +150,11 @@ public class Client implements ClientInterface {
 
 			Map.Entry pair = (Map.Entry) it.next();
 			// temp.add(Integer.parseInt(pair.getKey().toString()));
-			System.out.println("key: " + pair.getKey() + " User: "
-					+ pair.getValue());
+//			System.out.println("key: " + pair.getKey() + " User: "
+//					+ pair.getValue());
 			tempIDs.add(Integer.parseInt(pair.getKey().toString()));
 			tempClients.add((String) pair.getValue());
 		}
-		System.out.println(tempIDs);
-		System.out.println(tempClients);
 
 		for (int i = 0; i < tempIDs.size(); i++) {
 			int l = tempIDs.get(i);
@@ -168,18 +167,19 @@ public class Client implements ClientInterface {
 		}
 
 
-		System.out.println("ID list: " +IDs);
+		System.out.println("sadsadadsa");
+		ci = (ClientInterface) UnicastRemoteObject.exportObject(this, 0);
+//		registry = LocateRegistry.createRegistry(1234);
+		System.out.println(myUserName);
+		registry.bind(myUserName, ci);
+		ClientInterface ciLeader = (ClientInterface) registry.lookup(myLeader);
 
-		HashMap<Integer, ClientInterface> clientInterfaces = new HashMap<Integer, ClientInterface>();
+		HashMap<Integer, ClientInterface> clientInterface = ciLeader.getInterfaceOfGroup();
+		clientInterface.put(clientID, ci);
+		ciLeader.sharegroup();
 
-		for (int i = 0; i < IDs.size(); i++) {
-			ci = (ClientInterface) UnicastRemoteObject.exportObject(this, 0);
-			registry = LocateRegistry.createRegistry(1234);
-			registry.bind(temp.get(i), ci);
-			clientInterfaces.put(IDs.get(i), ci);
 
-		}
-		cm = new CommunicationModule(myUserName, clientID, clientInterfaces);
+		cm = new CommunicationModule(myUserName, clientID, clientInterface, clients);
 
 		return myLeader;
 
@@ -189,7 +189,7 @@ public class Client implements ClientInterface {
 		cm.addMessageToQueue(message);
 	}
 
-	public void broadcastMessage(String message) throws RemoteException {
+	public void broadcastMessage(String message) throws RemoteException, NotBoundException {
 
 		cm.sendMessage(message);
 
@@ -298,6 +298,25 @@ public class Client implements ClientInterface {
 	public ArrayList<TextMessage> getMessages() {
 		return cm.getAcceptedMessages();
 
+	}
+
+	public HashMap<Integer, ClientInterface> getInterfaceOfGroup()
+			throws RemoteException {
+		return clientInterfaces;
+	}
+
+	public void setClientInterfaces(
+			HashMap<Integer, ClientInterface> clientInterfaces)
+			throws RemoteException {
+		this.clientInterfaces = clientInterfaces;
+
+	}
+
+	public void sharegroup() throws RemoteException {
+
+        for(int key: clientInterfaces.keySet()){
+        	clientInterfaces.get(key).setClientInterfaces(clientInterfaces);
+        }
 	}
 }
 

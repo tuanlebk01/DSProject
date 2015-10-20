@@ -1,10 +1,12 @@
 package Communication;
 
+import java.io.Serializable;
+
 
 /**
  * Created by Johan on 2015-10-14.
  */
-public class TextMessage {
+public class TextMessage implements Serializable {
 
     private int seqNr;
     private String message;

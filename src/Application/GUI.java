@@ -448,7 +448,7 @@ public class GUI {
 			msgField.setText("");
 			try {
 				client.broadcastMessage(message);
-			} catch (RemoteException e) {
+			} catch (RemoteException | NotBoundException e) {
 				e.printStackTrace();
 			}
 		}

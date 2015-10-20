@@ -2,8 +2,11 @@ package Communication;
 
 
 import GroupManagement.ClientInterface;
+import GroupManagement.NameServerInterface;
 
+import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
+import java.rmi.registry.Registry;
 import java.util.*;
 
 /** Communication module, connects from one to many clients with basic multicast.
@@ -19,6 +22,8 @@ public class CommunicationModule {
     private HashMap <Integer, ClientInterface> clientInterfaces;
     private HashMap <Integer, Integer> lastAcceptedSeqNr;
     private ArrayList <TextMessage> acceptedMessages = new ArrayList<>();
+    private Registry registry;
+	private ArrayList<String> clients;
 
 
     /** The communication module keep track of the sequence numbers received by any client.
@@ -26,12 +31,14 @@ public class CommunicationModule {
      * @param userName - userName of the client that created the communication module
      * @param clientID - clientId of the client that created the communication module
      * @param clientInterfaces - A hashmap of all clientIds and clientInterfaces to all the clients in the group
+     * @param clients
      */
-    public CommunicationModule(String userName, int clientID, HashMap <Integer, ClientInterface> clientInterfaces){
+    public CommunicationModule(String userName, int clientID, HashMap <Integer, ClientInterface> clientInterfaces, ArrayList<String> clients){
         counter = 0;
         this.userName = userName;
         this.clientInterfaces = clientInterfaces;
         this.clientID = clientID;
+        this.clients = clients;
 
         this.lastAcceptedSeqNr = new HashMap<>();
 
@@ -44,12 +51,21 @@ public class CommunicationModule {
      *
      * @param message - The string that the message contains
      * @throws RemoteException
+     * @throws NotBoundException
      */
-    public void sendMessage(String message) throws RemoteException{
+    public void sendMessage(String message) throws RemoteException, NotBoundException{
         TextMessage textMessage = new TextMessage(counter, message, userName, clientID);
+        ClientInterface ci;
 
-        for(int key: clientInterfaces.keySet()){
-            clientInterfaces.get(key).addMessageToQueue(textMessage);
+        Registry = registry;
+        for(int i= 0; i<clients.size(); i++){
+//        	System.out.println(key + " " + clientInterfaces.get(key));
+//        	ClientInterface ac = (ClientInterface) registry.lookup("key");
+//        	clientInterfaces.get(key).addMessageToQueue(textMessage);
+
+            ci = (ClientInterface) registry.lookup("username");
+            ci.addMessageToQueue(textMessage);
+
         }
         counter++;
     }

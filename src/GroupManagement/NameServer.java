@@ -1,5 +1,7 @@
 package GroupManagement;
 
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.rmi.AlreadyBoundException;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
@@ -19,7 +21,7 @@ public class NameServer extends RemoteServer implements NameServerInterface {
 	private static String Name = "NamingService";
 	private HashMap<String, String> leaderInfo = new HashMap<String, String>();
 	// the first column is ClientID, the second column is user name
-	private HashMap<Integer, String> ClientInfo = new HashMap<Integer, String>();
+	private Triple clientInfo;
 	private HashMap<String, ArrayList<String>> groupInfo = new HashMap<String, ArrayList<String>>();
 	private int clientID = 0;
 
@@ -71,14 +73,55 @@ public class NameServer extends RemoteServer implements NameServerInterface {
 	}
 
 	public int registerChatClient(String userName) throws RemoteException,
-			ServerNotActiveException {
+			ServerNotActiveException, UnknownHostException {
 
 		clientID++;
-		ClientInfo.put(clientID, userName);
+		String str = getClientHost();
+		System.out.println(str);
+		clientInfo = new Triple(clientID, userName, InetAddress.getByName(str));
 
-		this.ClientInfo.put(clientID, userName);
-		System.out.println("NS: Connected: " + ClientInfo.get(clientID));
+		System.out.println("NS: Connected: " + clientInfo.getClientID() + " - " + clientInfo.getUsername() +" - " + clientInfo.getIp());
 		return clientID;
+	}
+
+	private class Triple{
+		private int clientID;
+		private String username;
+		private InetAddress ip;
+
+		public Triple (int clientID,String username, InetAddress ip){
+			this.clientID = clientID;
+			this.username = username;
+			this.ip = ip;
+		}
+
+		public int getClientID() {
+			return clientID;
+		}
+
+		public void setClientID(int clientID) {
+			this.clientID = clientID;
+		}
+
+		public String getUsername() {
+			return username;
+		}
+
+		public void setUsername(String username) {
+			this.username = username;
+		}
+
+		public InetAddress getIp() {
+			return ip;
+		}
+
+		public void setIp(InetAddress ip) {
+			this.ip = ip;
+		}
+
+
+
+
 	}
 
 	public boolean createGroup(String groupName, String userName)
@@ -136,12 +179,12 @@ public class NameServer extends RemoteServer implements NameServerInterface {
 
 		if(groupName == null) {
 
-			System.out.println("NS: The following user left the server: " + ClientInfo.get(ID));
-			ClientInfo.remove(ID);
+//			System.out.println("NS: The following user left the server: " + ClientInfo.get(ID));
+//			ClientInfo.remove(ID);
 
 		} else {
-			System.out.println("NS: Leader: " + ClientInfo.get(ID) + " left in group: " + groupName + ". Start election");
-			ClientInfo.remove(ID);
+//			System.out.println("NS: Leader: " + ClientInfo.get(ID) + " left in group: " + groupName + ". Start election");
+//			ClientInfo.remove(ID);
 
 		}
 	}
@@ -153,9 +196,6 @@ public class NameServer extends RemoteServer implements NameServerInterface {
 
 	}
 
-	public HashMap<Integer, String> getClientInfo() {
-		return ClientInfo;
-	}
 
 	@Override
 	public void updateGroupLeaderInfo(String Groupname) throws RemoteException {

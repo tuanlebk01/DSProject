@@ -3,6 +3,7 @@ package GroupManagement;
 import Communication.TextMessage;
 
 import java.io.Serializable;
+import java.net.UnknownHostException;
 import java.rmi.AlreadyBoundException;
 import java.rmi.NotBoundException;
 import java.rmi.Remote;
@@ -17,7 +18,7 @@ public interface ClientInterface extends Remote, Serializable {
 
 	public int connectToNameServer(String userName, int portNr)
 			throws RemoteException, AlreadyBoundException,
-			ServerNotActiveException, NotBoundException;
+			ServerNotActiveException, NotBoundException, UnknownHostException;
 
 	public boolean createGroup(String groupName, String userName)
 			throws RemoteException, ServerNotActiveException,
@@ -40,5 +41,12 @@ public interface ClientInterface extends Remote, Serializable {
 	public void disconnect(String groupName, String userName) throws RemoteException;
 
 	public void removeFromGroup(String groupName, String userName) throws RemoteException;
+
+	public HashMap<Integer, ClientInterface> getInterfaceOfGroup()
+			throws RemoteException;
+	public void setClientInterfaces(HashMap<Integer, ClientInterface> clientInterfaces) throws RemoteException;
+
+	public void sharegroup() throws RemoteException;
+
 
 }
