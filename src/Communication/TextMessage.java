@@ -26,7 +26,9 @@ public class TextMessage {
         return clientID;
     }
 
-
+    public void addStringToMessage(String additionalMessage){
+        message = message+additionalMessage;
+    }
 
     public String getMessage(){
         return message;
