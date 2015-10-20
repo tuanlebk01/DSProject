@@ -1,5 +1,6 @@
 package Communication;
 
+import GroupManagement.Client;
 import GroupManagement.ClientInterface;
 
 import java.lang.reflect.Array;
@@ -10,7 +11,7 @@ import java.util.*;
  */
 public class CommunicationModule {
 
-    private static int timeOutTime = 1000;
+    private static int timeOutTime = 1000; // Milliseconds
     private int counter;
     private String userName;
     private int clientID;
@@ -115,7 +116,19 @@ public class CommunicationModule {
         return  temp;
     }
 
-    public void updateClientInterfaces(HashMap <Integer, ClientInterface> clientInterfaces){
-        this.clientInterfaces = clientInterfaces;
+    //public void updateClientInterfaces(HashMap <Integer, ClientInterface> clientInterfaces){
+    //    this.clientInterfaces = clientInterfaces;
+    //}
+
+    public void addAnotherClientInterface(int clientID, ClientInterface ci){
+        clientInterfaces.put(clientID, ci);
+        lastAcceptedSeqNr.put(clientID, 0);
+        lastSentSeqNr.put(clientID, 0);
+    }
+
+    public void removeClientInterface (int clientID){
+        clientInterfaces.remove(clientID);
+        lastAcceptedSeqNr.remove(clientID);
+        lastSentSeqNr.remove(clientID);
     }
 }
