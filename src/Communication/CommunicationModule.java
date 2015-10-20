@@ -1,24 +1,22 @@
 package Communication;
 
-import GroupManagement.Client;
-import GroupManagement.ClientInterface;
 
-import java.lang.reflect.Array;
+import GroupManagement.ClientInterface;
 import java.util.*;
 
-/**
+/** Communication module, connects from one to many clients
+ *
  * Created by Johan on 2015-10-14.
  */
 public class CommunicationModule {
 
-    private static int timeOutTime = 1000; // Milliseconds
     private int counter;
     private String userName;
     private int clientID;
     private HashMap <Integer, ClientInterface> clientInterfaces;
     private HashMap <Integer, Integer> lastAcceptedSeqNr;
     private HashMap <Integer, Integer> lastSentSeqNr;
-    private ArrayList <TextMessage> acceptedMessages = new ArrayList<TextMessage>();
+    private ArrayList <TextMessage> acceptedMessages = new ArrayList<>();
 
 
     public CommunicationModule(String userName, int clientID, HashMap <Integer, ClientInterface> clientInterfaces){
@@ -27,8 +25,8 @@ public class CommunicationModule {
         this.clientInterfaces = clientInterfaces;
         this.clientID = clientID;
 
-        this.lastAcceptedSeqNr = new HashMap<Integer, Integer>();
-        this.lastSentSeqNr = new HashMap<Integer, Integer>();
+        this.lastAcceptedSeqNr = new HashMap<>();
+        this.lastSentSeqNr = new HashMap<>();
 
         for(int key: clientInterfaces.keySet()){
             lastSentSeqNr.put(key, 0);
@@ -42,6 +40,7 @@ public class CommunicationModule {
         for(int key: clientInterfaces.keySet()){
             clientInterfaces.get(key).addMessageToQueue(textMessage);
         }
+        lastSentSeqNr.put(clientID, lastSentSeqNr.get(clientID)+1);
     }
 
     public void addMessageToQueue (TextMessage textMessage){
@@ -56,6 +55,7 @@ public class CommunicationModule {
         }
     }
     private class InnerThread extends Thread {
+        private int timeOutTime = 1000; // Milliseconds
         private boolean timedOut = false;
         private int clientID;
         private TextMessage message;
@@ -115,10 +115,6 @@ public class CommunicationModule {
         acceptedMessages = new ArrayList<TextMessage>();
         return  temp;
     }
-
-    //public void updateClientInterfaces(HashMap <Integer, ClientInterface> clientInterfaces){
-    //    this.clientInterfaces = clientInterfaces;
-    //}
 
     public void addAnotherClientInterface(int clientID, ClientInterface ci){
         clientInterfaces.put(clientID, ci);
