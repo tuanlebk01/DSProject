@@ -16,6 +16,7 @@ import java.util.Map.Entry;
 
 import Application.GUI;
 import Communication.CommunicationModule;
+import Communication.TextMessage;
 
 public class Client implements ClientInterface {
 
@@ -23,7 +24,7 @@ public class Client implements ClientInterface {
 	private Registry registry;
 	private NameServerInterface ns;
 	private ClientInterface ci;
-	private CommunicationModule cm;
+	public CommunicationModule cm;
 	private HashMap<String, ArrayList<String>> groupsInfo = new HashMap<String, ArrayList<String>>();
 	private HashMap<String, String> leaders = new HashMap<String, String>();
 	private HashMap<Integer, ClientInterface> clientInterfaces = new HashMap<Integer, ClientInterface>();
@@ -165,6 +166,12 @@ public class Client implements ClientInterface {
 
 	public void retrieveMessage(String message) throws RemoteException {
 		GUI.writeMsg(message);
+	}
+
+
+
+	public void addMessageToQueue (TextMessage message){
+		cm.addMessageToQueue(message);
 	}
 
 	public void broadcastMessage(String message) {
