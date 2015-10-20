@@ -10,35 +10,36 @@ import java.util.*;
  */
 public class CommunicationModule {
 
+    private static int timeOutTime = 1000;
     private int counter;
     private String userName;
     private int clientID;
-    private HashMap<String, ArrayList<String>> groupsInfo;
-    private HashMap <Integer, ArrayList<TextMessage>> clientBuffers;
-    private HashMap<Integer, ClientInterface> clientInterfaces;
+    private HashMap <Integer, ClientInterface> clientInterfaces;
     private HashMap <Integer, Integer> lastAcceptedSeqNr;
+    private HashMap <Integer, Integer> lastSentSeqNr;
+    private ArrayList <TextMessage> acceptedMessages = new ArrayList<TextMessage>();
 
 
-    public CommunicationModule(String userName, HashMap<String, ArrayList<String>> groupsInfo, int clientID){
+    public CommunicationModule(String userName, int clientID, HashMap <Integer, ClientInterface> clientInterfaces){
         counter = 0;
         this.userName = userName;
-        this.groupsInfo = groupsInfo;
+        this.clientInterfaces = clientInterfaces;
         this.clientID = clientID;
 
-    }
+        this.lastAcceptedSeqNr = new HashMap<Integer, Integer>();
+        this.lastSentSeqNr = new HashMap<Integer, Integer>();
 
-    public void updateGroupsInfo(HashMap<String, ArrayList<String>> groupsInfo){
-        this.groupsInfo = groupsInfo;
+        for(int key: clientInterfaces.keySet()){
+            lastSentSeqNr.put(key, 0);
+            lastAcceptedSeqNr.put(key,0);
+        }
     }
 
     public void sendMessage(String message){
-        counter ++;
         TextMessage textMessage = new TextMessage(counter, message, userName, clientID);
 
-        ClientInterface ci;
         for(int key: clientInterfaces.keySet()){
-            ci = clientInterfaces.get(key);
-            // ci.
+            clientInterfaces.get(key).addMessageToQueue(textMessage);
         }
     }
 
@@ -48,39 +49,51 @@ public class CommunicationModule {
         int seqNr = lastAcceptedSeqNr.get(id);
 
         if (textMessage.getSeqNr() <= (seqNr+1) ){
-            // Static call to client
-            int acceptedSeqNr = lastAcceptedSeqNr.get(id);
-            acceptedSeqNr++;
-//            lastAcceptedSeqNr.replace(id, acceptedSeqNr-1, acceptedSeqNr);
-
+            AcceptMessage(textMessage, id);
         } else {
-            ArrayList<TextMessage> buffer = clientBuffers.get(id);
-            buffer.add(textMessage);
-            Collections.sort(buffer, new Comparator<TextMessage>() {
-                @Override
-                public int compare(TextMessage tm1, TextMessage tm2) {
-                    return tm1.getSeqNr() - tm2.getSeqNr(); // Ascending
-                }
-            });
-            //checkBuffer(buffer, id);
+            new InnerThread(id, textMessage);
         }
     }
+    private class InnerThread extends Thread {
+        private boolean timedOut = false;
+        private int clientID;
+        private TextMessage message;
 
-//    public void checkBuffer(ArrayList<TextMessage> buffer, int id){
-//        int seqNr = lastAcceptedSeqNr.get(id);
-//        for (int i=0; i<buffer.size(); i++){
-//            if(buffer.get(i).getSeqNr() <= (seqNr+1)){
-//                // Static call to client
-//                int acceptedSeqNr = lastAcceptedSeqNr.get(buffer.get(i).getClientID());
-//                acceptedSeqNr++;
-//
-//                lastAcceptedSeqNr.replace(buffer.get(i).getClientID(), acceptedSeqNr-1, acceptedSeqNr);
-//                buffer.remove(i);
-//            }else {
-//
-//            }
-//        }
-//    }
+        InnerThread(int clientID, TextMessage message) {
+            this.clientID = clientID;
+            this.message = message;
+            start();
+        }
+
+        public void run() {
+            long time1 = System.currentTimeMillis();
+            long time2;
+            while (!timedOut){
+
+                time2 = System.currentTimeMillis();
+                if(time2 >= time1 + timeOutTime){
+                    timedOut = true;
+                }
+                if (message.getSeqNr() <= (lastAcceptedSeqNr.get(clientID))+1){
+                    timedOut = true;
+                }
+            }
+            AcceptMessage(message, clientID);
+        }
+
+        private void AcceptMessage(TextMessage message, int clientID){
+            acceptedMessages.add(message);
+            lastAcceptedSeqNr.remove(clientID);
+            lastAcceptedSeqNr.put(clientID, message.getSeqNr());
+
+        }
+    }
+    private void AcceptMessage(TextMessage message, int clientID){
+        acceptedMessages.add(message);
+        lastAcceptedSeqNr.remove(clientID);
+        lastAcceptedSeqNr.put(clientID, message.getSeqNr());
+
+    }
 
     public void setClientInterface(HashMap<Integer, ClientInterface> clientInterfaces){
         this.clientInterfaces = clientInterfaces;
