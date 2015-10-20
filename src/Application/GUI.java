@@ -13,6 +13,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import javax.swing.DefaultListModel;
 import javax.swing.JButton;
@@ -27,6 +29,7 @@ import javax.swing.SwingUtilities;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
+import Communication.TextMessage;
 import GroupManagement.Client;
 import GroupManagement.NameServer;
 
@@ -39,9 +42,11 @@ public class GUI {
 	private JLabel groupsLabel;
 	private JTextField userNameTextField;
 	private JTextField portNrField;
+	private JTextField randomMSGField;
 	private JButton connectButton;
 	private JButton sendButton;
 	private JButton createNewGroupButton;
+	private JButton randomMSGButton;
 	private JButton joinGroupButton;
 	private DefaultListModel groupList = new DefaultListModel();
 	private DefaultListModel userList = new DefaultListModel();
@@ -60,7 +65,7 @@ public class GUI {
 	private boolean groupCreated;
 	private boolean isLeader = false;
 	private String leaderOfMyGroup;
-	private String myGroupName;
+	private String myGroupName = null;
 	private boolean fancyPrinting1 = true;
 	private boolean groupJoined;
 
@@ -83,17 +88,17 @@ public class GUI {
 
 		userNameLabel = new JLabel("Username");
 		userNameLabel.setFont(new Font("Tahoma", Font.PLAIN, 12));
-		userNameLabel.setBounds(28, 25, 73, 22);
+		userNameLabel.setBounds(28, 5, 73, 22);
 		frame.getContentPane().add(userNameLabel);
 
 		userNameTextField = new JTextField();
-		userNameTextField.setBounds(91, 27, 125, 20);
+		userNameTextField.setBounds(91, 7, 125, 20);
 		frame.getContentPane().add(userNameTextField);
 		userNameTextField.setColumns(10);
 		userNameTextField.setText("User1");
 
 		createNewGroupButton = new JButton("Create group");
-		createNewGroupButton.setBounds(524, 0, 135, 23);
+		createNewGroupButton.setBounds(524, 5, 135, 23);
 		frame.getContentPane().add(createNewGroupButton);
 
 		joinGroupButton = new JButton("Join group");
@@ -101,8 +106,12 @@ public class GUI {
 		frame.getContentPane().add(joinGroupButton);
 
 		connectButton = new JButton("Connect");
-		connectButton.setBounds(365, 25, 119, 23);
+		connectButton.setBounds(365, 5, 119, 23);
 		frame.getContentPane().add(connectButton);
+
+		randomMSGButton = new JButton("Test MSG");
+		randomMSGButton.setBounds(365, 35, 119, 23);
+		frame.getContentPane().add(randomMSGButton);
 
 		usersOnlineLabel = new JLabel("Online users");
 		usersOnlineLabel.setFont(new Font("Tahoma", Font.PLAIN, 12));
@@ -113,7 +122,7 @@ public class GUI {
 		frame.getContentPane().add(listUser);
 
 		sendButton = new JButton("Send");
-		sendButton.setBounds(384, 377, 104, 97);
+		sendButton.setBounds(384, 377, 100, 97);
 		frame.getContentPane().add(sendButton);
 
 		listGroup.setBounds(524, 100, 136, 124);
@@ -126,31 +135,43 @@ public class GUI {
 
 		portNrField = new JTextField();
 		portNrField.setColumns(10);
-		portNrField.setBounds(275, 27, 60, 20);
+		portNrField.setBounds(275, 7, 60, 20);
 		frame.getContentPane().add(portNrField);
+
+		randomMSGField = new JTextField();
+		randomMSGField.setColumns(10);
+		randomMSGField.setBounds(275, 37, 60, 20);
+		randomMSGField.setText("10");
+		frame.getContentPane().add(randomMSGField);
 
 		portNrField.setText("1111");
 
 		IPLabel = new JLabel("Port");
 		IPLabel.setFont(new Font("Tahoma", Font.PLAIN, 12));
-		IPLabel.setBounds(234, 25, 30, 22);
+		IPLabel.setBounds(234, 5, 30, 22);
 		frame.getContentPane().add(IPLabel);
 
 		chatArea = new JTextArea();
 		chatArea.setEditable(false);
 		chatArea.setLineWrap(true);
-		chatArea.setBounds(28, 76, 456, 294);
+		chatArea.setBounds(28, 100, 456, 265);
 		frame.add(new JScrollPane(chatArea), BorderLayout.CENTER);
 		frame.getContentPane().add(chatArea);
 
 		msgField = new JTextArea();
-		msgField.setBounds(28, 377, 350, 97);
+		msgField.setBounds(28, 377, 325, 97);
 		msgField.setColumns(10);
 		frame.add(new JScrollPane(msgField), BorderLayout.CENTER);
 		frame.getContentPane().add(msgField);
 
 		createGroup();
 		joinGroup();
+
+		randomMSGButton.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent a) {
+				sendTestMessage();
+			}
+		});
 
 		sendButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent a) {
@@ -212,6 +233,9 @@ public class GUI {
 
 												JOptionPane.showMessageDialog(null,
 														"Joined group: " + myGroupName);
+
+												startThread();
+
 											} else {
 
 											JOptionPane.showMessageDialog(
@@ -372,18 +396,58 @@ public class GUI {
 		}
 	}
 
+	private void startThread() {
+
+        final Timer timer = new Timer(true);
+        ArrayList<TextMessage> textMessages;
+
+        TimerTask task = new TimerTask() {
+
+            public void run() {
+            	System.out.println("asd");
+            	ArrayList<TextMessage> textMessages;
+            	textMessages = client.getMessages();
+            	for(int i = 0; i < textMessages.size(); i++) {
+            		writeMsg(textMessages.get(i).getSenderUserName(), textMessages.get(i).getMessage());
+            	}
+
+            }
+        };
+
+        timer.schedule(task, 0, 250);
+
+	}
+
+
+
+	public void sendTestMessage() {
+		if (connectButton.getText().equals("Connect")) {
+			JOptionPane.showMessageDialog(frame, "You need to connect first.");
+			return;
+		}
+		if(myGroupName != null) {
+			int nrOftestMSG = Integer.parseInt(randomMSGField.getText());
+
+			randomMSGField.setText("");
+
+			client.broadcastTestMessages(nrOftestMSG);
+		}
+	}
+
 	public void sendMessage() {
 		if (connectButton.getText().equals("Connect")) {
 			JOptionPane.showMessageDialog(frame, "You need to connect first.");
 			return;
 		}
-		String message = msgField.getText();
-		message = "[" + userNameTextField.getText() + "] " + message;
-		msgField.setText("");
-		client.broadcastMessage(message);
+		if(myGroupName != null) {
+			String message = msgField.getText();
+			message = "[" + userNameTextField.getText() + "] " + message;
+			msgField.setText("");
+			client.broadcastMessage(message);
+		}
 	}
 
-	public static void writeMsg(String message) {
+	public void writeMsg(String userName, String message) {
 		if (!userName.equals(""))
 			chatArea.append(userName + ": " + message + "\n");
 		else {

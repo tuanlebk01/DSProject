@@ -55,8 +55,8 @@ public class Client implements ClientInterface {
 		clientID = ns.registerChatClient(userName);
 
 		return clientID;
-		
-		
+
+
 
 	}
 
@@ -132,7 +132,10 @@ public class Client implements ClientInterface {
 				+ myLeader);
 		connectToGroupLeader(myLeader);
 
+
 		clientInfo = ns.getClientInfo();
+
+
 		System.out.println("CLIENT: nr of clients in list: " + clients.size());
 
 		ArrayList<Integer> temp = new ArrayList<Integer>();
@@ -150,7 +153,7 @@ public class Client implements ClientInterface {
 		// maps one interface to each client
 		// some rmi exception, haven't looked at it
 		// this is to get messaging to work
-		
+
 		// commented by Tuan
 	// Error here: Because we export object when someone join a group, it makes a duplicated name service here
 		// By exporting object when connecting to the name server, this error will be avoided
@@ -160,15 +163,14 @@ public class Client implements ClientInterface {
 			ci = (ClientInterface) UnicastRemoteObject.exportObject(this, 0);
 			clientInterfaces.put(temp.get(i), ci);
 		}
+
+		HashMap<Integer, ClientInterface> clientInterfaces = new HashMap<Integer, ClientInterface>();
+
+
+		cm = new CommunicationModule(myUserName, clientID, clientInterfaces);
 		return myLeader;
 
 	}
-
-	public void retrieveMessage(String message) throws RemoteException {
-		GUI.writeMsg(message);
-	}
-
-
 
 	public void addMessageToQueue (TextMessage message){
 		cm.addMessageToQueue(message);
@@ -176,6 +178,7 @@ public class Client implements ClientInterface {
 
 	public void broadcastMessage(String message) {
 
+		cm.sendMessage(message);
 
 	}
 
@@ -271,6 +274,17 @@ public class Client implements ClientInterface {
 	public void removeFromGroup(String groupName, String userName) throws RemoteException {
 
 		ns.removeMemberFromGroup(groupName, userName);
+	}
+
+	public void broadcastTestMessages(int nrOftestMSG) {
+
+		cm.sendMessagesInRandomOrder(nrOftestMSG);
+
+	}
+
+	public ArrayList<TextMessage> getMessages() {
+		return cm.getAcceptedMessages();
+
 	}
 }
 
