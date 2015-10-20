@@ -47,10 +47,10 @@ public class Client implements ClientInterface {
 
 		this.myUserName = userName;
 
-//		this.registry = LocateRegistry.getRegistry("Bellatrix.cs.umu.se",
-//				portNr);
-		this.registry = LocateRegistry.getRegistry("localhost",
+		this.registry = LocateRegistry.getRegistry("Sirius.cs.umu.se",
 				portNr);
+//		this.registry = LocateRegistry.getRegistry("localhost",
+//				portNr);
 		this.ns = (NameServerInterface) registry.lookup("NamingService");
 		clientID = ns.registerChatClient(userName);
 
@@ -87,8 +87,8 @@ public class Client implements ClientInterface {
 
 	public boolean connectToGroupLeader(String groupLeader) throws RemoteException, AlreadyBoundException, NotBoundException {
 
-//		registry = LocateRegistry.getRegistry("Bellatrix.cs.umu.se", 1234);
-		registry = LocateRegistry.getRegistry("localhost", 1234);
+		registry = LocateRegistry.getRegistry("Sirius.cs.umu.se", 1234);
+//		registry = LocateRegistry.getRegistry("localhost", 1234);
 		ci = (ClientInterface) registry.lookup(groupLeader);
 		System.out.println("CLIENT: connected to groupleader: " + groupLeader + " : with username: " + myUserName);
 		groupJoined = ci.addMemberToGroup(myUserName);
@@ -171,6 +171,14 @@ public class Client implements ClientInterface {
 		System.out.println("ID list: " +IDs);
 
 		HashMap<Integer, ClientInterface> clientInterfaces = new HashMap<Integer, ClientInterface>();
+
+		for (int i = 0; i < IDs.size(); i++) {
+			ci = (ClientInterface) UnicastRemoteObject.exportObject(this, 0);
+			registry = LocateRegistry.createRegistry(1234);
+			registry.bind(temp.get(i), ci);
+			clientInterfaces.put(IDs.get(i), ci);
+
+		}
 		cm = new CommunicationModule(myUserName, clientID, clientInterfaces);
 
 		return myLeader;
@@ -181,7 +189,7 @@ public class Client implements ClientInterface {
 		cm.addMessageToQueue(message);
 	}
 
-	public void broadcastMessage(String message) {
+	public void broadcastMessage(String message) throws RemoteException {
 
 		cm.sendMessage(message);
 
@@ -281,7 +289,7 @@ public class Client implements ClientInterface {
 		ns.removeMemberFromGroup(groupName, userName);
 	}
 
-	public void broadcastTestMessages(int nrOftestMSG) {
+	public void broadcastTestMessages(int nrOftestMSG) throws RemoteException {
 
 		cm.sendMessagesInRandomOrder(nrOftestMSG);
 
