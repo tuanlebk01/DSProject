@@ -69,6 +69,7 @@ public class CommunicationModule {
 
         for (int j=0; j<=messages.size();j++){
             for(int key: clientInterfaces.keySet()){
+                messages.get(j).addStringToMessage(" -  Was sent as message nr: "+j);
                 clientInterfaces.get(key).addMessageToQueue(messages.get(j));
             }
             counter++;

@@ -56,8 +56,6 @@ public class Client implements ClientInterface {
 
 		return clientID;
 
-
-
 	}
 
 	public boolean createGroup(String groupName, String userName)
@@ -80,6 +78,9 @@ public class Client implements ClientInterface {
 		clientInfo = ns.getClientInfo();
 		groupsInfo = ns.getGroupsInfo();
 
+
+		clientInterfaces.put(clientID, ci);
+
 		return groupCreated;
 
 	}
@@ -91,6 +92,8 @@ public class Client implements ClientInterface {
 		ci = (ClientInterface) registry.lookup(groupLeader);
 		System.out.println("CLIENT: connected to groupleader: " + groupLeader + " : with username: " + myUserName);
 		groupJoined = ci.addMemberToGroup(myUserName);
+		ci = (ClientInterface) UnicastRemoteObject.exportObject(this, 0);
+		clientInterfaces.put(clientID, ci);
 		return groupJoined;
 
 	}
@@ -131,43 +134,45 @@ public class Client implements ClientInterface {
 		System.out.println("CLIENT: Group: " + myGroup + " : Leader: "
 				+ myLeader);
 		connectToGroupLeader(myLeader);
-
-
-		clientInfo = ns.getClientInfo();
-
-
-		System.out.println("CLIENT: nr of clients in list: " + clients.size());
-
-		ArrayList<Integer> temp = new ArrayList<Integer>();
+		ArrayList<String> temp = new ArrayList<String>();
+		ArrayList<Integer> tempIDs = new ArrayList<Integer>();
+		ArrayList<Integer> IDs = new ArrayList<Integer>();
+		ArrayList<String> tempClients = new ArrayList<String>();
+		HashMap<Integer, String> clientInfo = ns.getClientInfo();
+		HashMap<String, Integer> tempClientInfo = new HashMap<String, Integer>();
+		groupsInfo = ns.getGroupsInfo();
+		temp = groupsInfo.get(groupName);
+		temp.remove(leaderName);
 
 		Iterator it = clientInfo.entrySet().iterator();
 		while (it.hasNext()) {
+
 			Map.Entry pair = (Map.Entry) it.next();
-			temp.add(Integer.parseInt(pair.getKey().toString()));
-			it.remove();
+			// temp.add(Integer.parseInt(pair.getKey().toString()));
+			System.out.println("key: " + pair.getKey() + " User: "
+					+ pair.getValue());
+			tempIDs.add(Integer.parseInt(pair.getKey().toString()));
+			tempClients.add((String) pair.getValue());
+		}
+		System.out.println(tempIDs);
+		System.out.println(tempClients);
+
+		for (int i = 0; i < tempIDs.size(); i++) {
+			int l = tempIDs.get(i);
+			String str = tempClients.get(i);
+			tempClientInfo.put(str, l);
+		}
+
+		for (String i : temp) {
+			IDs.add(tempClientInfo.get(i));
 		}
 
 
-		//LOOK AT THIS AND FIX IT SOMEHOW
-		// Loops through array with all clients
-		// maps one interface to each client
-		// some rmi exception, haven't looked at it
-		// this is to get messaging to work
-
-		// commented by Tuan
-	// Error here: Because we export object when someone join a group, it makes a duplicated name service here
-		// By exporting object when connecting to the name server, this error will be avoided
-		System.out.println("HERE IT ALL GOES TO HELL");
-		for (int i = 0; i < temp.size(); i++) {
-			System.out.println("temp: " + temp.get(i));
-			ci = (ClientInterface) UnicastRemoteObject.exportObject(this, 0);
-			clientInterfaces.put(temp.get(i), ci);
-		}
+		System.out.println("ID list: " +IDs);
 
 		HashMap<Integer, ClientInterface> clientInterfaces = new HashMap<Integer, ClientInterface>();
-
-
 		cm = new CommunicationModule(myUserName, clientID, clientInterfaces);
+
 		return myLeader;
 
 	}
