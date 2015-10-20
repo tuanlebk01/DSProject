@@ -404,7 +404,6 @@ public class GUI {
         TimerTask task = new TimerTask() {
 
             public void run() {
-            	System.out.println("asd");
             	ArrayList<TextMessage> textMessages;
             	textMessages = client.getMessages();
             	for(int i = 0; i < textMessages.size(); i++) {
@@ -430,7 +429,11 @@ public class GUI {
 
 			randomMSGField.setText("");
 
-			client.broadcastTestMessages(nrOftestMSG);
+			try {
+				client.broadcastTestMessages(nrOftestMSG);
+			} catch (RemoteException e) {
+				e.printStackTrace();
+			}
 		}
 	}
 
@@ -443,7 +446,11 @@ public class GUI {
 			String message = msgField.getText();
 			message = "[" + userNameTextField.getText() + "] " + message;
 			msgField.setText("");
-			client.broadcastMessage(message);
+			try {
+				client.broadcastMessage(message);
+			} catch (RemoteException e) {
+				e.printStackTrace();
+			}
 		}
 	}
 

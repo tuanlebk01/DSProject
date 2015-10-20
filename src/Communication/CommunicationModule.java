@@ -2,6 +2,8 @@ package Communication;
 
 
 import GroupManagement.ClientInterface;
+
+import java.rmi.RemoteException;
 import java.util.*;
 
 /** Communication module, connects from one to many clients with basic multicast.
@@ -41,8 +43,9 @@ public class CommunicationModule {
     /** Sends the message to all clientInterfaces that the communication module have knowledge of.
      *
      * @param message - The string that the message contains
+     * @throws RemoteException
      */
-    public void sendMessage(String message){
+    public void sendMessage(String message) throws RemoteException{
         TextMessage textMessage = new TextMessage(counter, message, userName, clientID);
 
         for(int key: clientInterfaces.keySet()){
@@ -57,8 +60,9 @@ public class CommunicationModule {
      *      - "Textmessage nr: x" where x is the number of the message.
      *
      * @param numberOfMessages - number of messages to send
+     * @throws RemoteException
      */
-    public void sendMessagesInRandomOrder(int numberOfMessages){
+    public void sendMessagesInRandomOrder(int numberOfMessages) throws RemoteException{
 
         List<TextMessage> messages = new ArrayList<>();
         for (int i = 0; i < numberOfMessages; i++)
@@ -86,6 +90,8 @@ public class CommunicationModule {
      */
     public void addMessageToQueue (TextMessage textMessage){
         int id = textMessage.getClientID();
+
+        System.out.println("ERROR: " + userName);
 
         int seqNr = lastAcceptedSeqNr.get(id);
 
