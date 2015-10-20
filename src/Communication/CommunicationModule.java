@@ -6,7 +6,7 @@ import java.util.*;
 
 /** Communication module, connects from one to many clients
  *
- * Created by Johan on 2015-10-14.
+ * Created by Johan
  */
 public class CommunicationModule {
 
@@ -104,15 +104,7 @@ public class CommunicationModule {
 
         ArrayList<TextMessage> temp = acceptedMessages;
 
-        // Sort temp
-        Collections.sort(temp, new Comparator<TextMessage>() {
-                    @Override
-                    public int compare(TextMessage t1, TextMessage t2) {
-                        return t1.getSeqNr() - t2.getSeqNr(); // Ascending
-                    }
-                }
-        );
-        acceptedMessages = new ArrayList<TextMessage>();
+        acceptedMessages = new ArrayList<>();
         return  temp;
     }
 
