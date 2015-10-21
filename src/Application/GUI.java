@@ -198,11 +198,10 @@ public class GUI {
 				if (evt.getValueIsAdjusting()) {
 					final JList source = (JList) evt.getSource();
 					try {
+						Thread.sleep(100);
 						mapOfGroups = client.getGroupsInfo();
-
 						listOfMembers.clear();
 						listOfMembers = mapOfGroups.get(source.getSelectedValue().toString());
-//						userList.clear();
 
 
 						fancyPrinting2 = true;
@@ -222,10 +221,13 @@ public class GUI {
 											groupJoined = client.isGroupJoined();
 
 											if(groupJoined) {
+
 												mapOfGroups = client.getGroupsInfo();
 												listOfMembers = mapOfGroups.get(myGroupName);
 
 												userList.clear();
+
+
 												for (int i = 0; i < listOfMembers.size(); i++) {
 													userList.add(i,listOfMembers.get(i));
 												}
@@ -255,7 +257,7 @@ public class GUI {
 							fancyPrinting2 = false;
 							fancyPrinting1 = false;
 						}
-					} catch (RemoteException ex) {
+					} catch (RemoteException | InterruptedException ex) {
 						ex.printStackTrace();
 					}
 				}

@@ -34,4 +34,10 @@ public interface NameServerInterface extends Remote, Serializable {
 
 	public ArrayList<Triple> getClientList() throws RemoteException;
 
+	public Triple getClientInfo() throws RemoteException;
+
+	public void setClientInfo(Triple clientInfo) throws RemoteException;
+
+	public ArrayList<Triple> getGroupTriples(String groupName) throws RemoteException;
+
 }

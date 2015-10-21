@@ -43,8 +43,8 @@ public class CommunicationModule {
 
         this.lastAcceptedSeqNr = new HashMap<>();
 
-        for(int key: clientInterfaces.keySet()){
-            lastAcceptedSeqNr.put(key,0);
+        for(int i = 0; i < clients.size(); i++ ) {
+        	lastAcceptedSeqNr.put(i, 0);
         }
     }
 

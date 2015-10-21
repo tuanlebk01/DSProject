@@ -23,6 +23,7 @@ public class NameServer extends RemoteServer implements NameServerInterface {
 	private HashMap<String, String> leaderInfo = new HashMap<String, String>();
 	private HashMap<String, ArrayList<String>> groupUserlistMap = new HashMap<String, ArrayList<String>>();
 	private ArrayList<Triple> listOfClients = new ArrayList<Triple>();
+	private ArrayList<Triple> groupTriples = new ArrayList<Triple>();
 
 	private int clientID = 0;
 
@@ -75,7 +76,11 @@ public class NameServer extends RemoteServer implements NameServerInterface {
 			tempList.add(userName);
 			groupUserlistMap.put(groupName, tempList);
 			leaderInfo.put(groupName, userName);
-			clientInfo.setGroup(groupName);
+			for(int i = 0; i < listOfClients.size(); i++) {
+				if(userName.equals(listOfClients.get(i).getUsername())) {
+					listOfClients.get(i).setGroup(groupName);
+				}
+			}
 			System.out.println("NS: Group created with name: " + groupName);
 			return true;
 		}
@@ -90,6 +95,13 @@ public class NameServer extends RemoteServer implements NameServerInterface {
 		if (!(tempList.contains(userName))) {
 			tempList.add(userName);
 			groupUserlistMap.put(groupName, tempList);
+
+			for(int i = 0; i < listOfClients.size(); i++) {
+				if(userName.equals(listOfClients.get(i).getUsername())) {
+					listOfClients.get(i).setGroup(groupName);
+				}
+			}
+
 			return true;
 		}
 		return false;
@@ -142,7 +154,6 @@ public class NameServer extends RemoteServer implements NameServerInterface {
 	}
 
 	public HashMap<String, String> getGroupLeaders() {
-
 		return leaderInfo;
 	}
 
@@ -154,5 +165,28 @@ public class NameServer extends RemoteServer implements NameServerInterface {
 	@Override
 	public ArrayList<Triple> getClientList() throws RemoteException {
 		return listOfClients;
+	}
+
+	public Triple getClientInfo() throws RemoteException {
+		return clientInfo;
+	}
+
+	public void setClientInfo(Triple clientInfo) throws RemoteException {
+		this.clientInfo = clientInfo;
+	}
+
+	public ArrayList<Triple> getGroupTriples(String groupName) throws RemoteException {
+
+
+		Triple triple;
+		for (int i = 0; i < listOfClients.size(); i++) {
+
+			triple = listOfClients.get(i);
+
+			if(groupName.equals(triple.getGroup())) {
+				groupTriples.add(triple);
+			}
+		}
+		return groupTriples;
 	}
 }

@@ -45,5 +45,7 @@ public interface ClientInterface extends Remote, Serializable {
 
 	public HashMap<String, ArrayList<String>> getGroupsInfo() throws RemoteException;
 
+	public void setClientList(ArrayList<Triple> clients) throws RemoteException;
+
 
 }
