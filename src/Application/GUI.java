@@ -198,15 +198,13 @@ public class GUI {
 				if (evt.getValueIsAdjusting()) {
 					final JList source = (JList) evt.getSource();
 					try {
-						mapOfGroups = client.getGroups();
+						mapOfGroups = client.getGroupsInfo();
 
 						listOfMembers.clear();
 						listOfMembers = mapOfGroups.get(source.getSelectedValue().toString());
-						userList.clear();
+//						userList.clear();
 
-						for (int i = 0; i < listOfMembers.size(); i++) {
-							userList.add(i, listOfMembers.get(i));
-						}
+
 						fancyPrinting2 = true;
 						if (fancyPrinting2 && fancyPrinting1) {
 							joinGroupButton.addActionListener(new ActionListener() {
@@ -224,7 +222,8 @@ public class GUI {
 											groupJoined = client.isGroupJoined();
 
 											if(groupJoined) {
-												listOfMembers = client.getGroupList(myGroupName);
+												mapOfGroups = client.getGroupsInfo();
+												listOfMembers = mapOfGroups.get(myGroupName);
 
 												userList.clear();
 												for (int i = 0; i < listOfMembers.size(); i++) {
@@ -279,13 +278,13 @@ public class GUI {
 						groupCreated = client.createGroup(input, userName);
 						if (groupCreated) {
 
+							myGroupName = input;
+							isLeader = true;
 							updateLists();
 
 //							JOptionPane.showMessageDialog(null,
 //									"Group created with name: " + input);
 							System.out.println("GUI: Group created: " + input);
-							myGroupName = input;
-							isLeader = true;
 
 						} else {
 //							JOptionPane.showMessageDialog(null,
@@ -338,7 +337,7 @@ public class GUI {
 				System.out.println("GUI: Connected to nameserver");
 
 			} catch (Exception ex) {
-				// ex.printStackTrace();
+				 ex.printStackTrace();
 				connectButton.setText("Connect");
 				JOptionPane.showMessageDialog(frame,
 						"Error, could not connect.");
@@ -359,7 +358,7 @@ public class GUI {
 
 	public void updateLists() {
 		try {
-			mapOfGroups = client.getGroups();
+			mapOfGroups = client.getGroupsInfo();
 		} catch (RemoteException ex) {
 			ex.printStackTrace();
 		}
@@ -377,10 +376,15 @@ public class GUI {
 			it.remove();
 		}
 
-		groupList.clear();
 
+		groupList.clear();
 		for (int i = 0; i < listOfGroups.size(); i++) {
 			groupList.add(i, listOfGroups.get(i));
+		}
+
+		userList.clear();
+		for (int i = 0; i < listOfMembers.size(); i++) {
+			userList.add(i,listOfMembers.get(i));
 		}
 	}
 

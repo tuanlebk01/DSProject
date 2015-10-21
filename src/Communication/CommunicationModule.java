@@ -3,6 +3,7 @@ package Communication;
 
 import GroupManagement.ClientInterface;
 import GroupManagement.NameServerInterface;
+import GroupManagement.Triple;
 
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
@@ -23,7 +24,7 @@ public class CommunicationModule {
     private HashMap <Integer, Integer> lastAcceptedSeqNr;
     private ArrayList <TextMessage> acceptedMessages = new ArrayList<>();
     private Registry registry;
-	private ArrayList<String> clients;
+	private ArrayList<Triple> clients;
 
 
     /** The communication module keep track of the sequence numbers received by any client.
@@ -33,10 +34,9 @@ public class CommunicationModule {
      * @param clientInterfaces - A hashmap of all clientIds and clientInterfaces to all the clients in the group
      * @param clients
      */
-    public CommunicationModule(String userName, int clientID, HashMap <Integer, ClientInterface> clientInterfaces, ArrayList<String> clients, Registry registry){
+    public CommunicationModule(String userName, int clientID, ArrayList<Triple> clients, Registry registry){
         counter = 0;
         this.userName = userName;
-        this.clientInterfaces = clientInterfaces;
         this.clientID = clientID;
         this.clients = clients;
         this.registry = registry;

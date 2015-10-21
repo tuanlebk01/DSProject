@@ -24,19 +24,14 @@ public interface ClientInterface extends Remote, Serializable {
 			throws RemoteException, ServerNotActiveException,
 			NotBoundException, AlreadyBoundException;
 
-	public HashMap<String, ArrayList<String>> getGroups()
-			throws RemoteException;
-
 	public String joinGroup(String groupName, String leaderName)
 			throws RemoteException, ServerNotActiveException, AlreadyBoundException, NotBoundException;
 
 	public boolean connectToGroupLeader(String groupLeader) throws RemoteException, AlreadyBoundException, NotBoundException;
 
-	public String startElection(ArrayList<String> client) throws RemoteException;
+	public String startElection() throws RemoteException;
 
-	public boolean addMemberToGroup(String user) throws RemoteException;
-
-	public ArrayList<String> getGroupList(String myGroup) throws RemoteException;
+	public boolean addMemberToGroup(String userName) throws RemoteException;
 
 	public void disconnect(String groupName, String userName) throws RemoteException;
 
@@ -47,6 +42,8 @@ public interface ClientInterface extends Remote, Serializable {
 	public void setClientInterfaces(HashMap<Integer, ClientInterface> clientInterfaces) throws RemoteException;
 
 	public void sharegroup() throws RemoteException;
+
+	public HashMap<String, ArrayList<String>> getGroupsInfo() throws RemoteException;
 
 
 }
