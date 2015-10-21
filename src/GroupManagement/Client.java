@@ -68,11 +68,17 @@ public class Client implements ClientInterface {
 		this.myGroup = groupName;
 		this.myLeader = userName;
 
-		registry = LocateRegistry.getRegistry("localhost", 1234);
+//		this.nameServer = (NameServerInterface) UnicastRemoteObject
+//				.exportObject(this, 0);
+//		Registry registry = LocateRegistry.createRegistry(port);
+//		registry.bind(NameServer.Name, nameServer);
+
+		leaderci = (ClientInterface) UnicastRemoteObject.exportObject(this, 0);
 		registry = LocateRegistry.createRegistry(1234);
 		registry.bind(userName, leaderci);
 
-		leaderci = (ClientInterface) UnicastRemoteObject.exportObject(this, 0);
+
+
 		System.out.println("CLIENT: Groupleader: " + userName + " running on port " + "1234");
 
 
