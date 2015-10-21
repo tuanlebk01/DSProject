@@ -30,7 +30,6 @@ public class CommunicationModule {
      *
      * @param userName - userName of the client that created the communication module
      * @param clientID - clientId of the client that created the communication module
-     * @param clientInterfaces - A hashmap of all clientIds and clientInterfaces to all the clients in the group
      * @param clients
      */
     public CommunicationModule(String userName, int clientID, ArrayList<Triple> clients, Registry registry){
@@ -76,22 +75,24 @@ public class CommunicationModule {
      * @param numberOfMessages - number of messages to send
      * @throws RemoteException
      */
-    public void sendMessagesInRandomOrder(int numberOfMessages) throws RemoteException{
+    public void sendMessagesInRandomOrder(int numberOfMessages) throws RemoteException, java.rmi.NotBoundException{
 
-//        List<TextMessage> messages = new ArrayList<>();
-//        for (int i = 0; i < numberOfMessages; i++)
-//        {
-//            messages.add(new TextMessage(i, "Textmessage nr: " + i, userName, clientID));
-//        }
-//        Collections.shuffle(messages);
-//
-//        for (int j=0; j<=messages.size();j++){
-//            for(int key: clientInterfaces.keySet()){
-//                messages.get(j).addStringToMessage(" -  Was sent as message nr: "+j);
-//                clientInterfaces.get(key).addMessageToQueue(messages.get(j));
-//            }
-//            counter++;
-//        }
+        List<TextMessage> messages = new ArrayList<>();
+        ClientInterface ci;
+        for (int i = 0; i < numberOfMessages; i++)
+        {
+            messages.add(new TextMessage(i, "Textmessage nr: " + i, userName, clientID));
+        }
+        Collections.shuffle(messages);
+
+        for (int j=0; j<=messages.size();j++){
+            for(int k= 0; k < clients.size(); k++){
+                messages.get(j).addStringToMessage(" -  Was sent as message nr: "+j);
+                ci = (ClientInterface) registry.lookup(clients.get(k).getUsername());
+                ci.addMessageToQueue(messages.get(j));
+            }
+            counter++;
+        }
     }
 
     /** This method receives a message and determines if the message should be accepted in the right order or if it
@@ -188,9 +189,6 @@ public class CommunicationModule {
 
     /** Add another client interface to the communication module. A counter for the sequence number from that client is
      * also added.
-     *
-     * @param clientID - clientId of the client to be added.
-     * @param ci - clientInterface to of the client to be added.
      */
     public void addAnotherClientInterface(Triple triple){
 
@@ -202,7 +200,6 @@ public class CommunicationModule {
      * that this method is called whenever a client leaves a group so it the communication module does not try to send
      * messages to that client any longer.
      *
-     * @param clientID - clientId of the client that left the group.
      */
     public void removeClientInterface (Triple triple){
     	clients.remove(triple);

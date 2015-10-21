@@ -217,7 +217,7 @@ public class Client implements ClientInterface {
 		ns.removeMemberFromGroup(groupName, userName);
 	}
 
-	public void broadcastTestMessages(int nrOftestMSG) throws RemoteException {
+	public void broadcastTestMessages(int nrOftestMSG) throws RemoteException, java.rmi.NotBoundException {
 
 		cm.sendMessagesInRandomOrder(nrOftestMSG);
 
