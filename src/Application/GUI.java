@@ -379,6 +379,9 @@ public class GUI {
 			it.remove();
 		}
 
+		System.out.println(listOfGroups);
+		System.out.println(listOfMembers);
+
 
 		groupList.clear();
 		for (int i = 0; i < listOfGroups.size(); i++) {
