@@ -32,4 +32,6 @@ public interface NameServerInterface extends Remote, Serializable {
 
 	public void removeGroup(String groupName)throws RemoteException;
 
+	public ArrayList<Object> getClietList() throws RemoteException;
+
 }
