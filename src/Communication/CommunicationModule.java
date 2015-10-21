@@ -137,11 +137,18 @@ public class CommunicationModule {
             long time2;
             while (!timedOut){
 
-                time2 = System.currentTimeMillis();
+            	try {
+					Thread.sleep(15);
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				}
+
+            	time2 = System.currentTimeMillis();
                 if(time2 >= time1 + timeOutTime){
                     timedOut = true;
                 }
                 if (message.getSeqNr() <= (lastAcceptedSeqNr.get(clientID))+1){
+
                     timedOut = true;
                 }
             }
@@ -154,7 +161,7 @@ public class CommunicationModule {
          * @param message - Message to accept
          * @param clientID - clientID of the client that sent the message.
          */
-        private void AcceptMessage(TextMessage message, int clientID){
+        private synchronized void AcceptMessage(TextMessage message, int clientID){
             acceptedMessages.add(message);
             if(message.getSeqNr()>lastAcceptedSeqNr.get(clientID)){
                 lastAcceptedSeqNr.remove(clientID);

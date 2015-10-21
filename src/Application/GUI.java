@@ -287,9 +287,18 @@ public class GUI {
 							listOfGroups.clear();
 							listOfMembers.clear();
 
-							listOfMembers = mapOfGroups.get(input);
+							Iterator it = mapOfGroups.entrySet().iterator();
+							while (it.hasNext()) {
+								Map.Entry pair = (Map.Entry) it.next();
+								listOfGroups.add(pair.getKey().toString());
+								listOfMembers.add(pair.getValue().toString());
+//										System.out.println("GUI:");
+//										System.out.println(pair.getKey() + " = " + pair.getValue());
+								it.remove();
+							}
 
-							System.out.println("list: " + listOfMembers);
+							System.out.println(listOfGroups);
+							System.out.println(listOfMembers);
 
 							groupList.clear();
 							for (int i = 0; i < listOfGroups.size(); i++) {
@@ -402,7 +411,7 @@ public class GUI {
 	}
 
 	public void updateLists() {
-
+		//FIX THIS
 
 	}
 
@@ -442,7 +451,7 @@ public class GUI {
 
 			try {
 				client.broadcastTestMessages(nrOftestMSG);
-			} catch (RemoteException e) {
+			} catch (RemoteException | NotBoundException e) {
 				e.printStackTrace();
 			}
 		}
