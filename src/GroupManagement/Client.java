@@ -18,6 +18,7 @@ import java.util.Map.Entry;
 import Application.GUI;
 import Communication.CommunicationModule;
 import Communication.TextMessage;
+import GroupManagement.NameServer.Triple;
 
 public class Client implements ClientInterface {
 
@@ -37,6 +38,7 @@ public class Client implements ClientInterface {
 	private String myLeader;
 	private boolean groupCreated;
 	private boolean groupJoined;
+	private Triple clientInfo3;
 
 	public Client() throws RemoteException {
 		super();

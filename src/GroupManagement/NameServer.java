@@ -19,10 +19,9 @@ public class NameServer extends RemoteServer implements NameServerInterface {
 	private static final long serialVersionUID = 1L;
 	private NameServerInterface nameServer;
 	private static String Name = "NamingService";
-	private HashMap<String, String> leaderInfo = new HashMap<String, String>();
-	// the first column is ClientID, the second column is user name
 	private Triple clientInfo;
-	private HashMap<String, ArrayList<String>> groupInfo = new HashMap<String, ArrayList<String>>();
+	private HashMap<String, String> leaderInfo = new HashMap<String, String>();
+	private HashMap<String, ArrayList<String>> groupUserlistMap = new HashMap<String, ArrayList<String>>();
 	private int clientID = 0;
 
 	public static void main(String args[]) {
@@ -50,26 +49,6 @@ public class NameServer extends RemoteServer implements NameServerInterface {
 		registry.bind(NameServer.Name, nameServer);
 		System.out.println("NS: Naming Service Running on port " + port);
 
-		ArrayList<String> tempList = new ArrayList<String>();
-
-		if (!(groupInfo.containsKey("Group 1"))) {
-
-			tempList.add("User 1");
-			tempList.add("User 2");
-			tempList.add("User 3");
-			leaderInfo.put("Group 1", "User 1");
-			groupInfo.put("Group 1", tempList);
-		}
-
-		tempList = new ArrayList<String>();
-
-		if (!(groupInfo.containsKey("Group 2"))) {
-			tempList.add("User 4");
-			tempList.add("User 5");
-			tempList.add("User 6");
-			leaderInfo.put("Group 2", "User 4");
-			groupInfo.put("Group 2", tempList);
-		}
 	}
 
 	public int registerChatClient(String userName) throws RemoteException,
@@ -84,10 +63,12 @@ public class NameServer extends RemoteServer implements NameServerInterface {
 		return clientID;
 	}
 
-	private class Triple{
+	private class Triple {
+		
 		private int clientID;
 		private String username;
 		private InetAddress ip;
+		private String group;
 
 		public Triple (int clientID,String username, InetAddress ip){
 			this.clientID = clientID;
@@ -119,9 +100,13 @@ public class NameServer extends RemoteServer implements NameServerInterface {
 			this.ip = ip;
 		}
 
+		public String getGroup() {
+			return group;
+		}
 
-
-
+		public void setGroup(String group) {
+			this.group = group;
+		}
 	}
 
 	public boolean createGroup(String groupName, String userName)
@@ -129,12 +114,12 @@ public class NameServer extends RemoteServer implements NameServerInterface {
 
 		ArrayList<String> tempList = new ArrayList<String>();
 
-		if (!groupInfo.containsKey(groupName)) {
+		if (!groupUserlistMap.containsKey(groupName)) {
 			tempList.add(userName);
-			groupInfo.put(groupName, tempList);
+			groupUserlistMap.put(groupName, tempList);
 			leaderInfo.put(groupName, userName);
 			System.out.println("NS: Group created with name: " + groupName);
-			System.out.println("Groups: " + groupInfo.keySet());
+			System.out.println("Groups: " + groupUserlistMap.keySet());
 			return true;
 		}
 		return false;
@@ -143,11 +128,11 @@ public class NameServer extends RemoteServer implements NameServerInterface {
 	public boolean addMember(String groupName, String userName)
 			throws RemoteException {
 
-		ArrayList<String> tempList = groupInfo.get(groupName);
+		ArrayList<String> tempList = groupUserlistMap.get(groupName);
 
 		if (!(tempList.contains(userName))) {
 			tempList.add(userName);
-			groupInfo.put(groupName, tempList);
+			groupUserlistMap.put(groupName, tempList);
 			return true;
 		}
 		return false;
@@ -156,56 +141,49 @@ public class NameServer extends RemoteServer implements NameServerInterface {
 	public void removeMemberFromGroup(String groupName, String userName)
 			throws RemoteException {
 
-		ArrayList<String> clientList = groupInfo.get(groupName);
+		ArrayList<String> clientList = groupUserlistMap.get(groupName);
 
 		clientList.remove(userName);
-		groupInfo.put(groupName, clientList);
+		groupUserlistMap.put(groupName, clientList);
 
 		System.out.println("NS: User: " + userName + " left group: " + groupName);
 	}
 
+	public void leaveServer(int ID) throws RemoteException {
+
+//		if(groupName == null) {
+
+//			System.out.println("NS: The following user left the server: " + ClientInfo.get(ID));
+//			ClientInfo.remove(ID);
+
+//		} else {
+//			System.out.println("NS: Leader: " + ClientInfo.get(ID) + " left in group: " + groupName + ". Start election");
+//			ClientInfo.remove(ID);
+
+//		}
+	}
+
+	public void removeGroup(String groupName) throws RemoteException {
+
+		groupUserlistMap.remove(groupName);
+		System.out.println("Group: " + groupName + " was removed");
+
+	}
+
+
 	public HashMap<String, ArrayList<String>> getGroupsInfo() {
 
-		return groupInfo;
+		return groupUserlistMap;
 	}
 
 	public HashMap<String, String> getGroupLeaders() {
 
 		return leaderInfo;
 	}
-
-	public void leaveServer(String groupName, int ID) throws RemoteException {
-
-
-		if(groupName == null) {
-
-//			System.out.println("NS: The following user left the server: " + ClientInfo.get(ID));
-//			ClientInfo.remove(ID);
-
-		} else {
-//			System.out.println("NS: Leader: " + ClientInfo.get(ID) + " left in group: " + groupName + ". Start election");
-//			ClientInfo.remove(ID);
-
-		}
-	}
-
-	public void removeGroup(String groupName) throws RemoteException {
-
-		groupInfo.remove(groupName);
-		System.out.println("Group: " + groupName + " was removed");
-
-	}
-
-
+	
 	@Override
 	public void updateGroupLeaderInfo(String Groupname) throws RemoteException {
 
-	}
-
-	@Override
-	public ArrayList<String> getMemberInGroup(String groupName)
-			throws RemoteException {
-		return null;
 	}
 
 }

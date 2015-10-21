@@ -57,7 +57,7 @@ public class CommunicationModule {
         TextMessage textMessage = new TextMessage(counter, message, userName, clientID);
         ClientInterface ci;
 
-        Registry = registry;
+//        Registry = registry;
         for(int i= 0; i<clients.size(); i++){
 //        	System.out.println(key + " " + clientInterfaces.get(key));
 //        	ClientInterface ac = (ClientInterface) registry.lookup("key");
