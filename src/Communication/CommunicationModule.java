@@ -33,12 +33,13 @@ public class CommunicationModule {
      * @param clientInterfaces - A hashmap of all clientIds and clientInterfaces to all the clients in the group
      * @param clients
      */
-    public CommunicationModule(String userName, int clientID, HashMap <Integer, ClientInterface> clientInterfaces, ArrayList<String> clients){
+    public CommunicationModule(String userName, int clientID, HashMap <Integer, ClientInterface> clientInterfaces, ArrayList<String> clients, Registry registry){
         counter = 0;
         this.userName = userName;
         this.clientInterfaces = clientInterfaces;
         this.clientID = clientID;
         this.clients = clients;
+        this.registry = registry;
 
         this.lastAcceptedSeqNr = new HashMap<>();
 

@@ -22,6 +22,7 @@ public class NameServer extends RemoteServer implements NameServerInterface {
 	private Triple clientInfo;
 	private HashMap<String, String> leaderInfo = new HashMap<String, String>();
 	private HashMap<String, ArrayList<String>> groupUserlistMap = new HashMap<String, ArrayList<String>>();
+	private ArrayList<Triple> listOfClients = new ArrayList<Triple>();
 	private int clientID = 0;
 
 	public static void main(String args[]) {
@@ -59,12 +60,14 @@ public class NameServer extends RemoteServer implements NameServerInterface {
 		System.out.println(str);
 		clientInfo = new Triple(clientID, userName, InetAddress.getByName(str));
 
+		listOfClients.add(clientInfo);
+
 		System.out.println("NS: Connected: " + clientInfo.getClientID() + " - " + clientInfo.getUsername() +" - " + clientInfo.getIp());
 		return clientID;
 	}
 
 	private class Triple {
-		
+
 		private int clientID;
 		private String username;
 		private InetAddress ip;
@@ -180,7 +183,7 @@ public class NameServer extends RemoteServer implements NameServerInterface {
 
 		return leaderInfo;
 	}
-	
+
 	@Override
 	public void updateGroupLeaderInfo(String Groupname) throws RemoteException {
 

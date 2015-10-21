@@ -26,6 +26,7 @@ public class Client implements ClientInterface {
 	private Registry registry;
 	private NameServerInterface ns;
 	private ClientInterface ci;
+	private ClientInterface leaderci;
 	public CommunicationModule cm;
 	private HashMap<String, ArrayList<String>> groupsInfo = new HashMap<String, ArrayList<String>>();
 	private HashMap<String, String> leaders = new HashMap<String, String>();
@@ -50,7 +51,7 @@ public class Client implements ClientInterface {
 
 		this.myUserName = userName;
 
-		this.registry = LocateRegistry.getRegistry("Sirius.cs.umu.se",
+		this.registry = LocateRegistry.getRegistry("Weasley.cs.umu.se",
 				portNr);
 //		this.registry = LocateRegistry.getRegistry("localhost",
 //				portNr);
@@ -68,16 +69,17 @@ public class Client implements ClientInterface {
 		this.myGroup = groupName;
 		this.myLeader = userName;
 
-		ci = (ClientInterface) UnicastRemoteObject.exportObject(this, 0);
+		registry = LocateRegistry.getRegistry("localhost", 1234);
 		registry = LocateRegistry.createRegistry(1234);
-		registry.bind(userName, ci);
+		registry.bind(userName, leaderci);
+
+		leaderci = (ClientInterface) UnicastRemoteObject.exportObject(this, 0);
 		System.out.println("CLIENT: Groupleader: " + userName + " running on port " + "1234");
 
-		registry = LocateRegistry.getRegistry("localhost", 1234);
-		ci = (ClientInterface) registry.lookup(userName);
+
+
 
 		groupCreated = ns.createGroup(groupName, userName);
-
 		clientInfo = ns.getClientInfo();
 		groupsInfo = ns.getGroupsInfo();
 
@@ -170,6 +172,7 @@ public class Client implements ClientInterface {
 
 
 		System.out.println("sadsadadsa");
+		registry = LocateRegistry.getRegistry("localhost", 1234);
 		ci = (ClientInterface) UnicastRemoteObject.exportObject(this, 0);
 //		registry = LocateRegistry.createRegistry(1234);
 		System.out.println(myUserName);
@@ -181,7 +184,7 @@ public class Client implements ClientInterface {
 		ciLeader.sharegroup();
 
 
-		cm = new CommunicationModule(myUserName, clientID, clientInterface, clients);
+		cm = new CommunicationModule(myUserName, clientID, clientInterface, clients, registry);
 
 		return myLeader;
 
