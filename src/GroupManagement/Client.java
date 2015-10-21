@@ -56,6 +56,8 @@ public class Client implements ClientInterface {
 		clientInfo = new Triple(clientID, myUserName, InetAddress.getLocalHost());
 		groupsInfo = ns.getGroupsInfo();
 
+		System.out.println(myUserName + " : " + clientID);
+
 		return clientID;
 
 	}
@@ -77,6 +79,7 @@ public class Client implements ClientInterface {
 		clients = ns.getClientList();
 		groupsInfo = ns.getGroupsInfo();
 		listOfClientsInMyGroup = groupsInfo.get(groupName);
+		cm = new CommunicationModule(myUserName, clientID, clients, registry);
 
 		return groupCreated;
 
@@ -102,6 +105,7 @@ public class Client implements ClientInterface {
 		HashMap<Integer, ClientInterface> clientInterface = ci.getInterfaceOfGroup();
 		ci.setClientList(clients);
 
+		ci.addClientInterface(clientInfo);
 
 		cm = new CommunicationModule(myUserName, clientID, clients, registry);
 
@@ -281,7 +285,10 @@ public class Client implements ClientInterface {
 			System.out.println(clients.get(i).getIp());
 		}
 
+	}
 
+	public void addClientInterface(Triple triple) throws RemoteException {
+		cm.addAnotherClientInterface(triple);
 	}
 }
 

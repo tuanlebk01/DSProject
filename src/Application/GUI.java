@@ -287,6 +287,7 @@ public class GUI {
 //							JOptionPane.showMessageDialog(null,
 //									"Group created with name: " + input);
 							System.out.println("GUI: Group created: " + input);
+							startThread();
 
 						} else {
 //							JOptionPane.showMessageDialog(null,

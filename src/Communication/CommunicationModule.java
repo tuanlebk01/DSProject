@@ -20,7 +20,6 @@ public class CommunicationModule {
     private int counter=0;
     private String userName;
     private int clientID;
-    private HashMap <Integer, ClientInterface> clientInterfaces;
     private HashMap <Integer, Integer> lastAcceptedSeqNr;
     private ArrayList <TextMessage> acceptedMessages = new ArrayList<>();
     private Registry registry;
@@ -43,8 +42,10 @@ public class CommunicationModule {
 
         this.lastAcceptedSeqNr = new HashMap<>();
 
+
+
         for(int i = 0; i < clients.size(); i++ ) {
-        	lastAcceptedSeqNr.put(i, 0);
+        	lastAcceptedSeqNr.put(clients.get(i).getClientID(), 0);
         }
     }
 
@@ -58,13 +59,8 @@ public class CommunicationModule {
         TextMessage textMessage = new TextMessage(counter, message, userName, clientID);
         ClientInterface ci;
 
-//        Registry = registry;
-        for(int i= 0; i<clients.size(); i++){
-//        	System.out.println(key + " " + clientInterfaces.get(key));
-//        	ClientInterface ac = (ClientInterface) registry.lookup("key");
-//        	clientInterfaces.get(key).addMessageToQueue(textMessage);
-
-            ci = (ClientInterface) registry.lookup("username");
+        for(int i= 0; i < clients.size(); i++){
+            ci = (ClientInterface) registry.lookup(userName);
             ci.addMessageToQueue(textMessage);
 
         }
@@ -81,20 +77,20 @@ public class CommunicationModule {
      */
     public void sendMessagesInRandomOrder(int numberOfMessages) throws RemoteException{
 
-        List<TextMessage> messages = new ArrayList<>();
-        for (int i = 0; i < numberOfMessages; i++)
-        {
-            messages.add(new TextMessage(i, "Textmessage nr: " + i, userName, clientID));
-        }
-        Collections.shuffle(messages);
-
-        for (int j=0; j<=messages.size();j++){
-            for(int key: clientInterfaces.keySet()){
-                messages.get(j).addStringToMessage(" -  Was sent as message nr: "+j);
-                clientInterfaces.get(key).addMessageToQueue(messages.get(j));
-            }
-            counter++;
-        }
+//        List<TextMessage> messages = new ArrayList<>();
+//        for (int i = 0; i < numberOfMessages; i++)
+//        {
+//            messages.add(new TextMessage(i, "Textmessage nr: " + i, userName, clientID));
+//        }
+//        Collections.shuffle(messages);
+//
+//        for (int j=0; j<=messages.size();j++){
+//            for(int key: clientInterfaces.keySet()){
+//                messages.get(j).addStringToMessage(" -  Was sent as message nr: "+j);
+//                clientInterfaces.get(key).addMessageToQueue(messages.get(j));
+//            }
+//            counter++;
+//        }
     }
 
     /** This method receives a message and determines if the message should be accepted in the right order or if it
@@ -108,9 +104,15 @@ public class CommunicationModule {
     public void addMessageToQueue (TextMessage textMessage){
         int id = textMessage.getClientID();
 
-        System.out.println("ERROR: " + userName);
+        System.out.println("ERROR: " + textMessage.getMessage());
+        System.out.println("ERROR: " + textMessage.getClientID());
+        System.out.println("ERROR: " + textMessage.getSenderUserName());
+        System.out.println("ERROR: " + textMessage.getSeqNr());
+        System.out.println("ERROR: " + lastAcceptedSeqNr.size());
+        System.out.println(lastAcceptedSeqNr.keySet());
 
-        int seqNr = lastAcceptedSeqNr.get(id);
+        int seqNr = lastAcceptedSeqNr.get(2);
+        System.out.println(seqNr);
 
         if (textMessage.getSeqNr() <= (seqNr+1) ){
             AcceptMessage(textMessage, id);
@@ -196,9 +198,11 @@ public class CommunicationModule {
      * @param clientID - clientId of the client to be added.
      * @param ci - clientInterface to of the client to be added.
      */
-    public void addAnotherClientInterface(int clientID, ClientInterface ci){
-        clientInterfaces.put(clientID, ci);
-        lastAcceptedSeqNr.put(clientID, 0);
+    public void addAnotherClientInterface(Triple triple){
+
+    	System.out.println("asd");
+    	clients.add(triple);
+        lastAcceptedSeqNr.put(triple.getClientID(), 0);
     }
 
     /** Removes a client from the communication module. The counter for the sequence number is removed. It is important
@@ -207,8 +211,8 @@ public class CommunicationModule {
      *
      * @param clientID - clientId of the client that left the group.
      */
-    public void removeClientInterface (int clientID){
-        clientInterfaces.remove(clientID);
-        lastAcceptedSeqNr.remove(clientID);
+    public void removeClientInterface (Triple triple){
+    	clients.remove(triple);
+        lastAcceptedSeqNr.remove(triple.getClientID());
     }
 }

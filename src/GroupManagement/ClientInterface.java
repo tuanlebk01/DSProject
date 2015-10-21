@@ -47,5 +47,7 @@ public interface ClientInterface extends Remote, Serializable {
 
 	public void setClientList(ArrayList<Triple> clients) throws RemoteException;
 
+	public void addClientInterface(Triple triple) throws RemoteException;
+
 
 }

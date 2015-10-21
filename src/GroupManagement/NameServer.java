@@ -24,7 +24,6 @@ public class NameServer extends RemoteServer implements NameServerInterface {
 	private HashMap<String, ArrayList<String>> groupUserlistMap = new HashMap<String, ArrayList<String>>();
 	private ArrayList<Triple> listOfClients = new ArrayList<Triple>();
 	private ArrayList<Triple> groupTriples = new ArrayList<Triple>();
-
 	private int clientID = 0;
 
 	public static void main(String args[]) {
@@ -60,7 +59,7 @@ public class NameServer extends RemoteServer implements NameServerInterface {
 		clientID++;
 		String str = getClientHost();
 		clientInfo = new Triple(clientID, userName, InetAddress.getByName(str));
-
+		System.out.println("NS: " + userName + " : " + clientID);
 		listOfClients.add(clientInfo);
 
 		System.out.println("NS: Connected: " + clientInfo.getClientID() + " - " + clientInfo.getUsername() +" - " + clientInfo.getIp());
