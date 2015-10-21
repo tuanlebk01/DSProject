@@ -31,7 +31,6 @@ public class Client implements ClientInterface {
 	private HashMap<String, ArrayList<String>> groupsInfo = new HashMap<String, ArrayList<String>>();
 	private HashMap<String, String> leaders = new HashMap<String, String>();
 	private HashMap<Integer, ClientInterface> clientInterfaces = new HashMap<Integer, ClientInterface>();
-	private HashMap<Integer, String> clientInfo = new HashMap<Integer, String>();
 	private ArrayList<String> clients = new ArrayList<String>();
 	private int clientID;
 	private String myUserName;
@@ -39,7 +38,7 @@ public class Client implements ClientInterface {
 	private String myLeader;
 	private boolean groupCreated;
 	private boolean groupJoined;
-	private Triple clientInfo3;
+	private Triple clientInfo;
 
 	public Client() throws RemoteException {
 		super();
@@ -77,9 +76,8 @@ public class Client implements ClientInterface {
 		System.out.println("CLIENT: Groupleader: " + userName + " running on port " + "1234");
 
 
-
-
 		groupCreated = ns.createGroup(groupName, userName);
+
 		clientInfo = ns.getClientInfo();
 		groupsInfo = ns.getGroupsInfo();
 
@@ -93,7 +91,6 @@ public class Client implements ClientInterface {
 	public boolean connectToGroupLeader(String groupLeader) throws RemoteException, AlreadyBoundException, NotBoundException {
 
 		registry = LocateRegistry.getRegistry("Sirius.cs.umu.se", 1234);
-//		registry = LocateRegistry.getRegistry("localhost", 1234);
 		ci = (ClientInterface) registry.lookup(groupLeader);
 		System.out.println("CLIENT: connected to groupleader: " + groupLeader + " : with username: " + myUserName);
 		groupJoined = ci.addMemberToGroup(myUserName);
@@ -263,7 +260,6 @@ public class Client implements ClientInterface {
 			if(groupName == null) {
 
 				ns.leaveServer(groupName, clientID);
-				clientInfo = ns.getClientInfo();
 
 			} else if(userName.equals(myLeader)) {
 
@@ -277,7 +273,7 @@ public class Client implements ClientInterface {
 
 					ns.removeMemberFromGroup(groupName, userName);
 					groupsInfo = ci.getGroups();
-					clientInfo = ns.getClientInfo();
+//					clientInfo = ns.getClientInfo();
 					ci.startElection(groupsInfo.get(groupName));
 
 				}

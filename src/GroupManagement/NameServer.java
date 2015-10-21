@@ -66,12 +66,12 @@ public class NameServer extends RemoteServer implements NameServerInterface {
 		return clientID;
 	}
 
-	private class Triple {
+	public class Triple {
 
 		private int clientID;
 		private String username;
 		private InetAddress ip;
-		private String group;
+		private String group = null;
 
 		public Triple (int clientID,String username, InetAddress ip){
 			this.clientID = clientID;
@@ -152,18 +152,27 @@ public class NameServer extends RemoteServer implements NameServerInterface {
 		System.out.println("NS: User: " + userName + " left group: " + groupName);
 	}
 
-	public void leaveServer(int ID) throws RemoteException {
+	public void leaveServer(String groupName, int ID) throws RemoteException {
 
-//		if(groupName == null) {
 
-//			System.out.println("NS: The following user left the server: " + ClientInfo.get(ID));
-//			ClientInfo.remove(ID);
+		if(groupName == null) {
 
-//		} else {
-//			System.out.println("NS: Leader: " + ClientInfo.get(ID) + " left in group: " + groupName + ". Start election");
-//			ClientInfo.remove(ID);
+			for (int i = 0; i < listOfClients.size(); i++) {
+				Triple triple = listOfClients.get(i);
 
-//		}
+				if(ID == triple.getClientID()) {
+					listOfClients.remove(i);
+					System.out.println("NS: The following user left the server: " + triple.getClientID());
+				}
+			}
+
+
+		} else {
+
+			System.out.println("NS: Leader: " + ClientInfo.get(ID) + " left in group: " + groupName + ". Start election");
+			ClientInfo.remove(ID);
+
+		}
 	}
 
 	public void removeGroup(String groupName) throws RemoteException {
