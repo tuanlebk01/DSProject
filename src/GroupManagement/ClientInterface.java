@@ -49,5 +49,7 @@ public interface ClientInterface extends Remote, Serializable {
 
 	public void addClientInterface(Triple triple) throws RemoteException;
 
+	public ArrayList<Triple> getClientlist(String groupName)throws RemoteException;
+
 
 }

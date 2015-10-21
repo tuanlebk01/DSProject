@@ -43,10 +43,10 @@ public class CommunicationModule {
         this.lastAcceptedSeqNr = new HashMap<>();
 
 
-
         for(int i = 0; i < clients.size(); i++ ) {
         	lastAcceptedSeqNr.put(clients.get(i).getClientID(), 0);
         }
+
     }
 
     /** Sends the message to all clientInterfaces that the communication module have knowledge of.
@@ -56,11 +56,12 @@ public class CommunicationModule {
      * @throws NotBoundException
      */
     public void sendMessage(String message) throws RemoteException, NotBoundException{
-        TextMessage textMessage = new TextMessage(counter, message, userName, clientID);
+        TextMessage textMessage;
         ClientInterface ci;
 
         for(int i= 0; i < clients.size(); i++){
-            ci = (ClientInterface) registry.lookup(userName);
+        	textMessage = new TextMessage(counter, message, userName, clientID);
+            ci = (ClientInterface) registry.lookup(clients.get(i).getUsername());
             ci.addMessageToQueue(textMessage);
 
         }
@@ -104,15 +105,8 @@ public class CommunicationModule {
     public void addMessageToQueue (TextMessage textMessage){
         int id = textMessage.getClientID();
 
-        System.out.println("ERROR: " + textMessage.getMessage());
-        System.out.println("ERROR: " + textMessage.getClientID());
-        System.out.println("ERROR: " + textMessage.getSenderUserName());
-        System.out.println("ERROR: " + textMessage.getSeqNr());
-        System.out.println("ERROR: " + lastAcceptedSeqNr.size());
-        System.out.println(lastAcceptedSeqNr.keySet());
 
         int seqNr = lastAcceptedSeqNr.get(2);
-        System.out.println(seqNr);
 
         if (textMessage.getSeqNr() <= (seqNr+1) ){
             AcceptMessage(textMessage, id);
@@ -200,7 +194,6 @@ public class CommunicationModule {
      */
     public void addAnotherClientInterface(Triple triple){
 
-    	System.out.println("asd");
     	clients.add(triple);
         lastAcceptedSeqNr.put(triple.getClientID(), 0);
     }

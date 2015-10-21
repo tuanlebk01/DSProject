@@ -2,10 +2,20 @@
 The project in distributed system
 
 
-GCom client, GUI Chat & Debug
+GUI:
+Chatwindow
+userlist
 
-Group management
 
-Communication Module, Basic non-reliable
 
-Message Ordering Module, Casual ordering
+
+Client:
+Election
+pull list from leader instead of nameserver
+disconnection/aborts
+
+
+
+
+Com Mod:
+Test messages

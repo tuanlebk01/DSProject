@@ -56,8 +56,6 @@ public class Client implements ClientInterface {
 		clientInfo = new Triple(clientID, myUserName, InetAddress.getLocalHost());
 		groupsInfo = ns.getGroupsInfo();
 
-		System.out.println(myUserName + " : " + clientID);
-
 		return clientID;
 
 	}
@@ -101,13 +99,17 @@ public class Client implements ClientInterface {
 		ci = (ClientInterface) UnicastRemoteObject.exportObject(this, 0);
 		registry.bind(myUserName, ci);
 		ci = (ClientInterface) registry.lookup(myLeader);
-
-		HashMap<Integer, ClientInterface> clientInterface = ci.getInterfaceOfGroup();
-		ci.setClientList(clients);
-
-		ci.addClientInterface(clientInfo);
-
+		clients = ci.getClientlist(groupName);
 		cm = new CommunicationModule(myUserName, clientID, clients, registry);
+
+		for (int i = 0; i < clients.size(); i++){
+			if (!clients.get(i).getUsername().equals(myUserName)){
+				ci = (ClientInterface) registry.lookup(clients.get(i).getUsername());
+				ci.addClientInterface(clientInfo);
+				ci.setClientList(clients);
+			}
+		}
+
 
 		return myLeader;
 
@@ -240,13 +242,6 @@ public class Client implements ClientInterface {
 
 	public void sharegroup() throws RemoteException {
 
-		System.out.println("DISTRIBUTING NEW LIST");
-		for(int i = 0; i < clients.size(); i++) {
-			System.out.println(clients.get(i).getUsername()+ " : " + clients.get(i).getClientID() + " : " + clients.get(i).getGroup()+ " : " + clients.get(i).getIp());
-
-		}
-
-
 //        for (int i = 0; i < clients.size(); i++) {
 //
 //        	String ip = clients.get(i).getIp().toString();
@@ -280,15 +275,16 @@ public class Client implements ClientInterface {
 	public void setClientList(ArrayList<Triple> clients) throws RemoteException {
 
 		this.clients = clients;
-
-		for(int i = 0; i < clients.size(); i++ ){
-			System.out.println(clients.get(i).getIp());
-		}
-
 	}
 
 	public void addClientInterface(Triple triple) throws RemoteException {
 		cm.addAnotherClientInterface(triple);
+	}
+
+	@Override
+	public ArrayList<Triple> getClientlist(String groupName) throws RemoteException {
+		clients = ns.getGroupTriples(groupName);
+		return clients;
 	}
 }
 
