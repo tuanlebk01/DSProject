@@ -224,7 +224,6 @@ public class GUI {
 
 												mapOfGroups = client.getGroupsInfo();
 												listOfMembers = mapOfGroups.get(myGroupName);
-
 												userList.clear();
 
 
@@ -278,11 +277,29 @@ public class GUI {
 						System.out.println("GUI: Trying to create group");
 
 						groupCreated = client.createGroup(input, userName);
+
 						if (groupCreated) {
 
 							myGroupName = input;
 							isLeader = true;
-							updateLists();
+
+							mapOfGroups = client.getGroupsInfo();
+							listOfGroups.clear();
+							listOfMembers.clear();
+
+							listOfMembers = mapOfGroups.get(input);
+
+							System.out.println("list: " + listOfMembers);
+
+							groupList.clear();
+							for (int i = 0; i < listOfGroups.size(); i++) {
+								groupList.add(i, listOfGroups.get(i));
+							}
+
+							userList.clear();
+							for (int i = 0; i < listOfMembers.size(); i++) {
+								userList.add(i,listOfMembers.get(i));
+							}
 
 //							JOptionPane.showMessageDialog(null,
 //									"Group created with name: " + input);
@@ -335,7 +352,32 @@ public class GUI {
 				client = new Client();
 				connectButton.setText("Disconnect");
 				clientID = client.connectToNameServer(userName, portNr);
-				updateLists();
+
+				mapOfGroups = client.getGroupsInfo();
+				listOfGroups.clear();
+				listOfMembers.clear();
+
+				//this list is weird...
+
+				Iterator it = mapOfGroups.entrySet().iterator();
+				while (it.hasNext()) {
+					Map.Entry pair = (Map.Entry) it.next();
+					listOfGroups.add(pair.getKey().toString());
+					listOfMembers.add(pair.getValue().toString());
+//							System.out.println("GUI:");
+//							System.out.println(pair.getKey() + " = " + pair.getValue());
+					it.remove();
+				}
+
+				groupList.clear();
+				for (int i = 0; i < listOfGroups.size(); i++) {
+					groupList.add(i, listOfGroups.get(i));
+				}
+
+				userList.clear();
+				for (int i = 0; i < listOfMembers.size(); i++) {
+					userList.add(i,listOfMembers.get(i));
+				}
 
 				System.out.println("GUI: Connected to nameserver");
 
@@ -360,38 +402,8 @@ public class GUI {
 	}
 
 	public void updateLists() {
-		try {
-			mapOfGroups = client.getGroupsInfo();
-		} catch (RemoteException ex) {
-			ex.printStackTrace();
-		}
-
-		listOfGroups.clear();
-		listOfMembers.clear();
-
-		Iterator it = mapOfGroups.entrySet().iterator();
-		while (it.hasNext()) {
-			Map.Entry pair = (Map.Entry) it.next();
-			listOfGroups.add(pair.getKey().toString());
-			listOfMembers.add(pair.getValue().toString());
-//					System.out.println("GUI:");
-//					System.out.println(pair.getKey() + " = " + pair.getValue());
-			it.remove();
-		}
-
-		System.out.println(listOfGroups);
-		System.out.println(listOfMembers);
 
 
-		groupList.clear();
-		for (int i = 0; i < listOfGroups.size(); i++) {
-			groupList.add(i, listOfGroups.get(i));
-		}
-
-		userList.clear();
-		for (int i = 0; i < listOfMembers.size(); i++) {
-			userList.add(i,listOfMembers.get(i));
-		}
 	}
 
 	private void startThread() {
