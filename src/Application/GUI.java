@@ -400,7 +400,7 @@ public class GUI {
 		} else {
 			try {
 				client.disconnect(myGroupName, userName);
-			} catch (RemoteException e) {
+			} catch (RemoteException | NotBoundException e) {
 				e.printStackTrace();
 			}
 			chatArea.setText("");

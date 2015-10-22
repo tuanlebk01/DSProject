@@ -3,14 +3,14 @@ The project in distributed system
 
 
 GUI:
-Chatwindow
+Chatwindow - scrollable
 userlist
+crashes if testmsgfield is empty, and it empties by itself
 
 
 
 
 Client:
-Election
 pull list from leader instead of nameserver
 disconnection/aborts
 
@@ -18,4 +18,3 @@ disconnection/aborts
 
 
 Com Mod:
-Test messages

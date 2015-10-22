@@ -51,7 +51,7 @@ public interface ClientInterface extends Remote, Serializable {
 
 	public void removeClientInterface(Triple triple) throws RemoteException;
 
-    public void setNewLeader(String leader);
+    public void setNewLeader(String leader) throws RemoteException;
 
 	public ArrayList<Triple> getClientlist(String groupName)throws RemoteException;
 

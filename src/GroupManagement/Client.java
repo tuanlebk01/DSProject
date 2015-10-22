@@ -44,7 +44,7 @@ public class Client implements ClientInterface {
 
 		this.myUserName = userName;
 
-		this.registry = LocateRegistry.getRegistry("Severus.cs.umu.se",
+		this.registry = LocateRegistry.getRegistry("Default.cs.umu.se",
 				portNr);
 //		this.registry = LocateRegistry.getRegistry("localhost",
 //				portNr);
@@ -143,14 +143,14 @@ public class Client implements ClientInterface {
 
     }
 
-    public void setNewLeader(String leader){
+    public void setNewLeader(String leader) throws RemoteException{
         myLeader = leader;
     }
 
 	public boolean connectToGroupLeader(String groupLeader) throws RemoteException, AlreadyBoundException, NotBoundException {
 
 		//Should be leader ip
-		registry = LocateRegistry.getRegistry("Severus.cs.umu.se", 1234);
+		registry = LocateRegistry.getRegistry("Default.cs.umu.se", 1234);
 		ci = (ClientInterface) registry.lookup(groupLeader);
 
 		System.out.println("CLIENT: connected to groupleader: " + groupLeader + " : with username: " + myUserName);
@@ -250,6 +250,12 @@ public class Client implements ClientInterface {
 	public void broadcastTestMessages(int nrOftestMSG) throws RemoteException, java.rmi.NotBoundException {
 
 		cm.sendMessagesInRandomOrder(nrOftestMSG);
+
+	}
+
+	public void broadcastTestMessages2(int nrOftestMSG) throws RemoteException, java.rmi.NotBoundException {
+
+		cm.sendMessageWithOneDrop(nrOftestMSG);
 
 	}
 

@@ -20,7 +20,7 @@ public class CommunicationModule {
     private int counter=0;
     private String userName;
     private int clientID;
-    private HashMap <Integer, Integer> lastAcceptedSeqNr;
+    private  HashMap <Integer, Integer> lastAcceptedSeqNr;
     private ArrayList <TextMessage> acceptedMessages = new ArrayList<>();
     private Registry registry;
 	private ArrayList<Triple> clients;
@@ -33,7 +33,7 @@ public class CommunicationModule {
      * @param clients
      */
     public CommunicationModule(String userName, int clientID, ArrayList<Triple> clients, Registry registry){
-        counter = 0;
+        counter = 1;
         this.userName = userName;
         this.clientID = clientID;
         this.clients = clients;
@@ -79,24 +79,53 @@ public class CommunicationModule {
 
         List<TextMessage> messages = new ArrayList<>();
         ClientInterface ci;
+        int tempCounter = 0;
         for (int i = 0; i < numberOfMessages; i++)
         {
-            messages.add(new TextMessage(i+counter, "Textmessage nr: " + i, userName, clientID));
+            messages.add(new TextMessage(i+counter, "Seq nr: " + (i+counter), userName, clientID));
+            tempCounter++;
         }
-        Collections.shuffle(messages);
-        messages.remove(messages.size()/2);
+        counter = counter + tempCounter;
+
         Collections.shuffle(messages);
 
+        for (int l=0; l<messages.size();l++){
+                messages.get(l).addStringToMessage(" -  Was sent as message nr: "+l);
+        }
 
-        for (int j=0; j<=messages.size();j++){
+        for (int j=0; j<messages.size();j++){
             for(int k= 0; k < clients.size(); k++){
-                messages.get(j).addStringToMessage(" -  Was sent as message nr: "+j);
                 ci = (ClientInterface) registry.lookup(clients.get(k).getUsername());
                 ci.addMessageToQueue(messages.get(j));
             }
-            counter++;
         }
     }
+
+    public void sendMessageWithOneDrop(int numberOfMessages) throws RemoteException, java.rmi.NotBoundException{
+
+        List<TextMessage> messages = new ArrayList<>();
+        ClientInterface ci;
+        int tempCounter = 0;
+        for (int i = 0; i < numberOfMessages; i++)
+        {
+            messages.add(new TextMessage(i+counter, "Seq nr: " + (i+counter), userName, clientID));
+            tempCounter++;
+        }
+
+        counter = counter + tempCounter;
+
+        messages.remove(messages.size()/2);
+
+        counter = counter + tempCounter;
+
+        for (int j=0; j<messages.size();j++){
+            for(int k= 0; k < clients.size(); k++){
+                ci = (ClientInterface) registry.lookup(clients.get(k).getUsername());
+                ci.addMessageToQueue(messages.get(j));
+            }
+        }
+    }
+
 
     /** This method receives a message and determines if the message should be accepted in the right order or if it
      * arrived in the wrong order. In that case the message is held of until the right message arrives or the first
@@ -110,7 +139,7 @@ public class CommunicationModule {
         int id = textMessage.getClientID();
 
 
-        int seqNr = lastAcceptedSeqNr.get(2);
+        int seqNr = lastAcceptedSeqNr.get(id);
 
         if (textMessage.getSeqNr() <= (seqNr+1) ){
             AcceptMessage(textMessage, id);
@@ -126,7 +155,9 @@ public class CommunicationModule {
     private class InnerThread extends Thread {
         private int timeOutTime = 1000; // Milliseconds
         private boolean timedOut = false;
+        private boolean accepted = false;
         private int clientID;
+        long time1;
         private TextMessage message;
 
         InnerThread(int clientID, TextMessage message) {
@@ -136,26 +167,34 @@ public class CommunicationModule {
         }
 
         public void run() {
-            long time1 = System.currentTimeMillis();
+            time1 = System.currentTimeMillis();
             long time2;
             while (!timedOut){
-
             	try {
 					Thread.sleep(25);
 				} catch (InterruptedException e) {
 					e.printStackTrace();
 				}
-
-            	time2 = System.currentTimeMillis();
+               	time2 = System.currentTimeMillis();
                 if(time2 >= time1 + timeOutTime){
                     timedOut = true;
                 }
-                if (message.getSeqNr() <= (lastAcceptedSeqNr.get(clientID))+1){
-
-                    timedOut = true;
-                }
+                checkIfAcceptMessage(message);
             }
-            AcceptMessage(message, clientID);
+            if(!accepted){
+            	AcceptMessage(message, clientID);
+            }
+        }
+
+
+
+        private synchronized void checkIfAcceptMessage(TextMessage message){
+
+            if (message.getSeqNr() == (lastAcceptedSeqNr.get(clientID))+1){
+            	System.out.println("Accepting message: "+ message.getSeqNr());
+                AcceptMessage(message, clientID);
+                accepted = true;
+            }
         }
 
         /** Accepts a message and adds it to the list of accepted messages. It also updates the lastAccepted message if
@@ -189,7 +228,7 @@ public class CommunicationModule {
      *
      * @return - Array list of messages
      */
-    public ArrayList<TextMessage> getAcceptedMessages(){
+    public synchronized ArrayList<TextMessage> getAcceptedMessages(){
 
         ArrayList<TextMessage> temp = acceptedMessages;
 
