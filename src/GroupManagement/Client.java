@@ -9,13 +9,11 @@ import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.rmi.server.ServerNotActiveException;
 import java.rmi.server.UnicastRemoteObject;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashMap;
+import java.util.*;
 
 import Communication.CommunicationModule;
 import Communication.TextMessage;
+import com.sun.javafx.collections.TrackableObservableList;
 
 public class Client implements ClientInterface {
 
@@ -114,6 +112,24 @@ public class Client implements ClientInterface {
 		return myLeader;
 
 	}
+
+    public void removeClientFromComModules (Triple triple) throws java.rmi.RemoteException, java.rmi.NotBoundException{
+        ci = (ClientInterface) registry.lookup(myLeader);
+        clients = ci.getClientlist(myGroup);
+
+        Iterator<Triple>  it = clients.iterator();
+        while (it.hasNext()){
+            if(it.next().getUsername().equals(triple.getUsername())){
+                it.remove();
+            }else {
+                if (!it.next().getUsername().equals(myUserName)){
+                    ci = (ClientInterface) registry.lookup(it.next().getUsername());
+                    ci.removeClientInterface(triple);
+                    ci.setClientList(clients);
+                }
+            }
+        }
+    }
 
 	public boolean connectToGroupLeader(String groupLeader) throws RemoteException, AlreadyBoundException, NotBoundException {
 
@@ -285,6 +301,10 @@ public class Client implements ClientInterface {
 	public void addClientInterface(Triple triple) throws RemoteException {
 		cm.addAnotherClientInterface(triple);
 	}
+
+    public void removeClientInterface(Triple triple) throws RemoteException{
+        cm.removeClientInterface(triple);
+    }
 
 	@Override
 	public ArrayList<Triple> getClientlist(String groupName) throws RemoteException {
