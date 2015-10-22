@@ -13,7 +13,6 @@ import java.util.*;
 
 import Communication.CommunicationModule;
 import Communication.TextMessage;
-import com.sun.javafx.collections.TrackableObservableList;
 
 public class Client implements ClientInterface {
 
@@ -139,6 +138,7 @@ public class Client implements ClientInterface {
                 }
             }
             ns.removeMemberFromGroup(myGroup, triple.getUsername());
+            ns.updateNewLeader(myGroup, myLeader);
 
 
     }
@@ -232,13 +232,6 @@ public class Client implements ClientInterface {
 					groupsInfo = ns.getGroupsInfo();
 					listOfClientsInMyGroup = groupsInfo.get(myGroup);
 					myLeader = startElection();
-						for (int i = 0; i < clients.size(); i++){
-							if (!clients.get(i).getUsername().equals(myUserName)){
-								ci = (ClientInterface) registry.lookup(clients.get(i).getUsername());
-								ci.addClientInterface(clientInfo);
-								ci.setClientList(clients);
-							}
-						}
 				}
 
 			} else {

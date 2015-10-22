@@ -40,4 +40,6 @@ public interface NameServerInterface extends Remote, Serializable {
 
 	public ArrayList<Triple> getGroupTriples(String groupName) throws RemoteException;
 
+	public void updateNewLeader (String groupName, String newLeader) throws RemoteException;
+
 }

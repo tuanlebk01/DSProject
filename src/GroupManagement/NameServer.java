@@ -188,4 +188,11 @@ public class NameServer extends RemoteServer implements NameServerInterface {
 		}
 		return clients;
 	}
+
+	@Override
+	public void updateNewLeader(String groupName, String newLeader) throws RemoteException {
+		leaderInfo.remove(groupName);
+		leaderInfo.put(groupName, newLeader);
+
+	}
 }
