@@ -115,22 +115,32 @@ public class Client implements ClientInterface {
 
     public void handleDisconnect (Triple triple) throws java.rmi.RemoteException, java.rmi.NotBoundException{
 
-        Iterator<Triple>  it = clients.iterator();
-        while (it.hasNext()) {
-            if (it.next().getUsername().equals(triple.getUsername())) {
-                it.remove();
+        if(triple.equals(myLeader)) {
+            if (listOfClientsInMyGroup.size() == 1) {
+                System.out.println("Leader leaving its own group and it was empty");
+                ns.removeGroup(myGroup);
             }
+            myLeader = startElection();
         }
-        it = clients.iterator();
-        myLeader = startElection();
-        while (it.hasNext()) {
-            if (!it.next().getUsername().equals(myUserName)){
-                ci = (ClientInterface) registry.lookup(it.next().getUsername());
-                ci.removeClientInterface(triple);
-                ci.setClientList(clients);
-                ci.setNewLeader(myLeader);
+
+            Iterator<Triple> it = clients.iterator();
+            while (it.hasNext()) {
+                if (it.next().getUsername().equals(triple.getUsername())) {
+                    it.remove();
+                }
             }
-        }
+            it = clients.iterator();
+            while (it.hasNext()) {
+                if (!it.next().getUsername().equals(myUserName)) {
+                    ci = (ClientInterface) registry.lookup(it.next().getUsername());
+                    ci.removeClientInterface(triple);
+                    ci.setClientList(clients);
+                    ci.setNewLeader(myLeader);
+                }
+            }
+            ns.removeMemberFromGroup(myGroup, triple.getUsername());
+
+
     }
 
     public void setNewLeader(String leader){
@@ -202,7 +212,7 @@ public class Client implements ClientInterface {
 
 	}
 
-	public void disconnect(String groupName, String userName) throws RemoteException, NotBoundException {
+	public void disconnect(String groupName, String userName) throws RemoteException, java.rmi.NotBoundException {
 
 			if(groupName == null) {
 
