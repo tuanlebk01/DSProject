@@ -154,12 +154,10 @@ public class NameServer extends RemoteServer implements NameServerInterface {
 		return leaderInfo;
 	}
 
-	@Override
 	public void updateGroupLeaderInfo(String Groupname) throws RemoteException {
 
 	}
 
-	@Override
 	public ArrayList<Triple> getClientList() throws RemoteException {
 		return listOfClients;
 	}
@@ -189,7 +187,6 @@ public class NameServer extends RemoteServer implements NameServerInterface {
 		return clients;
 	}
 
-	@Override
 	public void updateNewLeader(String groupName, String newLeader) throws RemoteException {
 		leaderInfo.remove(groupName);
 		leaderInfo.put(groupName, newLeader);
