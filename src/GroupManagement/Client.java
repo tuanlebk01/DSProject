@@ -45,7 +45,7 @@ public class Client implements ClientInterface {
 
 		this.myUserName = userName;
 
-		this.registry = LocateRegistry.getRegistry("Weasley.cs.umu.se",
+		this.registry = LocateRegistry.getRegistry("Severus.cs.umu.se",
 				portNr);
 //		this.registry = LocateRegistry.getRegistry("localhost",
 //				portNr);
@@ -140,7 +140,7 @@ public class Client implements ClientInterface {
 	public boolean connectToGroupLeader(String groupLeader) throws RemoteException, AlreadyBoundException, NotBoundException {
 
 		//Should be leader ip
-		registry = LocateRegistry.getRegistry("Weasley.cs.umu.se", 1234);
+		registry = LocateRegistry.getRegistry("Severus.cs.umu.se", 1234);
 		ci = (ClientInterface) registry.lookup(groupLeader);
 
 		System.out.println("CLIENT: connected to groupleader: " + groupLeader + " : with username: " + myUserName);
@@ -202,7 +202,7 @@ public class Client implements ClientInterface {
 
 	}
 
-	public void disconnect(String groupName, String userName) throws RemoteException {
+	public void disconnect(String groupName, String userName) throws RemoteException, NotBoundException {
 
 			if(groupName == null) {
 
@@ -221,9 +221,14 @@ public class Client implements ClientInterface {
 					ns.removeMemberFromGroup(groupName, userName);
 					groupsInfo = ns.getGroupsInfo();
 					listOfClientsInMyGroup = groupsInfo.get(myGroup);
-					sharegroup();
-					startElection();
-
+					myLeader = startElection();
+						for (int i = 0; i < clients.size(); i++){
+							if (!clients.get(i).getUsername().equals(myUserName)){
+								ci = (ClientInterface) registry.lookup(clients.get(i).getUsername());
+								ci.addClientInterface(clientInfo);
+								ci.setClientList(clients);
+							}
+						}
 				}
 
 			} else {
