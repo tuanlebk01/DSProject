@@ -113,22 +113,30 @@ public class Client implements ClientInterface {
 
 	}
 
-    public void removeClientFromComModules (Triple triple) throws java.rmi.RemoteException, java.rmi.NotBoundException{
-        ci = (ClientInterface) registry.lookup(myLeader);
-        clients = ci.getClientlist(myGroup);
+    public void handleDisconnect (Triple triple) throws java.rmi.RemoteException, java.rmi.NotBoundException{
 
         Iterator<Triple>  it = clients.iterator();
-        while (it.hasNext()){
-            if(it.next().getUsername().equals(triple.getUsername())){
+        while (it.hasNext()) {
+            if (it.next().getUsername().equals(triple.getUsername())) {
                 it.remove();
-            }else {
-                if (!it.next().getUsername().equals(myUserName)){
-                    ci = (ClientInterface) registry.lookup(it.next().getUsername());
-                    ci.removeClientInterface(triple);
-                    ci.setClientList(clients);
-                }
             }
         }
+        it = clients.iterator();
+        myLeader = startElection();
+        while (it.hasNext()) {
+            if (!it.next().getUsername().equals(myUserName)){
+                ci = (ClientInterface) registry.lookup(it.next().getUsername());
+                ci.removeClientInterface(triple);
+                ci.setClientList(clients);
+                ci.setNewLeader(myLeader);
+            }
+        }
+        ns.updateClientlist();
+        ns.updateLeader();
+    }
+    
+    public void setNewLeader(String leader){
+        myLeader = leader;
     }
 
 	public boolean connectToGroupLeader(String groupLeader) throws RemoteException, AlreadyBoundException, NotBoundException {
