@@ -81,7 +81,7 @@ public class CommunicationModule {
         ClientInterface ci;
         for (int i = 0; i < numberOfMessages; i++)
         {
-            messages.add(new TextMessage(i, "Textmessage nr: " + i, userName, clientID));
+            messages.add(new TextMessage(i+counter, "Textmessage nr: " + i, userName, clientID));
         }
         Collections.shuffle(messages);
 
@@ -138,7 +138,7 @@ public class CommunicationModule {
             while (!timedOut){
 
             	try {
-					Thread.sleep(15);
+					Thread.sleep(25);
 				} catch (InterruptedException e) {
 					e.printStackTrace();
 				}
@@ -173,7 +173,7 @@ public class CommunicationModule {
     /** Duplicate of the AcceptMessage because of scope for runnable InnerThread.
      *
      */
-    private void AcceptMessage(TextMessage message, int clientID){
+    private synchronized void AcceptMessage(TextMessage message, int clientID){
         acceptedMessages.add(message);
         if(message.getSeqNr()>lastAcceptedSeqNr.get(clientID)){
             lastAcceptedSeqNr.remove(clientID);
