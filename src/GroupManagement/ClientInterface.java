@@ -33,7 +33,7 @@ public interface ClientInterface extends Remote, Serializable {
 
 	public boolean addMemberToGroup(String userName) throws RemoteException;
 
-	public void disconnect(String groupName, String userName) throws RemoteException;
+	public void disconnect(String groupName, String userName) throws RemoteException, java.rmi.NotBoundException;
 
 	public void removeFromGroup(String groupName, String userName) throws RemoteException;
 
