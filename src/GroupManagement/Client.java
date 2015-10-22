@@ -131,10 +131,8 @@ public class Client implements ClientInterface {
                 ci.setNewLeader(myLeader);
             }
         }
-        ns.updateClientlist();
-        ns.updateLeader();
     }
-    
+
     public void setNewLeader(String leader){
         myLeader = leader;
     }
