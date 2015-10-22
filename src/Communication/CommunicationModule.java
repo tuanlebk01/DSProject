@@ -84,6 +84,9 @@ public class CommunicationModule {
             messages.add(new TextMessage(i+counter, "Textmessage nr: " + i, userName, clientID));
         }
         Collections.shuffle(messages);
+        messages.remove(messages.size()/2);
+        Collections.shuffle(messages);
+
 
         for (int j=0; j<=messages.size();j++){
             for(int k= 0; k < clients.size(); k++){
