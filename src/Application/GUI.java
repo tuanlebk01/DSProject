@@ -25,6 +25,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
+import javax.swing.ScrollPaneConstants;
 import javax.swing.SwingUtilities;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
@@ -55,6 +56,7 @@ public class GUI {
 	private JFrame frame = new JFrame();
 	private static JTextArea chatArea;
 	private JTextArea msgField;
+	private JScrollPane scrollPane;
 	private static String userName;
 	private static int portNr;
 	private ArrayList<String> listOfGroups = new ArrayList<String>();
@@ -152,17 +154,22 @@ public class GUI {
 		frame.getContentPane().add(IPLabel);
 
 		chatArea = new JTextArea();
+		chatArea.setWrapStyleWord(true);
 		chatArea.setEditable(false);
 		chatArea.setLineWrap(true);
 		chatArea.setBounds(28, 100, 456, 265);
-		frame.add(new JScrollPane(chatArea), BorderLayout.CENTER);
-		frame.getContentPane().add(chatArea);
+		scrollPane = new JScrollPane(chatArea);
+		scrollPane.setBounds(28, 100, 456, 265);
+		frame.getContentPane().add(scrollPane);
 
 		msgField = new JTextArea();
+		msgField.setWrapStyleWord(true);
+		msgField.setLineWrap(true);
 		msgField.setBounds(28, 377, 325, 97);
 		msgField.setColumns(10);
-		frame.add(new JScrollPane(msgField), BorderLayout.CENTER);
-		frame.getContentPane().add(msgField);
+		scrollPane = new JScrollPane(msgField);
+		scrollPane.setBounds(28, 377, 325, 97);
+		frame.getContentPane().add(scrollPane);
 
 		createGroup();
 		joinGroup();
