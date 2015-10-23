@@ -100,7 +100,6 @@ public class CommunicationModule {
             }
         }
     }
-
     public void sendMessageWithOneDrop(int numberOfMessages) throws RemoteException, java.rmi.NotBoundException{
 
         List<TextMessage> messages = new ArrayList<>();

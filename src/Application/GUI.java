@@ -44,11 +44,13 @@ public class GUI {
 	private JTextField userNameTextField;
 	private JTextField portNrField;
 	private JTextField randomMSGField;
+	private JTextField dropMSGField;
 	private JButton connectButton;
 	private JButton sendButton;
 	private JButton createNewGroupButton;
 	private JButton randomMSGButton;
 	private JButton joinGroupButton;
+	private JButton dropMSGButton;
 	private DefaultListModel groupList = new DefaultListModel();
 	private DefaultListModel userList = new DefaultListModel();
 	private JList listGroup = new JList(groupList);
@@ -111,9 +113,13 @@ public class GUI {
 		connectButton.setBounds(365, 5, 119, 23);
 		frame.getContentPane().add(connectButton);
 
-		randomMSGButton = new JButton("Test MSG");
+		randomMSGButton = new JButton("Rdm MSG");
 		randomMSGButton.setBounds(365, 35, 119, 23);
 		frame.getContentPane().add(randomMSGButton);
+
+		dropMSGButton = new JButton("Drop MSG");
+		dropMSGButton.setBounds(365, 65, 119, 23);
+		frame.getContentPane().add(dropMSGButton);
 
 		usersOnlineLabel = new JLabel("Online users");
 		usersOnlineLabel.setFont(new Font("Tahoma", Font.PLAIN, 12));
@@ -146,6 +152,12 @@ public class GUI {
 		randomMSGField.setText("10");
 		frame.getContentPane().add(randomMSGField);
 
+		dropMSGField = new JTextField();
+		dropMSGField.setColumns(10);
+		dropMSGField.setBounds(275, 67, 60, 20);
+		dropMSGField.setText("10");
+		frame.getContentPane().add(dropMSGField);
+
 		portNrField.setText("1111");
 
 		IPLabel = new JLabel("Port");
@@ -173,6 +185,12 @@ public class GUI {
 
 		createGroup();
 		joinGroup();
+
+		dropMSGButton.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent a) {
+				sendDropTestMessage();
+			}
+		});
 
 		randomMSGButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent a) {
@@ -229,13 +247,26 @@ public class GUI {
 
 											if(groupJoined) {
 
-												mapOfGroups = client.getGroupsInfo();
-												listOfMembers = mapOfGroups.get(myGroupName);
+												listOfMembers.clear();
+												listOfGroups.clear();
+												groupList.clear();
 												userList.clear();
 
+												mapOfGroups = client.getGroupsInfo();
 
-												for (int i = 0; i < listOfMembers.size(); i++) {
-													userList.add(i,listOfMembers.get(i));
+												Iterator it = mapOfGroups.entrySet().iterator();
+												while (it.hasNext()) {
+													Map.Entry pair = (Map.Entry) it.next();
+													listOfGroups.add(pair.getKey().toString());
+													listOfMembers.add(pair.getValue().toString());
+													it.remove();
+												}
+
+												for(String key: mapOfGroups.keySet()) {
+													listOfMembers = mapOfGroups.get(key);
+													System.out
+															.println("asd: " + listOfMembers);
+
 												}
 
 												JOptionPane.showMessageDialog(null,
@@ -288,33 +319,33 @@ public class GUI {
 						if (groupCreated) {
 
 							myGroupName = input;
+							leaderOfMyGroup = userName;
 							isLeader = true;
 
-							mapOfGroups = client.getGroupsInfo();
-							listOfGroups.clear();
 							listOfMembers.clear();
+							listOfGroups.clear();
+							groupList.clear();
+							userList.clear();
+							mapOfGroups = client.getGroupsInfo();
+							listOfMembers = client.getListOfClientsInMyGroup();
 
 							Iterator it = mapOfGroups.entrySet().iterator();
 							while (it.hasNext()) {
 								Map.Entry pair = (Map.Entry) it.next();
 								listOfGroups.add(pair.getKey().toString());
-								listOfMembers.add(pair.getValue().toString());
-//										System.out.println("GUI:");
-//										System.out.println(pair.getKey() + " = " + pair.getValue());
 								it.remove();
 							}
 
-							System.out.println(listOfGroups);
-							System.out.println(listOfMembers);
-
-							groupList.clear();
 							for (int i = 0; i < listOfGroups.size(); i++) {
 								groupList.add(i, listOfGroups.get(i));
 							}
 
-							userList.clear();
 							for (int i = 0; i < listOfMembers.size(); i++) {
-								userList.add(i,listOfMembers.get(i));
+								if( listOfMembers.get(i).equals(leaderOfMyGroup)) {
+									userList.add(i, listOfMembers.get(i) + " : L");
+								} else {
+									userList.add(i, listOfMembers.get(i));
+								}
 							}
 
 //							JOptionPane.showMessageDialog(null,
@@ -417,8 +448,7 @@ public class GUI {
 		}
 	}
 
-	public void updateLists() {
-		//FIX THIS
+	private void updateLists() {
 
 	}
 
@@ -444,7 +474,21 @@ public class GUI {
 
 	}
 
+	public void sendDropTestMessage() {
+		if (connectButton.getText().equals("Connect")) {
+			JOptionPane.showMessageDialog(frame, "You need to connect first.");
+			return;
+		}
+		if(myGroupName != null) {
+			int nrOftestMSG = Integer.parseInt(dropMSGField.getText());
 
+			try {
+				client.broadcastTestMessages2(nrOftestMSG);
+			} catch (RemoteException | NotBoundException e) {
+				e.printStackTrace();
+			}
+		}
+	}
 
 	public void sendTestMessage() {
 		if (connectButton.getText().equals("Connect")) {
@@ -453,8 +497,6 @@ public class GUI {
 		}
 		if(myGroupName != null) {
 			int nrOftestMSG = Integer.parseInt(randomMSGField.getText());
-
-			randomMSGField.setText("");
 
 			try {
 				client.broadcastTestMessages(nrOftestMSG);
@@ -482,11 +524,8 @@ public class GUI {
 	}
 
 	public void writeMsg(String userName, String message) {
-		if (!userName.equals(""))
-			chatArea.append(userName + ": " + message + "\n");
-		else {
+
 			chatArea.append(message + "\n");
-		}
 	}
 
 	public void setClientID(int clientID) {

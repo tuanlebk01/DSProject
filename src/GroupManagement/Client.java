@@ -44,10 +44,10 @@ public class Client implements ClientInterface {
 
 		this.myUserName = userName;
 
-		this.registry = LocateRegistry.getRegistry("Default.cs.umu.se",
-				portNr);
-//		this.registry = LocateRegistry.getRegistry("localhost",
+//		this.registry = LocateRegistry.getRegistry("Default.cs.umu.se",
 //				portNr);
+		this.registry = LocateRegistry.getRegistry("localhost",
+				portNr);
 		ns = (NameServerInterface) registry.lookup("NamingService");
 		clientID = ns.registerChatClient(userName);
 		clientInfo = new Triple(clientID, myUserName, InetAddress.getLocalHost());
@@ -74,6 +74,7 @@ public class Client implements ClientInterface {
 		clients = ns.getClientList();
 		groupsInfo = ns.getGroupsInfo();
 		listOfClientsInMyGroup = groupsInfo.get(groupName);
+		System.out.println("asd"  + listOfClientsInMyGroup);
 		cm = new CommunicationModule(myUserName, clientID, clients, registry);
 
 		return groupCreated;
@@ -92,7 +93,7 @@ public class Client implements ClientInterface {
 		System.out.println("CLIENT: Group: " + myGroup + " : Leader: " + myLeader);
 
 		connectToGroupLeader(myLeader);
-
+		listOfClientsInMyGroup = groupsInfo.get(groupName);
 		ci = (ClientInterface) UnicastRemoteObject.exportObject(this, 0);
 		registry.bind(myUserName, ci);
 		ci = (ClientInterface) registry.lookup(myLeader);
@@ -107,7 +108,8 @@ public class Client implements ClientInterface {
 			}
 		}
 
-
+		listOfClientsInMyGroup = ci.getListOfClientsInMyGroup();
+		System.out.println("asd : " + listOfClientsInMyGroup);
 		return myLeader;
 
 	}
@@ -151,17 +153,17 @@ public class Client implements ClientInterface {
 
 		//Should be leader ip
 		// fix this one
-		String leaderName = ns.getGroupLeaders().get(groupLeader);
-		ArrayList<Triple> clientList = ns.getClientList();
-		InetAddress ip;
-		for (int i = 0; i < clientList.size(); i++){
-			if (leaderName == clientList.get(i).getUsername()) {
-				ip = clients.get(i).getIp();
-				System.out.println("ip address :" +ip);
-			}
-		}
+//		String leaderName = ns.getGroupLeaders().get(groupLeader);
+//		ArrayList<Triple> clientList = ns.getClientList();
+//		InetAddress ip;
+//		for (int i = 0; i < clientList.size(); i++){
+//			if (leaderName == clientList.get(i).getUsername()) {
+//				ip = clients.get(i).getIp();
+//				System.out.println("ip address :" +ip);
+//			}
+//		}
 
-		registry = LocateRegistry.getRegistry("ip", 1234);
+		registry = LocateRegistry.getRegistry("localhost", 1234);
 		ci = (ClientInterface) registry.lookup(groupLeader);
 
 		System.out.println("CLIENT: connected to groupleader: " + groupLeader + " : with username: " + myUserName);
@@ -180,7 +182,7 @@ public class Client implements ClientInterface {
 		groupJoined = ns.addMember(myGroup, userName);
 		groupsInfo = ns.getGroupsInfo();
 		listOfClientsInMyGroup = groupsInfo.get(myGroup);
-
+		System.out.println("asd: " + listOfClientsInMyGroup);
 		clients = ns.getGroupTriples(myGroup);
 
 		sharegroup();
@@ -336,6 +338,10 @@ public class Client implements ClientInterface {
 	public ArrayList<Triple> getClientlist(String groupName) throws RemoteException {
 		clients = ns.getGroupTriples(groupName);
 		return clients;
+	}
+
+	public ArrayList<String> getListOfClientsInMyGroup() throws RemoteException {
+		return listOfClientsInMyGroup;
 	}
 }
 

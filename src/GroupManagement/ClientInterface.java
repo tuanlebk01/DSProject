@@ -55,5 +55,6 @@ public interface ClientInterface extends Remote, Serializable {
 
 	public ArrayList<Triple> getClientlist(String groupName)throws RemoteException;
 
+	public ArrayList<String> getListOfClientsInMyGroup() throws RemoteException;
 
 }
