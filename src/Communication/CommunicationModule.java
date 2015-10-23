@@ -116,8 +116,6 @@ public class CommunicationModule {
 
         messages.remove(messages.size()/2);
 
-        counter = counter + tempCounter;
-
         for (int j=0; j<messages.size();j++){
             for(int k= 0; k < clients.size(); k++){
                 ci = (ClientInterface) registry.lookup(clients.get(k).getUsername());
@@ -153,7 +151,7 @@ public class CommunicationModule {
      *
      */
     private class InnerThread extends Thread {
-        private int timeOutTime = 2000; // Milliseconds
+        private int timeOutTime = 5000; // Milliseconds
         private boolean timedOut = false;
         private boolean accepted = false;
         private int clientID;
