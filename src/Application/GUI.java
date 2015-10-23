@@ -236,7 +236,7 @@ public class GUI {
 					final JList source = (JList) evt.getSource();
 					try {
 						Thread.sleep(100);
-						mapOfGroups = client.getGroupsInfo();
+						mapOfGroups = client.askNSforGroupsInfo();
 						listOfMembers.clear();
 						listOfMembers = mapOfGroups.get(source.getSelectedValue().toString());
 
@@ -259,33 +259,37 @@ public class GUI {
 
 											if(groupJoined) {
 
-												listOfMembers.clear();
-												listOfGroups.clear();
+
 												groupList.clear();
 												userList.clear();
+												listOfGroups.clear();
+												listOfMembers.clear();
 
 												mapOfGroups = client.getGroupsInfo();
+
+												System.out
+														.println(mapOfGroups);
+												System.out
+														.println(mapOfGroups.get(myGroupName));
 
 												Iterator it = mapOfGroups.entrySet().iterator();
 												while (it.hasNext()) {
 													Map.Entry pair = (Map.Entry) it.next();
 													listOfGroups.add(pair.getKey().toString());
-													listOfMembers.add(pair.getValue().toString());
-													it.remove();
 												}
 
-												for(String key: mapOfGroups.keySet()) {
-													listOfMembers = mapOfGroups.get(key);
-													System.out.println("asd: " + listOfMembers);
-													for (int i = 0; i < listOfMembers.size(); i++) {
-														System.out.println("asd: " + listOfMembers.get(i));
-														if( listOfMembers.get(i).equals(leaderOfMyGroup)) {
-															userList.add(i, listOfMembers.get(i) + " : L");
-														} else {
-															userList.add(i, listOfMembers.get(i));
-														}
-													}
+												listOfMembers = mapOfGroups.get(myGroupName);
 
+												for (int i = 0; i < listOfGroups.size(); i++) {
+													groupList.add(i, listOfGroups.get(i));
+												}
+
+												for (int i = 0; i < listOfMembers.size(); i++) {
+													if( listOfMembers.get(i).equals(leaderOfMyGroup)) {
+														userList.add(i, listOfMembers.get(i) + " : L");
+													} else {
+														userList.add(i, listOfMembers.get(i));
+													}
 												}
 
 												JOptionPane.showMessageDialog(null,
@@ -341,19 +345,21 @@ public class GUI {
 							leaderOfMyGroup = userName;
 							isLeader = true;
 
-							listOfMembers.clear();
-							listOfGroups.clear();
 							groupList.clear();
 							userList.clear();
-							mapOfGroups = client.getGroupsInfo();
-							listOfMembers = client.getListOfClientsInMyGroup();
+
+
+							mapOfGroups = client.askNSforGroupsInfo();
 
 							Iterator it = mapOfGroups.entrySet().iterator();
 							while (it.hasNext()) {
 								Map.Entry pair = (Map.Entry) it.next();
 								listOfGroups.add(pair.getKey().toString());
-								it.remove();
+//										System.out.println("GUI:");
+//										System.out.println(pair.getKey() + " = " + pair.getValue());
 							}
+
+							listOfMembers = mapOfGroups.get(myGroupName);
 
 							for (int i = 0; i < listOfGroups.size(); i++) {
 								groupList.add(i, listOfGroups.get(i));
@@ -419,7 +425,7 @@ public class GUI {
 				connectButton.setText("Disconnect");
 				clientID = client.connectToNameServer(userName, portNr);
 
-				mapOfGroups = client.getGroupsInfo();
+				mapOfGroups = client.askNSforGroupsInfo();
 				listOfGroups.clear();
 				listOfMembers.clear();
 
@@ -435,14 +441,16 @@ public class GUI {
 					it.remove();
 				}
 
-				groupList.clear();
 				for (int i = 0; i < listOfGroups.size(); i++) {
 					groupList.add(i, listOfGroups.get(i));
 				}
 
-				userList.clear();
 				for (int i = 0; i < listOfMembers.size(); i++) {
-					userList.add(i,listOfMembers.get(i));
+					if( listOfMembers.get(i).equals(leaderOfMyGroup)) {
+						userList.add(i, listOfMembers.get(i) + " : L");
+					} else {
+						userList.add(i, listOfMembers.get(i));
+					}
 				}
 
 				System.out.println("GUI: Connected to nameserver");
@@ -464,11 +472,45 @@ public class GUI {
 			userList.clear();
 			groupList.clear();
 			connectButton.setText("Connect");
+
 		}
 	}
 
 	private void updateLists() {
 
+		listOfMembers.clear();
+		listOfGroups.clear();
+		groupList.clear();
+		userList.clear();
+
+		try {
+			mapOfGroups = client.getGroupsInfo();
+		} catch (RemoteException e) {
+			e.printStackTrace();
+		}
+
+
+		Iterator it = mapOfGroups.entrySet().iterator();
+		while (it.hasNext()) {
+			Map.Entry pair = (Map.Entry) it.next();
+			listOfGroups.add(pair.getKey().toString());
+//					System.out.println("GUI:");
+//					System.out.println(pair.getKey() + " = " + pair.getValue());
+		}
+
+		listOfMembers = mapOfGroups.get(myGroupName);
+
+		for (int i = 0; i < listOfGroups.size(); i++) {
+			groupList.add(i, listOfGroups.get(i));
+		}
+
+		for (int i = 0; i < listOfMembers.size(); i++) {
+			if( listOfMembers.get(i).equals(leaderOfMyGroup)) {
+				userList.add(i, listOfMembers.get(i) + " : L");
+			} else {
+				userList.add(i, listOfMembers.get(i));
+			}
+		}
 	}
 
 	private void startThread() {
@@ -479,19 +521,28 @@ public class GUI {
         TimerTask task = new TimerTask() {
 
             public void run() {
-            	updateLists();
-            	ArrayList<TextMessage> textMessages;
-            	textMessages = client.getMessages();
-            	for(int i = 0; i < textMessages.size(); i++) {
-            		if(!(textMessages.get(i) == null)){
-            			writeMsg(textMessages.get(i).getSenderUserName(), textMessages.get(i).getMessage());
-            		}
-            	}
+	           	ArrayList<TextMessage> textMessages;
+	           	textMessages = client.getMessages();
+	           	if(!(textMessages == null)) {
+	           		for(int i = 0; i < textMessages.size(); i++) {
+	           			if(!(textMessages.get(i) == null)){
+	           				writeMsg(textMessages.get(i).getSenderUserName(), textMessages.get(i).getMessage());
+	            		}
+	            	}
+	            }
             }
         };
 
         timer.schedule(task, 0, 250);
 
+
+        TimerTask task2 = new TimerTask() {
+
+            public void run() {
+	           	updateLists();
+            }
+        };
+        timer.schedule(task2, 0, 2000);
 	}
 
 	public void getQueue() {

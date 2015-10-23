@@ -63,7 +63,12 @@ public class Client implements ClientInterface {
 		this.myLeader = userName;
 
 		ci = (ClientInterface) UnicastRemoteObject.exportObject(this, 0);
-		registry = LocateRegistry.createRegistry(1234);
+		try {
+			registry = LocateRegistry.createRegistry(1234);
+		} catch(Exception ex) {
+			ex.printStackTrace();
+		}
+
 		registry.bind(userName, ci);
 
 		System.out.println("CLIENT: Groupleader: " + userName + " running on port " + "1234");
@@ -72,7 +77,7 @@ public class Client implements ClientInterface {
 		clients = ns.getClientList();
 		groupsInfo = ns.getGroupsInfo();
 		listOfClientsInMyGroup = groupsInfo.get(groupName);
-		System.out.println("asd"  + listOfClientsInMyGroup);
+		System.out.println("in here:" + listOfClientsInMyGroup);
 		cm = new CommunicationModule(myUserName, clientID, clients, registry);
 
 		return groupCreated;
@@ -91,7 +96,6 @@ public class Client implements ClientInterface {
 		System.out.println("CLIENT: Group: " + myGroup + " : Leader: " + myLeader);
 
 		connectToGroupLeader(myLeader);
-		listOfClientsInMyGroup = groupsInfo.get(groupName);
 		ci = (ClientInterface) UnicastRemoteObject.exportObject(this, 0);
 		registry.bind(myUserName, ci);
 		ci = (ClientInterface) registry.lookup(myLeader);
@@ -107,7 +111,7 @@ public class Client implements ClientInterface {
 		}
 
 		listOfClientsInMyGroup = ci.getListOfClientsInMyGroup();
-		System.out.println("asd : " + listOfClientsInMyGroup);
+		getGroupsInfo();
 		return myLeader;
 
 	}
@@ -198,7 +202,10 @@ public class Client implements ClientInterface {
 	}
 
 	public void broadcastMessage(String message) throws RemoteException, NotBoundException {
-		cm.sendMessage(message);
+		try {
+			cm.sendMessage(message);
+		} catch (Exception e) {
+		}
 	}
 
 	public String startElection() throws RemoteException {
@@ -272,7 +279,6 @@ public class Client implements ClientInterface {
 
 	public ArrayList<TextMessage> getMessages() {
 		return cm.getAcceptedMessages();
-
 	}
 
     public ArrayList<TextMessage> getMessagesInQueue() {
@@ -319,6 +325,11 @@ public class Client implements ClientInterface {
 	}
 
 	public HashMap<String, ArrayList<String>> getGroupsInfo() throws RemoteException {
+		groupsInfo = ci.askNSforGroupsInfo();
+		return groupsInfo;
+	}
+
+	public HashMap<String, ArrayList<String>> askNSforGroupsInfo() throws RemoteException {
 		groupsInfo = ns.getGroupsInfo();
 		return groupsInfo;
 	}

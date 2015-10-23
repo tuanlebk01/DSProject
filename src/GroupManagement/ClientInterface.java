@@ -57,4 +57,6 @@ public interface ClientInterface extends Remote, Serializable {
 
 	public ArrayList<String> getListOfClientsInMyGroup() throws RemoteException;
 
+	public HashMap<String, ArrayList<String>> askNSforGroupsInfo() throws RemoteException;
+
 }
