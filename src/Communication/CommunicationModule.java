@@ -57,18 +57,25 @@ public class CommunicationModule {
      * @throws RemoteException
      * @throws NotBoundException
      */
-    public void sendMessage(String message) throws RemoteException, NotBoundException{
-        TextMessage textMessage;
+    public void sendMessage(String message){
+        TextMessage textMessage = null;
         ClientInterface ci;
 
+        try {
         for(int i= 0; i < clients.size(); i++){
+
         	textMessage = new TextMessage(counter, message, userName, clientID);
         	Registry registry = LocateRegistry.getRegistry(clients.get(i).getIp().toString().split("/")[1], 1234);
             ci = (ClientInterface) registry.lookup(clients.get(i).getUsername());
             ci.addMessageToQueue(textMessage);
 
         }
+        }
+        catch(Exception e){
+        	e.printStackTrace();
+        }
         counter++;
+        System.out.println(counter + " : " +textMessage.getClientID());
     }
 
     /** This method sends a number of testMessages in a random order to all the clientInterfaces. The number of messages
@@ -100,7 +107,9 @@ public class CommunicationModule {
         for (int j=0; j<messages.size();j++){
             for(int k= 0; k < clients.size(); k++){
                 ci = (ClientInterface) registry.get(clients.get(j).getClientID()).lookup(clients.get(k).getUsername());
-                ci.addMessageToQueue(messages.get(j));
+                if (messages.get(j)!= null){
+                	ci.addMessageToQueue(messages.get(j));
+                }
             }
         }
     }

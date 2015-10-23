@@ -213,7 +213,7 @@ public class Client implements ClientInterface {
 		return leaders;
 	}
 
-	public void addMessageToQueue (TextMessage message){
+	public void addMessageToQueue (TextMessage message)throws RemoteException{
 		cm.addMessageToQueue(message);
 	}
 
