@@ -29,7 +29,7 @@ public class TextMessage implements Serializable {
     }
 
     public void addStringToMessage(String additionalMessage){
-        message = message+additionalMessage;
+        message = message + additionalMessage;
     }
 
     public String getMessage(){

@@ -2,7 +2,6 @@ package Communication;
 
 
 import GroupManagement.ClientInterface;
-import GroupManagement.NameServerInterface;
 import GroupManagement.Triple;
 
 import java.rmi.NotBoundException;
@@ -19,12 +18,14 @@ import java.util.*;
 public class CommunicationModule {
 
     private int counter=0;
+    private ArrayList<TextMessage> waitingMessages;
     private String userName;
     private int clientID;
     private  HashMap <Integer, Integer> lastAcceptedSeqNr;
     private ArrayList <TextMessage> acceptedMessages = new ArrayList<>();
     private HashMap<Integer, Registry> registry;
 	private ArrayList<Triple> clients;
+    private boolean ordered=true;
 
 
     /** The communication module keep track of the sequence numbers received by any client.
@@ -39,6 +40,7 @@ public class CommunicationModule {
         this.clientID = clientID;
         this.clients = clients;
         this.registry = registry;
+        waitingMessages = new ArrayList<>();
 
         this.lastAcceptedSeqNr = new HashMap<>();
 
@@ -102,7 +104,6 @@ public class CommunicationModule {
             }
         }
     }
-
     public void sendMessageWithOneDrop(int numberOfMessages) throws RemoteException, java.rmi.NotBoundException{
 
         List<TextMessage> messages = new ArrayList<>();
@@ -117,8 +118,6 @@ public class CommunicationModule {
         counter = counter + tempCounter;
 
         messages.remove(messages.size()/2);
-
-        counter = counter + tempCounter;
 
         for (int j=0; j<messages.size();j++){
             for(int k= 0; k < clients.size(); k++){
@@ -139,12 +138,24 @@ public class CommunicationModule {
      */
     public void addMessageToQueue (TextMessage textMessage){
         int id = textMessage.getClientID();
+<<<<<<< HEAD
         int seqNr = lastAcceptedSeqNr.get(id);
 
         if (textMessage.getSeqNr() <= (seqNr+1) ){
             AcceptMessage(textMessage, id);
+=======
+
+        if(ordered){
+            int seqNr = lastAcceptedSeqNr.get(id);
+
+            if (textMessage.getSeqNr() <= (seqNr+1) ){
+                AcceptMessage(textMessage, id);
+            } else {
+                new InnerThread(id, textMessage);
+            }
+>>>>>>> db5e482843ca56618e19d5c975187983dbe898c3
         } else {
-            new InnerThread(id, textMessage);
+            AcceptMessage(textMessage, textMessage.getClientID());
         }
     }
 
@@ -153,7 +164,7 @@ public class CommunicationModule {
      *
      */
     private class InnerThread extends Thread {
-        private int timeOutTime = 1000; // Milliseconds
+        private int timeOutTime = 5000; // Milliseconds
         private boolean timedOut = false;
         private boolean accepted = false;
         private int clientID;
@@ -163,15 +174,17 @@ public class CommunicationModule {
         InnerThread(int clientID, TextMessage message) {
             this.clientID = clientID;
             this.message = message;
+            waitingMessages.add(message);
             start();
         }
 
         public void run() {
+
             time1 = System.currentTimeMillis();
             long time2;
             while (!timedOut){
             	try {
-					Thread.sleep(25);
+					Thread.sleep(200);
 				} catch (InterruptedException e) {
 					e.printStackTrace();
 				}
@@ -205,6 +218,7 @@ public class CommunicationModule {
          */
         private synchronized void AcceptMessage(TextMessage message, int clientID){
             acceptedMessages.add(message);
+            waitingMessages.remove(message);
             if(message.getSeqNr()>lastAcceptedSeqNr.get(clientID)){
                 lastAcceptedSeqNr.remove(clientID);
                 lastAcceptedSeqNr.put(clientID, message.getSeqNr());
@@ -255,7 +269,17 @@ public class CommunicationModule {
         lastAcceptedSeqNr.remove(triple.getClientID());
     }
 
+<<<<<<< HEAD
 	public void addAnotherRegistry(Registry registry2, int id) {
 		registry.put(id, registry2);
 	}
+=======
+    public ArrayList<TextMessage> getQueue(){
+        return waitingMessages;
+    }
+
+    public void setOrdered(boolean ordered){
+        this.ordered = ordered;
+    }
+>>>>>>> db5e482843ca56618e19d5c975187983dbe898c3
 }
