@@ -109,7 +109,6 @@ public class Client implements ClientInterface {
 		ci = (ClientInterface) leaderRegistry.lookup(myLeader);
 		clients = ci.getClientlist(groupName);
 
-		cm = new CommunicationModule(myUserName, clientID, clients);
 
 		for (int i = 0; i < clients.size(); i++){
 			if (!clients.get(i).getUsername().equals(myUserName)){
@@ -120,12 +119,15 @@ public class Client implements ClientInterface {
 				ci = (ClientInterface) goRegistry.lookup(clients.get(i).getUsername());
 				ci.setClientList(clients);
 				ci.addClientInterface(clientInfo);
-			}else {
-				addClientInterface(clientInfo);
 			}
 		}
 
+		cm = new CommunicationModule(myUserName, clientID, clients);
+		for (int i = 0; i < clients.size(); i++){
+			addClientInterface(clientInfo);
+		}
 
+		System.out.println("Joined finished");
 
 		listOfClientsInMyGroup = ci.getListOfClientsInMyGroup();
 		getGroupsInfo();

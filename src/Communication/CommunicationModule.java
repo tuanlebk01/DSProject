@@ -57,29 +57,30 @@ public class CommunicationModule {
      * @throws RemoteException
      * @throws NotBoundException
      */
-    public void sendMessage(String message){
+    public void sendMessage(String message) throws RemoteException, NotBoundException{
         TextMessage textMessage = null;
         ClientInterface ci;
         textMessage = new TextMessage(counter, message, userName, clientID);
+        Registry registry;
 
-        try {
+		System.out.println("Message ready to send");
         for(int i= 0; i < clients.size(); i++){
+    		System.out.println("Looping through all clients");
 
         	if(clients.get(i).getClientID() == clientID){
+          		System.out.println("Add message to own queue");
         		addMessageToQueue(textMessage);
         	}else {
-            	Registry registry = LocateRegistry.getRegistry(clients.get(i).getIp().toString().split("/")[1], 1234);
-                ci = (ClientInterface) registry.lookup(clients.get(i).getUsername());
-                ci.addMessageToQueue(textMessage);
+
+        		System.out.println(clients.get(i).getIp().toString().split("/")[1]);
+            	registry = LocateRegistry.getRegistry(clients.get(i).getIp().toString().split("/")[1], 1234);
+//                ci = (ClientInterface) registry.lookup(clients.get(i).getUsername());
+//          		System.out.println("Looked up client");
+//                ci.addMessageToQueue(textMessage);
+//          		System.out.println("Sent message to other clients");
         	}
-
-
-
         }
-        }
-        catch(Exception e){
-        	e.printStackTrace();
-        }
+
         counter++;
     }
 
