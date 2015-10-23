@@ -45,7 +45,7 @@ public class Client implements ClientInterface {
 			ServerNotActiveException, NotBoundException, UnknownHostException {
 
 		this.myUserName = userName;
-		this.registry = LocateRegistry.getRegistry("Mcgonagall.cs.umu.se",
+		this.registry = LocateRegistry.getRegistry("Mad-eye.cs.umu.se",
 				portNr);
 
 		ns = (NameServerInterface) registry.lookup("NamingService");
@@ -94,6 +94,8 @@ public class Client implements ClientInterface {
 
 		this.myGroup = groupName;
 		this.myLeader = leaderName;
+		HashMap<Integer, Registry> mapRegistry2 = new HashMap<>();
+
 		clientInfo.setGroup(groupName);
 
 		System.out.println("CLIENT: Group: " + myGroup + " : Leader: " + myLeader);
@@ -113,7 +115,7 @@ public class Client implements ClientInterface {
 				String ip = clients.get(i).getIp().toString().split("/")[1];
 				System.out.println("ipppppppppppp: " +ip);
 				System.out.println("clietn   " +clients.get(i).getUsername());
-				Registry goRegistry = LocateRegistry.createRegistry(1234);
+				Registry goRegistry = LocateRegistry.getRegistry(ip, 1234);
 				ci = (ClientInterface) goRegistry.lookup(clients.get(i).getUsername());
 				ci.setClientList(clients);
 			}
