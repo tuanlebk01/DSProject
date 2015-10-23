@@ -72,10 +72,10 @@ public class CommunicationModule {
 
         		System.out.println(clients.get(i).getIp().toString().split("/")[1]);
             	registry = LocateRegistry.getRegistry(clients.get(i).getIp().toString().split("/")[1], 1234);
-//                ci = (ClientInterface) registry.lookup(clients.get(i).getUsername());
-//          		System.out.println("Looked up client");
-//                ci.addMessageToQueue(textMessage);
-//          		System.out.println("Sent message to other clients");
+               ci = (ClientInterface) registry.lookup(clients.get(i).getUsername());
+         		System.out.println("Looked up client");
+                ci.addMessageToQueue(textMessage);
+          		System.out.println("Sent message to other clients");
         	}
         }
 
@@ -274,7 +274,7 @@ public class CommunicationModule {
      *
      */
     public void removeClientInterface (Triple triple){
-    	clients.remove(triple);
+    	//clients.remove(triple);
         lastAcceptedSeqNr.remove(triple.getClientID());
     }
 

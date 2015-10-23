@@ -125,7 +125,9 @@ public class Client implements ClientInterface {
 		cm = new CommunicationModule(myUserName, clientID, clients);
 		int temp = clients.size();
 		for (int i = 0; i < temp; i++){
-			addClientInterface(clientInfo);
+			if (!clients.get(i).getUsername().equals(myUserName)){
+				addClientInterface(clientInfo);
+			}
 		}
 
 		System.out.println("Joined finished");
