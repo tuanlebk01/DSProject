@@ -132,7 +132,6 @@ public class GUI {
 		getMSGButton.setBounds(365, 95, 119, 23);
 		frame.getContentPane().add(getMSGButton);
 
-
 		usersOnlineLabel = new JLabel("Online users");
 		usersOnlineLabel.setFont(new Font("Tahoma", Font.PLAIN, 12));
 		usersOnlineLabel.setBounds(557, 242, 73, 22);
@@ -145,8 +144,8 @@ public class GUI {
 		sendButton.setBounds(384, 377, 100, 97);
 		frame.getContentPane().add(sendButton);
 
-		clearButton = new JButton("Send");
-		clearButton.setBounds(384, 377, 100, 97);
+		clearButton = new JButton("Clear");
+		clearButton.setBounds(28, 95, 119, 23);
 		frame.getContentPane().add(clearButton);
 
 		listGroup.setBounds(524, 100, 136, 124);
@@ -210,6 +209,12 @@ public class GUI {
 		dropMSGButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent a) {
 				sendDropTestMessage();
+			}
+		});
+
+		clearButton.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent a) {
+				chatArea.setText("");
 			}
 		});
 
