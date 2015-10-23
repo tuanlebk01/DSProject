@@ -2,7 +2,6 @@ package Communication;
 
 
 import GroupManagement.ClientInterface;
-import GroupManagement.NameServerInterface;
 import GroupManagement.Triple;
 
 import java.rmi.NotBoundException;
@@ -155,7 +154,7 @@ public class CommunicationModule {
      *
      */
     private class InnerThread extends Thread {
-        private int timeOutTime = 1000; // Milliseconds
+        private int timeOutTime = 2000; // Milliseconds
         private boolean timedOut = false;
         private boolean accepted = false;
         private int clientID;
