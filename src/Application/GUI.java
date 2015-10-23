@@ -50,6 +50,7 @@ public class GUI {
 	private JButton createNewGroupButton;
 	private JButton randomMSGButton;
 	private JButton joinGroupButton;
+	private JButton getMSGButton;
 	private JButton dropMSGButton;
 	private DefaultListModel groupList = new DefaultListModel();
 	private DefaultListModel userList = new DefaultListModel();
@@ -121,6 +122,11 @@ public class GUI {
 		dropMSGButton.setBounds(365, 65, 119, 23);
 		frame.getContentPane().add(dropMSGButton);
 
+		getMSGButton = new JButton("Queue");
+		getMSGButton.setBounds(365, 95, 119, 23);
+		frame.getContentPane().add(getMSGButton);
+
+
 		usersOnlineLabel = new JLabel("Online users");
 		usersOnlineLabel.setFont(new Font("Tahoma", Font.PLAIN, 12));
 		usersOnlineLabel.setBounds(557, 242, 73, 22);
@@ -169,9 +175,9 @@ public class GUI {
 		chatArea.setWrapStyleWord(true);
 		chatArea.setEditable(false);
 		chatArea.setLineWrap(true);
-		chatArea.setBounds(28, 100, 456, 265);
+		chatArea.setBounds(28, 130, 456, 240);
 		scrollPane = new JScrollPane(chatArea);
-		scrollPane.setBounds(28, 100, 456, 265);
+		scrollPane.setBounds(28, 130, 456, 240);
 		frame.getContentPane().add(scrollPane);
 
 		msgField = new JTextArea();
@@ -189,6 +195,12 @@ public class GUI {
 		dropMSGButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent a) {
 				sendDropTestMessage();
+			}
+		});
+
+		getMSGButton.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent a) {
+				getQueue();
 			}
 		});
 
@@ -472,6 +484,15 @@ public class GUI {
 
         timer.schedule(task, 0, 250);
 
+	}
+
+	public void getQueue() {
+		ArrayList<TextMessage> queue = client.getMessagesInQueue();
+		for(int i = 0; i < queue.size(); i++) {
+
+			chatArea.append("Message in queue: " + queue.get(i).getSeqNr() + "\n");
+
+		}
 	}
 
 	public void sendDropTestMessage() {
