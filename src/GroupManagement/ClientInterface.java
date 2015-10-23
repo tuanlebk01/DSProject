@@ -8,6 +8,7 @@ import java.rmi.AlreadyBoundException;
 import java.rmi.NotBoundException;
 import java.rmi.Remote;
 import java.rmi.RemoteException;
+import java.rmi.registry.Registry;
 import java.rmi.server.ServerNotActiveException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -53,7 +54,7 @@ public interface ClientInterface extends Remote, Serializable {
 
     public void setNewLeader(String leader) throws RemoteException;
 
-	public ArrayList<Triple> getClientlist(String groupName)throws RemoteException;
+    public ArrayList<Triple> getClientlist(String groupName) throws RemoteException;
 
 
 }

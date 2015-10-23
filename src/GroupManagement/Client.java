@@ -18,6 +18,7 @@ public class Client implements ClientInterface {
 
 	private static final long serialVersionUID = 1L;
 	private Registry registry;
+	private Registry leaderRegistry;
 	private NameServerInterface ns;
 	private ClientInterface ci;
 	public CommunicationModule cm;
@@ -30,6 +31,7 @@ public class Client implements ClientInterface {
 	private String myUserName;
 	private String myGroup;
 	private String myLeader;
+	private String IpOfLeader;
 	private boolean groupCreated;
 	private boolean groupJoined;
 	private Triple clientInfo;
@@ -43,8 +45,8 @@ public class Client implements ClientInterface {
 			ServerNotActiveException, NotBoundException, UnknownHostException {
 
 		this.myUserName = userName;
-
-		this.registry = LocateRegistry.getRegistry("Mcgonagall.cs.umu.se",
+		//Mad-eye.cs.umu.se
+		this.registry = LocateRegistry.getRegistry("Mad-eye.cs.umu.se",
 				portNr);
 //		this.registry = LocateRegistry.getRegistry("localhost",
 //				portNr);
@@ -74,7 +76,10 @@ public class Client implements ClientInterface {
 		clients = ns.getClientList();
 		groupsInfo = ns.getGroupsInfo();
 		listOfClientsInMyGroup = groupsInfo.get(groupName);
-		cm = new CommunicationModule(myUserName, clientID, clients, registry);
+		HashMap <Integer, Registry> mapOfRegisters = new HashMap<>();
+		mapOfRegisters.put(clientID, registry);
+
+		cm = new CommunicationModule(myUserName, clientID, clients, mapOfRegisters);
 
 		return groupCreated;
 
@@ -86,6 +91,7 @@ public class Client implements ClientInterface {
 
 		this.myGroup = groupName;
 		this.myLeader = leaderName;
+		HashMap<Integer, Registry> mapRegistry2 = new HashMap<>();
 
 		clientInfo.setGroup(groupName);
 
@@ -94,18 +100,28 @@ public class Client implements ClientInterface {
 		connectToGroupLeader(myLeader);
 
 		ci = (ClientInterface) UnicastRemoteObject.exportObject(this, 0);
+		Registry registry = LocateRegistry.createRegistry(1234);
 		registry.bind(myUserName, ci);
-		ci = (ClientInterface) registry.lookup(myLeader);
+
+		leaderRegistry = LocateRegistry.getRegistry(IpOfLeader, 1234);
+		ci = (ClientInterface) leaderRegistry.lookup(myLeader);
 		clients = ci.getClientlist(groupName);
-		cm = new CommunicationModule(myUserName, clientID, clients, registry);
+
+		HashMap <Integer, Registry> mapOfRegisters = new HashMap<>();
 
 		for (int i = 0; i < clients.size(); i++){
 			if (!clients.get(i).getUsername().equals(myUserName)){
-				ci = (ClientInterface) registry.lookup(clients.get(i).getUsername());
-				ci.addClientInterface(clientInfo);
+				String ip = clients.get(i).getIp().toString().split("/")[1];
+				System.out.println("ipppppppppppp: " +ip);
+				System.out.println("clietn   " +clients.get(i).getUsername());
+				Registry goRegistry = LocateRegistry.getRegistry(ip, 1234);
+				ci = (ClientInterface) goRegistry.lookup(clients.get(i).getUsername());
 				ci.setClientList(clients);
 			}
 		}
+
+
+		cm = new CommunicationModule(myUserName, clientID, clients, mapOfRegisters);
 
 
 		return myLeader;
@@ -148,7 +164,7 @@ public class Client implements ClientInterface {
     }
 
 	public boolean connectToGroupLeader(String groupLeader) throws RemoteException, AlreadyBoundException, NotBoundException {
-
+		Registry leaderRegistry;
 		//Should be leader ip
 		// fix this one
 		//String leaderName = ns.getGroupLeaders().get(groupLeader);
@@ -162,14 +178,15 @@ public class Client implements ClientInterface {
 
 			}
 		}
-		registry = LocateRegistry.getRegistry(ip, 1234);
-		ci = (ClientInterface) registry.lookup(groupLeader);
+		leaderRegistry = LocateRegistry.getRegistry(ip, 1234);
+		System.out.println(groupLeader);
+		ci = (ClientInterface) leaderRegistry.lookup(groupLeader);
 
 		System.out.println("CLIENT: connected to groupleader: " + groupLeader + " : with username: " + myUserName);
 
 		groupJoined = ci.addMemberToGroup(myUserName);
 
-
+		this.IpOfLeader = ip;
 		return groupJoined;
 
 	}
@@ -320,7 +337,7 @@ public class Client implements ClientInterface {
 		return groupsInfo;
 	}
 
-	public void setClientList(ArrayList<Triple> clients) throws RemoteException {
+	public void setClientList(ArrayList<Triple> clients ) throws RemoteException {
 
 		this.clients = clients;
 	}
@@ -333,11 +350,11 @@ public class Client implements ClientInterface {
         cm.removeClientInterface(triple);
     }
 
-	@Override
 	public ArrayList<Triple> getClientlist(String groupName) throws RemoteException {
 		clients = ns.getGroupTriples(groupName);
 		return clients;
 	}
+
 }
 
 
