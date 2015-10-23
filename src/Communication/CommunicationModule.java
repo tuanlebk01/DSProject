@@ -24,6 +24,7 @@ public class CommunicationModule {
     private ArrayList <TextMessage> acceptedMessages = new ArrayList<>();
     private Registry registry;
 	private ArrayList<Triple> clients;
+    private boolean ordered=true;
 
 
     /** The communication module keep track of the sequence numbers received by any client.
@@ -136,13 +137,16 @@ public class CommunicationModule {
     public void addMessageToQueue (TextMessage textMessage){
         int id = textMessage.getClientID();
 
+        if(ordered){
+            int seqNr = lastAcceptedSeqNr.get(id);
 
-        int seqNr = lastAcceptedSeqNr.get(id);
-
-        if (textMessage.getSeqNr() <= (seqNr+1) ){
-            AcceptMessage(textMessage, id);
+            if (textMessage.getSeqNr() <= (seqNr+1) ){
+                AcceptMessage(textMessage, id);
+            } else {
+                new InnerThread(id, textMessage);
+            }
         } else {
-            new InnerThread(id, textMessage);
+            AcceptMessage(textMessage, textMessage.getClientID());
         }
     }
 
@@ -258,5 +262,9 @@ public class CommunicationModule {
 
     public ArrayList<TextMessage> getQueue(){
         return waitingMessages;
+    }
+
+    public void setOrdered(boolean ordered){
+        this.ordered = ordered;
     }
 }
