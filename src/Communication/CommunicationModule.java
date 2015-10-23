@@ -23,7 +23,6 @@ public class CommunicationModule {
     private int clientID;
     private  HashMap <Integer, Integer> lastAcceptedSeqNr;
     private ArrayList <TextMessage> acceptedMessages = new ArrayList<>();
-    private HashMap<Integer, Registry> registry;
 	private ArrayList<Triple> clients;
     private boolean ordered=true;
 
@@ -39,7 +38,6 @@ public class CommunicationModule {
         this.userName = userName;
         this.clientID = clientID;
         this.clients = clients;
-        this.registry = registry;
         waitingMessages = new ArrayList<>();
 
         this.lastAcceptedSeqNr = new HashMap<>();

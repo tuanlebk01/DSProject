@@ -123,7 +123,8 @@ public class Client implements ClientInterface {
 		}
 
 		cm = new CommunicationModule(myUserName, clientID, clients);
-		for (int i = 0; i < clients.size(); i++){
+		int temp = clients.size();
+		for (int i = 0; i < temp; i++){
 			addClientInterface(clientInfo);
 		}
 
