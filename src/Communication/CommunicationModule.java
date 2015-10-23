@@ -46,7 +46,6 @@ public class CommunicationModule {
 
 
         for(int i = 0; i < clients.size(); i++ ) {
-        	System.out.println(clients.size());
         	lastAcceptedSeqNr.put(clients.get(i).getClientID(), 0);
         }
 
@@ -82,7 +81,6 @@ public class CommunicationModule {
         	e.printStackTrace();
         }
         counter++;
-        System.out.println(counter + " : " +textMessage.getClientID());
     }
 
     /** This method sends a number of testMessages in a random order to all the clientInterfaces. The number of messages
@@ -158,6 +156,8 @@ public class CommunicationModule {
         int id = textMessage.getClientID();
 
         if(ordered){
+
+        	System.out.println(lastAcceptedSeqNr.keySet());
             int seqNr = lastAcceptedSeqNr.get(id);
 
             if (textMessage.getSeqNr() <= (seqNr+1) ){
@@ -215,7 +215,6 @@ public class CommunicationModule {
         private synchronized void checkIfAcceptMessage(TextMessage message){
 
             if (message.getSeqNr() == (lastAcceptedSeqNr.get(clientID))+1){
-            	System.out.println("Accepting message: "+ message.getSeqNr());
                 AcceptMessage(message, clientID);
                 accepted = true;
             }
