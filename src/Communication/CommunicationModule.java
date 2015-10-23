@@ -171,7 +171,7 @@ public class CommunicationModule {
             long time2;
             while (!timedOut){
             	try {
-					Thread.sleep(25);
+					Thread.sleep(200);
 				} catch (InterruptedException e) {
 					e.printStackTrace();
 				}

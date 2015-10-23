@@ -276,8 +276,15 @@ public class GUI {
 
 												for(String key: mapOfGroups.keySet()) {
 													listOfMembers = mapOfGroups.get(key);
-													System.out
-															.println("asd: " + listOfMembers);
+													System.out.println("asd: " + listOfMembers);
+													for (int i = 0; i < listOfMembers.size(); i++) {
+														System.out.println("asd: " + listOfMembers.get(i));
+														if( listOfMembers.get(i).equals(leaderOfMyGroup)) {
+															userList.add(i, listOfMembers.get(i) + " : L");
+														} else {
+															userList.add(i, listOfMembers.get(i));
+														}
+													}
 
 												}
 
@@ -476,9 +483,10 @@ public class GUI {
             	ArrayList<TextMessage> textMessages;
             	textMessages = client.getMessages();
             	for(int i = 0; i < textMessages.size(); i++) {
-            		writeMsg(textMessages.get(i).getSenderUserName(), textMessages.get(i).getMessage());
+            		if(!(textMessages.get(i) == null)){
+            			writeMsg(textMessages.get(i).getSenderUserName(), textMessages.get(i).getMessage());
+            		}
             	}
-
             }
         };
 
