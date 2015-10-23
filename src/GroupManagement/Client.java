@@ -45,8 +45,9 @@ public class Client implements ClientInterface {
 			ServerNotActiveException, NotBoundException, UnknownHostException {
 
 		this.myUserName = userName;
-		this.registry = LocateRegistry.getRegistry("Mad-eye.cs.umu.se",
+		this.registry = LocateRegistry.getRegistry("Mcgonagall.cs.umu.se",
 				portNr);
+
 		ns = (NameServerInterface) registry.lookup("NamingService");
 		clientID = ns.registerChatClient(userName);
 		clientInfo = new Triple(clientID, myUserName, InetAddress.getLocalHost());
@@ -93,8 +94,6 @@ public class Client implements ClientInterface {
 
 		this.myGroup = groupName;
 		this.myLeader = leaderName;
-		HashMap<Integer, Registry> mapRegistry2 = new HashMap<>();
-
 		clientInfo.setGroup(groupName);
 
 		System.out.println("CLIENT: Group: " + myGroup + " : Leader: " + myLeader);
@@ -108,17 +107,16 @@ public class Client implements ClientInterface {
 		ci = (ClientInterface) leaderRegistry.lookup(myLeader);
 		clients = ci.getClientlist(groupName);
 
-		HashMap <Integer, Registry> mapOfRegisters = new HashMap<>();
 
 		for (int i = 0; i < clients.size(); i++){
 			if (!clients.get(i).getUsername().equals(myUserName)){
 				String ip = clients.get(i).getIp().toString().split("/")[1];
 				System.out.println("ipppppppppppp: " +ip);
 				System.out.println("clietn   " +clients.get(i).getUsername());
-				Registry goRegistry = LocateRegistry.getRegistry(ip, 1234);
+				Registry goRegistry = LocateRegistry.createRegistry(1234);
 				ci = (ClientInterface) goRegistry.lookup(clients.get(i).getUsername());
+				ci.setClientList(clients);
 			}
-			ci.setClientList(clients);
 		}
 
 		cm = new CommunicationModule(myUserName, clientID, clients);

@@ -113,8 +113,8 @@ public class CommunicationModule {
 
         for (int j=0; j<messages.size();j++){
             for(int k= 0; k < clients.size(); k++){
-            	Registry registry = LocateRegistry.getRegistry(clients.get(j).getIp().toString().split("/")[1], 1234);
-            	 ci = (ClientInterface) registry.lookup(clients.get(j).getUsername());
+            	Registry registry = LocateRegistry.getRegistry(clients.get(k).getIp().toString().split("/")[1], 1234);
+            	 ci = (ClientInterface) registry.lookup(clients.get(k).getUsername());
                 if (messages.get(j)!= null){
                 	ci.addMessageToQueue(messages.get(j));
                 }
@@ -138,8 +138,8 @@ public class CommunicationModule {
 
         for (int j=0; j<messages.size();j++){
             for(int k= 0; k < clients.size(); k++){
-            	Registry registry = LocateRegistry.getRegistry(clients.get(j).getIp().toString().split("/")[1], 1234);
-           	 ci = (ClientInterface) registry.lookup(clients.get(j).getUsername());
+            	Registry registry = LocateRegistry.getRegistry(clients.get(k).getIp().toString().split("/")[1], 1234);
+           	 ci = (ClientInterface) registry.lookup(clients.get(k).getUsername());
                 ci.addMessageToQueue(messages.get(j));
             }
         }
