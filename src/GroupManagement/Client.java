@@ -45,13 +45,7 @@ public class Client implements ClientInterface {
 			ServerNotActiveException, NotBoundException, UnknownHostException {
 
 		this.myUserName = userName;
-<<<<<<< HEAD
-		//Mad-eye.cs.umu.se
 		this.registry = LocateRegistry.getRegistry("Mad-eye.cs.umu.se",
-=======
-
-		this.registry = LocateRegistry.getRegistry("localhost",
->>>>>>> db5e482843ca56618e19d5c975187983dbe898c3
 				portNr);
 		ns = (NameServerInterface) registry.lookup("NamingService");
 		clientID = ns.registerChatClient(userName);
@@ -84,15 +78,10 @@ public class Client implements ClientInterface {
 		clients = ns.getClientList();
 		groupsInfo = ns.getGroupsInfo();
 		listOfClientsInMyGroup = groupsInfo.get(groupName);
-<<<<<<< HEAD
 		HashMap <Integer, Registry> mapOfRegisters = new HashMap<>();
 		mapOfRegisters.put(clientID, registry);
 
-		cm = new CommunicationModule(myUserName, clientID, clients, mapOfRegisters);
-=======
-		System.out.println("in here:" + listOfClientsInMyGroup);
-		cm = new CommunicationModule(myUserName, clientID, clients, registry);
->>>>>>> db5e482843ca56618e19d5c975187983dbe898c3
+		cm = new CommunicationModule(myUserName, clientID, clients);
 
 		return groupCreated;
 
@@ -132,15 +121,11 @@ public class Client implements ClientInterface {
 			}
 		}
 
-<<<<<<< HEAD
-
-		cm = new CommunicationModule(myUserName, clientID, clients, mapOfRegisters);
+		cm = new CommunicationModule(myUserName, clientID, clients);
 
 
-=======
 		listOfClientsInMyGroup = ci.getListOfClientsInMyGroup();
 		getGroupsInfo();
->>>>>>> db5e482843ca56618e19d5c975187983dbe898c3
 		return myLeader;
 
 	}
@@ -181,14 +166,9 @@ public class Client implements ClientInterface {
     }
 
 	public boolean connectToGroupLeader(String groupLeader) throws RemoteException, AlreadyBoundException, NotBoundException {
-<<<<<<< HEAD
 		Registry leaderRegistry;
 		//Should be leader ip
 		// fix this one
-=======
-
-
->>>>>>> db5e482843ca56618e19d5c975187983dbe898c3
 		//String leaderName = ns.getGroupLeaders().get(groupLeader);
 		ArrayList<Triple> clientList = ns.getClientList();
 		String ip = null;
@@ -388,12 +368,9 @@ public class Client implements ClientInterface {
 		return clients;
 	}
 
-<<<<<<< HEAD
-=======
 	public ArrayList<String> getListOfClientsInMyGroup() throws RemoteException {
 		return listOfClientsInMyGroup;
 	}
->>>>>>> db5e482843ca56618e19d5c975187983dbe898c3
 }
 
 

@@ -34,7 +34,7 @@ public class CommunicationModule {
      * @param clientID - clientId of the client that created the communication module
      * @param clients
      */
-    public CommunicationModule(String userName, int clientID, ArrayList<Triple> clients, HashMap<Integer, Registry> registry){
+    public CommunicationModule(String userName, int clientID, ArrayList<Triple> clients){
         counter = 1;
         this.userName = userName;
         this.clientID = clientID;
@@ -138,12 +138,6 @@ public class CommunicationModule {
      */
     public void addMessageToQueue (TextMessage textMessage){
         int id = textMessage.getClientID();
-<<<<<<< HEAD
-        int seqNr = lastAcceptedSeqNr.get(id);
-
-        if (textMessage.getSeqNr() <= (seqNr+1) ){
-            AcceptMessage(textMessage, id);
-=======
 
         if(ordered){
             int seqNr = lastAcceptedSeqNr.get(id);
@@ -153,7 +147,6 @@ public class CommunicationModule {
             } else {
                 new InnerThread(id, textMessage);
             }
->>>>>>> db5e482843ca56618e19d5c975187983dbe898c3
         } else {
             AcceptMessage(textMessage, textMessage.getClientID());
         }
@@ -269,11 +262,6 @@ public class CommunicationModule {
         lastAcceptedSeqNr.remove(triple.getClientID());
     }
 
-<<<<<<< HEAD
-	public void addAnotherRegistry(Registry registry2, int id) {
-		registry.put(id, registry2);
-	}
-=======
     public ArrayList<TextMessage> getQueue(){
         return waitingMessages;
     }
@@ -281,5 +269,4 @@ public class CommunicationModule {
     public void setOrdered(boolean ordered){
         this.ordered = ordered;
     }
->>>>>>> db5e482843ca56618e19d5c975187983dbe898c3
 }
