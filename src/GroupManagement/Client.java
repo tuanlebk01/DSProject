@@ -276,6 +276,10 @@ public class Client implements ClientInterface {
 
 	}
 
+    public ArrayList<TextMessage> getMessagesInQueue() {
+        return cm.getQueue();
+    }
+
 	public HashMap<Integer, ClientInterface> getInterfaceOfGroup()
 			throws RemoteException {
 		return clientInterfaces;
