@@ -44,7 +44,7 @@ public class Client implements ClientInterface {
 
 		this.myUserName = userName;
 
-		this.registry = LocateRegistry.getRegistry("Draco.cs.umu.se",
+		this.registry = LocateRegistry.getRegistry("Mcgonagall.cs.umu.se",
 				portNr);
 //		this.registry = LocateRegistry.getRegistry("localhost",
 //				portNr);
@@ -153,18 +153,16 @@ public class Client implements ClientInterface {
 		// fix this one
 		//String leaderName = ns.getGroupLeaders().get(groupLeader);
 		ArrayList<Triple> clientList = ns.getClientList();
-		InetAddress ip;
+		String ip = null;
 		for (int i = 0; i < clientList.size(); i++){
 			System.out.println("name of clients " +clientList.get(i).getUsername());
 			String tempClient = clientList.get(i).getUsername();
 			if (tempClient.equals(groupLeader)) {
-				ip = clientList.get(i).getIp();
-				System.out.println("ip address :" +ip);
-				System.out.println("leader name: " +groupLeader);
+				ip = clientList.get(i).getIp().toString().split("/")[1];
+
 			}
 		}
-
-		registry = LocateRegistry.getRegistry("ip", 1234);
+		registry = LocateRegistry.getRegistry(ip, 1234);
 		ci = (ClientInterface) registry.lookup(groupLeader);
 
 		System.out.println("CLIENT: connected to groupleader: " + groupLeader + " : with username: " + myUserName);
