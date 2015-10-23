@@ -44,7 +44,7 @@ public class Client implements ClientInterface {
 
 		this.myUserName = userName;
 
-		this.registry = LocateRegistry.getRegistry("Default.cs.umu.se",
+		this.registry = LocateRegistry.getRegistry("Draco.cs.umu.se",
 				portNr);
 //		this.registry = LocateRegistry.getRegistry("localhost",
 //				portNr);
@@ -151,13 +151,16 @@ public class Client implements ClientInterface {
 
 		//Should be leader ip
 		// fix this one
-		String leaderName = ns.getGroupLeaders().get(groupLeader);
+		//String leaderName = ns.getGroupLeaders().get(groupLeader);
 		ArrayList<Triple> clientList = ns.getClientList();
 		InetAddress ip;
 		for (int i = 0; i < clientList.size(); i++){
-			if (leaderName == clientList.get(i).getUsername()) {
-				ip = clients.get(i).getIp();
+			System.out.println("name of clients " +clientList.get(i).getUsername());
+			String tempClient = clientList.get(i).getUsername();
+			if (tempClient.equals(groupLeader)) {
+				ip = clientList.get(i).getIp();
 				System.out.println("ip address :" +ip);
+				System.out.println("leader name: " +groupLeader);
 			}
 		}
 
