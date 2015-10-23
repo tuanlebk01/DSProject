@@ -356,6 +356,11 @@ public class Client implements ClientInterface {
 	public ArrayList<String> getListOfClientsInMyGroup() throws RemoteException {
 		return listOfClientsInMyGroup;
 	}
+
+	public void setOrdered(boolean b) {
+		cm.setOrdered(b);
+
+	}
 }
 
 

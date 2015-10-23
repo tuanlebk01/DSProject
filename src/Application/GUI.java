@@ -4,6 +4,7 @@ import java.awt.BorderLayout;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
 import java.net.InetAddress;
 import java.rmi.AlreadyBoundException;
 import java.rmi.NotBoundException;
@@ -16,8 +17,11 @@ import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
 
+import javax.swing.AbstractAction;
+import javax.swing.AbstractButton;
 import javax.swing.DefaultListModel;
 import javax.swing.JButton;
+import javax.swing.JCheckBox;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JList;
@@ -46,12 +50,14 @@ public class GUI {
 	private JTextField randomMSGField;
 	private JTextField dropMSGField;
 	private JButton connectButton;
+	private JButton clearButton;
 	private JButton sendButton;
 	private JButton createNewGroupButton;
 	private JButton randomMSGButton;
 	private JButton joinGroupButton;
 	private JButton getMSGButton;
 	private JButton dropMSGButton;
+	private JCheckBox checkbox;
 	private DefaultListModel groupList = new DefaultListModel();
 	private DefaultListModel userList = new DefaultListModel();
 	private JList listGroup = new JList(groupList);
@@ -139,6 +145,10 @@ public class GUI {
 		sendButton.setBounds(384, 377, 100, 97);
 		frame.getContentPane().add(sendButton);
 
+		clearButton = new JButton("Send");
+		clearButton.setBounds(384, 377, 100, 97);
+		frame.getContentPane().add(clearButton);
+
 		listGroup.setBounds(524, 100, 136, 124);
 		frame.getContentPane().add(listGroup);
 
@@ -189,6 +199,11 @@ public class GUI {
 		scrollPane.setBounds(28, 377, 325, 97);
 		frame.getContentPane().add(scrollPane);
 
+		checkbox = new JCheckBox(new CheckboxAction("Ordered"));
+		checkbox.setSelected(true);
+		checkbox.setBounds(175, 35, 85, 25);
+		frame.getContentPane().add(checkbox);
+
 		createGroup();
 		joinGroup();
 
@@ -226,6 +241,22 @@ public class GUI {
 		frame.setSize(700, 530);
 		frame.setLocationRelativeTo(null);
 		frame.setVisible(true);
+	}
+
+	class CheckboxAction extends AbstractAction {
+	    public CheckboxAction(String text) {
+	        super(text);
+	    }
+
+	    @Override
+	    public void actionPerformed(ActionEvent e) {
+	        JCheckBox cbLog = (JCheckBox) e.getSource();
+	        if (cbLog.isSelected()) {
+	            client.setOrdered(true);
+	        } else {
+	        	client.setOrdered(false);
+	        }
+	    }
 	}
 
 	private void joinGroup() {
@@ -468,10 +499,16 @@ public class GUI {
 			} catch (RemoteException | NotBoundException e) {
 				e.printStackTrace();
 			}
+
+			listOfMembers.clear();
+			listOfGroups.clear();
+			groupList.clear();
+			userList.clear();
 			chatArea.setText("");
 			userList.clear();
 			groupList.clear();
 			connectButton.setText("Connect");
+			System.exit(0);
 
 		}
 	}
