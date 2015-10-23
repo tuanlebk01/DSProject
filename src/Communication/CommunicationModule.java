@@ -6,6 +6,7 @@ import GroupManagement.Triple;
 
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
+import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.util.*;
 
@@ -22,7 +23,7 @@ public class CommunicationModule {
     private int clientID;
     private  HashMap <Integer, Integer> lastAcceptedSeqNr;
     private ArrayList <TextMessage> acceptedMessages = new ArrayList<>();
-    private Registry registry;
+    private HashMap<Integer, Registry> registry;
 	private ArrayList<Triple> clients;
     private boolean ordered=true;
 
@@ -33,7 +34,7 @@ public class CommunicationModule {
      * @param clientID - clientId of the client that created the communication module
      * @param clients
      */
-    public CommunicationModule(String userName, int clientID, ArrayList<Triple> clients, Registry registry){
+    public CommunicationModule(String userName, int clientID, ArrayList<Triple> clients){
         counter = 1;
         this.userName = userName;
         this.clientID = clientID;
@@ -56,17 +57,25 @@ public class CommunicationModule {
      * @throws RemoteException
      * @throws NotBoundException
      */
-    public void sendMessage(String message) throws RemoteException, NotBoundException{
-        TextMessage textMessage;
+    public void sendMessage(String message){
+        TextMessage textMessage = null;
         ClientInterface ci;
 
+        try {
         for(int i= 0; i < clients.size(); i++){
+
         	textMessage = new TextMessage(counter, message, userName, clientID);
+        	Registry registry = LocateRegistry.getRegistry(clients.get(i).getIp().toString().split("/")[1], 1234);
             ci = (ClientInterface) registry.lookup(clients.get(i).getUsername());
             ci.addMessageToQueue(textMessage);
 
         }
+        }
+        catch(Exception e){
+        	e.printStackTrace();
+        }
         counter++;
+        System.out.println(counter + " : " +textMessage.getClientID());
     }
 
     /** This method sends a number of testMessages in a random order to all the clientInterfaces. The number of messages
@@ -97,8 +106,10 @@ public class CommunicationModule {
 
         for (int j=0; j<messages.size();j++){
             for(int k= 0; k < clients.size(); k++){
-                ci = (ClientInterface) registry.lookup(clients.get(k).getUsername());
-                ci.addMessageToQueue(messages.get(j));
+                ci = (ClientInterface) registry.get(clients.get(j).getClientID()).lookup(clients.get(k).getUsername());
+                if (messages.get(j)!= null){
+                	ci.addMessageToQueue(messages.get(j));
+                }
             }
         }
     }
@@ -119,7 +130,7 @@ public class CommunicationModule {
 
         for (int j=0; j<messages.size();j++){
             for(int k= 0; k < clients.size(); k++){
-                ci = (ClientInterface) registry.lookup(clients.get(k).getUsername());
+                ci = (ClientInterface) registry.get(clients.get(j).getClientID()).lookup(clients.get(k).getUsername());
                 ci.addMessageToQueue(messages.get(j));
             }
         }
