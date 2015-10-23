@@ -46,6 +46,7 @@ public class CommunicationModule {
 
 
         for(int i = 0; i < clients.size(); i++ ) {
+        	System.out.println(clients.size());
         	lastAcceptedSeqNr.put(clients.get(i).getClientID(), 0);
         }
 
@@ -60,14 +61,20 @@ public class CommunicationModule {
     public void sendMessage(String message){
         TextMessage textMessage = null;
         ClientInterface ci;
+        textMessage = new TextMessage(counter, message, userName, clientID);
 
         try {
         for(int i= 0; i < clients.size(); i++){
 
-        	textMessage = new TextMessage(counter, message, userName, clientID);
-        	Registry registry = LocateRegistry.getRegistry(clients.get(i).getIp().toString().split("/")[1], 1234);
-            ci = (ClientInterface) registry.lookup(clients.get(i).getUsername());
-            ci.addMessageToQueue(textMessage);
+        	if(clients.get(i).getClientID() == clientID){
+        		addMessageToQueue(textMessage);
+        	}else {
+            	Registry registry = LocateRegistry.getRegistry(clients.get(i).getIp().toString().split("/")[1], 1234);
+                ci = (ClientInterface) registry.lookup(clients.get(i).getUsername());
+                ci.addMessageToQueue(textMessage);
+        	}
+
+
 
         }
         }
@@ -106,7 +113,8 @@ public class CommunicationModule {
 
         for (int j=0; j<messages.size();j++){
             for(int k= 0; k < clients.size(); k++){
-                ci = (ClientInterface) registry.get(clients.get(j).getClientID()).lookup(clients.get(k).getUsername());
+            	Registry registry = LocateRegistry.getRegistry(clients.get(j).getIp().toString().split("/")[1], 1234);
+            	 ci = (ClientInterface) registry.lookup(clients.get(j).getUsername());
                 if (messages.get(j)!= null){
                 	ci.addMessageToQueue(messages.get(j));
                 }
@@ -130,7 +138,8 @@ public class CommunicationModule {
 
         for (int j=0; j<messages.size();j++){
             for(int k= 0; k < clients.size(); k++){
-                ci = (ClientInterface) registry.get(clients.get(j).getClientID()).lookup(clients.get(k).getUsername());
+            	Registry registry = LocateRegistry.getRegistry(clients.get(j).getIp().toString().split("/")[1], 1234);
+           	 ci = (ClientInterface) registry.lookup(clients.get(j).getUsername());
                 ci.addMessageToQueue(messages.get(j));
             }
         }

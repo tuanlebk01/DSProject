@@ -117,11 +117,12 @@ public class Client implements ClientInterface {
 				System.out.println("clietn   " +clients.get(i).getUsername());
 				Registry goRegistry = LocateRegistry.getRegistry(ip, 1234);
 				ci = (ClientInterface) goRegistry.lookup(clients.get(i).getUsername());
-				ci.setClientList(clients);
 			}
+			ci.setClientList(clients);
 		}
 
 		cm = new CommunicationModule(myUserName, clientID, clients);
+		//addClientInterface(clientInfo);
 
 
 		listOfClientsInMyGroup = ci.getListOfClientsInMyGroup();
