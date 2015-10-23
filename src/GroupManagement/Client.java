@@ -45,7 +45,7 @@ public class Client implements ClientInterface {
 			ServerNotActiveException, NotBoundException, UnknownHostException {
 
 		this.myUserName = userName;
-		this.registry = LocateRegistry.getRegistry("Mad-eye.cs.umu.se",
+		this.registry = LocateRegistry.getRegistry("Mcgonagall.cs.umu.se",
 				portNr);
 
 		ns = (NameServerInterface) registry.lookup("NamingService");
@@ -109,6 +109,7 @@ public class Client implements ClientInterface {
 		ci = (ClientInterface) leaderRegistry.lookup(myLeader);
 		clients = ci.getClientlist(groupName);
 
+		cm = new CommunicationModule(myUserName, clientID, clients);
 
 		for (int i = 0; i < clients.size(); i++){
 			if (!clients.get(i).getUsername().equals(myUserName)){
@@ -118,11 +119,12 @@ public class Client implements ClientInterface {
 				Registry goRegistry = LocateRegistry.getRegistry(ip, 1234);
 				ci = (ClientInterface) goRegistry.lookup(clients.get(i).getUsername());
 				ci.setClientList(clients);
+				ci.addClientInterface(clientInfo);
+			}else {
+				addClientInterface(clientInfo);
 			}
 		}
 
-		cm = new CommunicationModule(myUserName, clientID, clients);
-		//addClientInterface(clientInfo);
 
 
 		listOfClientsInMyGroup = ci.getListOfClientsInMyGroup();
