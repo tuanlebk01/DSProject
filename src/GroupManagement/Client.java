@@ -44,8 +44,6 @@ public class Client implements ClientInterface {
 
 		this.myUserName = userName;
 
-//		this.registry = LocateRegistry.getRegistry("Default.cs.umu.se",
-//				portNr);
 		this.registry = LocateRegistry.getRegistry("localhost",
 				portNr);
 		ns = (NameServerInterface) registry.lookup("NamingService");
@@ -151,19 +149,19 @@ public class Client implements ClientInterface {
 
 	public boolean connectToGroupLeader(String groupLeader) throws RemoteException, AlreadyBoundException, NotBoundException {
 
-		//Should be leader ip
-		// fix this one
-//		String leaderName = ns.getGroupLeaders().get(groupLeader);
-//		ArrayList<Triple> clientList = ns.getClientList();
-//		InetAddress ip;
-//		for (int i = 0; i < clientList.size(); i++){
-//			if (leaderName == clientList.get(i).getUsername()) {
-//				ip = clients.get(i).getIp();
-//				System.out.println("ip address :" +ip);
-//			}
-//		}
 
-		registry = LocateRegistry.getRegistry("localhost", 1234);
+		//String leaderName = ns.getGroupLeaders().get(groupLeader);
+		ArrayList<Triple> clientList = ns.getClientList();
+		String ip = null;
+		for (int i = 0; i < clientList.size(); i++){
+			System.out.println("name of clients " +clientList.get(i).getUsername());
+			String tempClient = clientList.get(i).getUsername();
+			if (tempClient.equals(groupLeader)) {
+				ip = clientList.get(i).getIp().toString().split("/")[1];
+
+			}
+		}
+		registry = LocateRegistry.getRegistry(ip, 1234);
 		ci = (ClientInterface) registry.lookup(groupLeader);
 
 		System.out.println("CLIENT: connected to groupleader: " + groupLeader + " : with username: " + myUserName);
@@ -276,6 +274,10 @@ public class Client implements ClientInterface {
 		return cm.getAcceptedMessages();
 
 	}
+
+    public ArrayList<TextMessage> getMessagesInQueue() {
+        return cm.getQueue();
+    }
 
 	public HashMap<Integer, ClientInterface> getInterfaceOfGroup()
 			throws RemoteException {

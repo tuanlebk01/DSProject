@@ -2,7 +2,6 @@ package Communication;
 
 
 import GroupManagement.ClientInterface;
-import GroupManagement.NameServerInterface;
 import GroupManagement.Triple;
 
 import java.rmi.NotBoundException;
@@ -18,6 +17,7 @@ import java.util.*;
 public class CommunicationModule {
 
     private int counter=0;
+    private ArrayList<TextMessage> waitingMessages;
     private String userName;
     private int clientID;
     private  HashMap <Integer, Integer> lastAcceptedSeqNr;
@@ -38,6 +38,7 @@ public class CommunicationModule {
         this.clientID = clientID;
         this.clients = clients;
         this.registry = registry;
+        waitingMessages = new ArrayList<>();
 
         this.lastAcceptedSeqNr = new HashMap<>();
 
@@ -152,7 +153,7 @@ public class CommunicationModule {
      *
      */
     private class InnerThread extends Thread {
-        private int timeOutTime = 1000; // Milliseconds
+        private int timeOutTime = 2000; // Milliseconds
         private boolean timedOut = false;
         private boolean accepted = false;
         private int clientID;
@@ -162,10 +163,12 @@ public class CommunicationModule {
         InnerThread(int clientID, TextMessage message) {
             this.clientID = clientID;
             this.message = message;
+            waitingMessages.add(message);
             start();
         }
 
         public void run() {
+
             time1 = System.currentTimeMillis();
             long time2;
             while (!timedOut){
@@ -204,6 +207,7 @@ public class CommunicationModule {
          */
         private synchronized void AcceptMessage(TextMessage message, int clientID){
             acceptedMessages.add(message);
+            waitingMessages.remove(message);
             if(message.getSeqNr()>lastAcceptedSeqNr.get(clientID)){
                 lastAcceptedSeqNr.remove(clientID);
                 lastAcceptedSeqNr.put(clientID, message.getSeqNr());
@@ -252,5 +256,9 @@ public class CommunicationModule {
     public void removeClientInterface (Triple triple){
     	clients.remove(triple);
         lastAcceptedSeqNr.remove(triple.getClientID());
+    }
+
+    public ArrayList<TextMessage> getQueue(){
+        return waitingMessages;
     }
 }
