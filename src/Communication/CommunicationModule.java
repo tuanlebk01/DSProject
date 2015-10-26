@@ -63,7 +63,7 @@ public class CommunicationModule {
 
 		System.out.println("Message ready to send");
         for(int i= 0; i < clients.size(); i++){
-    		System.out.println("Looping through all clients");
+    		System.out.println("Looping through all clients " + clients.get(i).getUsername());
 
         	if(clients.get(i).getClientID() == clientID){
           		System.out.println("Add message to own queue");
@@ -263,8 +263,7 @@ public class CommunicationModule {
      * also added.
      */
     public void addAnotherClientInterface(Triple triple){
-
-    	//clients.add(triple);
+    	clients.add(triple);
         lastAcceptedSeqNr.put(triple.getClientID(), 0);
     }
 
