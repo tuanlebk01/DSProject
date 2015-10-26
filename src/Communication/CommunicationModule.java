@@ -264,7 +264,7 @@ public class CommunicationModule {
      */
     public void addAnotherClientInterface(Triple triple){
 
-    	clients.add(triple);
+    	//clients.add(triple);
         lastAcceptedSeqNr.put(triple.getClientID(), 0);
     }
 
@@ -274,7 +274,7 @@ public class CommunicationModule {
      *
      */
     public void removeClientInterface (Triple triple){
-    	//clients.remove(triple);
+    	clients.remove(triple);
         lastAcceptedSeqNr.remove(triple.getClientID());
     }
 

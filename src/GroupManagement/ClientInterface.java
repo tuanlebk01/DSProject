@@ -60,4 +60,6 @@ public interface ClientInterface extends Remote, Serializable {
 
 	public HashMap<String, ArrayList<String>> askNSforGroupsInfo() throws RemoteException;
 
+	public ArrayList<Triple> getClientListFromMember() throws RemoteException;
+
 }

@@ -1,5 +1,6 @@
 package GroupManagement;
 
+
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.rmi.AlreadyBoundException;
@@ -64,14 +65,26 @@ public class Client implements ClientInterface {
 		this.myGroup = groupName;
 		this.myLeader = userName;
 
-		ci = (ClientInterface) UnicastRemoteObject.exportObject(this, 0);
+//		ci = (ClientInterface) UnicastRemoteObject.exportObject(this, 0);
+//		try {
+//			registry = LocateRegistry.createRegistry(1234);
+//		} catch(Exception ex) {
+//			ex.printStackTrace();
+//		}
+
 		try {
-			registry = LocateRegistry.createRegistry(1234);
-		} catch(Exception ex) {
-			ex.printStackTrace();
+			ci = (ClientInterface) UnicastRemoteObject.exportObject(this, 0);
+			Registry registry = LocateRegistry.getRegistry(1234);
+			registry.bind(userName, ci);
+         	System.out.println("try in create group");
+		} catch (Exception e) {
+			System.out.println("catch here in create group");
+	         Registry registry = LocateRegistry.createRegistry(1234);
+	         registry.bind(userName, ci);
 		}
 
-		registry.bind(userName, ci);
+
+		//registry.bind(userName, ci);
 
 		System.out.println("CLIENT: Groupleader: " + userName + " running on port " + "1234");
 
@@ -101,9 +114,22 @@ public class Client implements ClientInterface {
 		System.out.println("CLIENT: Group: " + myGroup + " : Leader: " + myLeader);
 
 		connectToGroupLeader(myLeader);
-		ci = (ClientInterface) UnicastRemoteObject.exportObject(this, 0);
-		Registry registry = LocateRegistry.createRegistry(1234);
-		registry.bind(myUserName, ci);
+
+//		ci = (ClientInterface) UnicastRemoteObject.exportObject(this, 0);
+//		Registry registry = LocateRegistry.createRegistry(1234);
+//		registry.bind(myUserName, ci);
+
+		try {
+			ci = (ClientInterface) UnicastRemoteObject.exportObject(this, 0);
+			Registry registry1 = LocateRegistry.getRegistry(1234);
+			registry1.bind(myUserName,ci);
+			System.out.println("try join group here");
+		} catch (Exception e) {
+			System.out.println("catch join group here");
+	         Registry registry1 = LocateRegistry.createRegistry(1234);
+	         registry1.bind(myUserName,ci);
+		}
+
 
 		leaderRegistry = LocateRegistry.getRegistry(IpOfLeader, 1234);
 		ci = (ClientInterface) leaderRegistry.lookup(myLeader);
@@ -118,6 +144,11 @@ public class Client implements ClientInterface {
 				Registry goRegistry = LocateRegistry.getRegistry(ip, 1234);
 				ci = (ClientInterface) goRegistry.lookup(clients.get(i).getUsername());
 				ci.setClientList(clients);
+				ArrayList<Triple> abc = ci.getClientListFromMember();
+				for (int j = 0; j < abc.size(); j++) {
+					System.out.println("client list: " +abc.get(i).getUsername());
+				}
+				System.out.println("client list: " +abc.get(i).getUsername());
 				ci.addClientInterface(clientInfo);
 			}
 		}
@@ -188,6 +219,7 @@ public class Client implements ClientInterface {
 
 			}
 		}
+
 		leaderRegistry = LocateRegistry.getRegistry(ip, 1234);
 		System.out.println(groupLeader);
 		ci = (ClientInterface) leaderRegistry.lookup(groupLeader);
@@ -375,6 +407,12 @@ public class Client implements ClientInterface {
 		clients = ns.getGroupTriples(groupName);
 		return clients;
 	}
+
+	public ArrayList<Triple> getClientListFromMember() throws RemoteException {
+		return clients;
+	}
+
+
 
 	public ArrayList<String> getListOfClientsInMyGroup() throws RemoteException {
 		return listOfClientsInMyGroup;
