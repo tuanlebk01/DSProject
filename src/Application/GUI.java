@@ -303,11 +303,6 @@ public class GUI {
 
 												mapOfGroups = client.getGroupsInfo();
 
-												System.out
-														.println(mapOfGroups);
-												System.out
-														.println(mapOfGroups.get(myGroupName));
-
 												Iterator it = mapOfGroups.entrySet().iterator();
 												while (it.hasNext()) {
 													Map.Entry pair = (Map.Entry) it.next();
@@ -371,8 +366,6 @@ public class GUI {
 				if (input != null && (input.length() > 1)) {
 
 					try {
-						System.out.println("GUI: Trying to create group");
-
 						groupCreated = client.createGroup(input, userName);
 
 						if (groupCreated) {
@@ -411,7 +404,6 @@ public class GUI {
 
 //							JOptionPane.showMessageDialog(null,
 //									"Group created with name: " + input);
-							System.out.println("GUI: Group created: " + input);
 							startThread();
 
 						} else {
@@ -444,7 +436,6 @@ public class GUI {
 				return;
 			} else {
 				userName = userNameTextField.getText();
-				System.out.println("GUI: Username: " + userName);
 			}
 
 			if (portNrField.getText().length() < 1) {

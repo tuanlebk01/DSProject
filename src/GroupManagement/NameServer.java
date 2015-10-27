@@ -48,7 +48,6 @@ public class NameServer extends RemoteServer implements NameServerInterface {
 				.exportObject(this, 0);
 		Registry registry = LocateRegistry.createRegistry(port);
 		registry.bind(NameServer.Name, nameServer);
-		System.out.println("NS: Naming Service Running on port " + port);
 
 	}
 
@@ -60,7 +59,6 @@ public class NameServer extends RemoteServer implements NameServerInterface {
 		clientInfo = new Triple(clientID, userName, InetAddress.getByName(str));
 		listOfClients.add(clientInfo);
 
-		System.out.println("NS: Connected: " + clientInfo.getClientID() + " - " + clientInfo.getUsername() +" - " + clientInfo.getIp());
 		return clientID;
 	}
 
@@ -78,7 +76,6 @@ public class NameServer extends RemoteServer implements NameServerInterface {
 					listOfClients.get(i).setGroup(groupName);
 				}
 			}
-			System.out.println("NS: Group created with name: " + groupName);
 			return true;
 		}
 		return false;
