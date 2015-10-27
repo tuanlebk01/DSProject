@@ -109,6 +109,12 @@ public class NameServer extends RemoteServer implements NameServerInterface {
 		clientList.remove(userName);
 		groupUserlistMap.put(groupName, clientList);
 
+		for (int i = 0; i< listOfClients.size(); i++){
+			if(listOfClients.get(i).getUsername().equals(userName)){
+				listOfClients.remove(i);
+			}
+		}
+
 		System.out.println("NS: User: " + userName + " left group: " + groupName);
 	}
 

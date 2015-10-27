@@ -60,12 +60,16 @@ public class CommunicationModule {
         ClientInterface ci;
         textMessage = new TextMessage(counter, message, userName, clientID);
         Registry registry;
+    	System.out.println("In CM: "+clients.size());
+
+
 
         for(int i= 0; i < clients.size(); i++){
 
         	if(clients.get(i).getClientID() == clientID){
         		addMessageToQueue(textMessage);
         	}else {
+        		System.out.println("Sending to: " + clients.get(i).getUsername());
 
             	registry = LocateRegistry.getRegistry(clients.get(i).getIp().toString().split("/")[1], 1234);
                ci = (ClientInterface) registry.lookup(clients.get(i).getUsername());
@@ -258,7 +262,7 @@ public class CommunicationModule {
      */
     public void addAnotherClientInterface(Triple triple){
     	if(!triple.getUsername().equals(userName)){
-    		clients.add(triple);
+    		//clients.add(triple);
     		lastAcceptedSeqNr.put(triple.getClientID(), 0);
     	}
     }
@@ -279,6 +283,10 @@ public class CommunicationModule {
 
     public void setOrdered(boolean ordered){
         this.ordered = ordered;
+    }
+
+    public void setClientList(ArrayList<Triple> clients){
+    	this.clients = clients;
     }
 
     public HashMap<Integer, Integer> getLastAcceptedSeqNr(){

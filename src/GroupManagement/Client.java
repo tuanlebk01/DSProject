@@ -98,6 +98,8 @@ public class Client implements ClientInterface {
 
 		connectToGroupLeader(myLeader);
 
+
+
 		try {
 			ci = (ClientInterface) UnicastRemoteObject.exportObject(this, 0);
 			Registry registry1 = LocateRegistry.getRegistry(1234);
@@ -112,26 +114,29 @@ public class Client implements ClientInterface {
 		ciLeader = (ClientInterface) leaderRegistry.lookup(myLeader);
 		clients = ciLeader.getClientlist(groupName);
 
-System.out.println("clients size: " + clients.size());
-		for (int i = 0; i < clients.size(); i++){
+		int temp = clients.size();
+		for (int i = 0; i < temp; i++){
 			if (!clients.get(i).getUsername().equals(myUserName)){
 				String ip = clients.get(i).getIp().toString().split("/")[1];
 				Registry goRegistry = LocateRegistry.getRegistry(ip, 1234);
 				ci = (ClientInterface) goRegistry.lookup(clients.get(i).getUsername());
+				System.out.println("Client size, join group: " + clients.size());
 				ci.setClientList(clients);
 
 				ci.addClientInterface(clientInfo);
 
 			}
 		}
-		setClientList(clients);
 
 		cm = new CommunicationModule(myUserName, clientID, clients);
 		cm.setLastAcceptedSeqNr(ciLeader.getLastAcceptedSeqNr());
 
+		setClientList(clients);
 
-		int temp = clients.size();
-		for (int i = 0; i < temp; i++){
+
+
+		int temp2 = clients.size();
+		for (int i = 0; i < temp2; i++){
 			if (!clients.get(i).getUsername().equals(myUserName)){
 				addClientInterface(clientInfo);
 			}
@@ -161,6 +166,7 @@ System.out.println("clients size: " + clients.size());
 
 		leaderRegistry = LocateRegistry.getRegistry(ip, 1234);
 		ci = (ClientInterface) leaderRegistry.lookup(groupLeader);
+
 
 		groupJoined = ci.addMemberToGroup(myUserName);
 
@@ -358,8 +364,9 @@ System.out.println("clients size: " + clients.size());
 	}
 
 	public void setClientList(ArrayList<Triple> clients ) throws RemoteException {
-		System.out.println("asdh");
+		System.out.println("clients size: " + clients.size());
 		this.clients = clients;
+		cm.setClientList(clients);
 	}
 
 	public void addClientInterface(Triple triple) throws RemoteException {
