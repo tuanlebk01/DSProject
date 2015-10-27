@@ -88,7 +88,8 @@ public class Client implements ClientInterface {
 		System.out.println("CLIENT: Groupleader: " + userName + " running on port " + "1234");
 
 		groupCreated = ns.createGroup(groupName, userName);
-		clients = ns.getClientList();
+		//clients = ns.getClientList();
+		clients.add(clientInfo);
 		groupsInfo = ns.getGroupsInfo();
 		listOfClientsInMyGroup = groupsInfo.get(groupName);
 
