@@ -527,7 +527,7 @@ public class GUI {
 
 		try {
 			mapOfGroups = client.getGroupsInfo();
-		} catch (RemoteException e) {
+		} catch (RemoteException | NotBoundException e) {
 			e.printStackTrace();
 		}
 
