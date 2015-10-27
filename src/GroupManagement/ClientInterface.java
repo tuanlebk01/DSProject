@@ -44,7 +44,7 @@ public interface ClientInterface extends Remote, Serializable {
 
 	public void sharegroup(int option) throws RemoteException, NotBoundException;
 
-	public HashMap<String, ArrayList<String>> getGroupsInfo() throws RemoteException;
+	public HashMap<String, ArrayList<String>> getGroupsInfo() throws RemoteException, NotBoundException;
 
 	public void setClientList(ArrayList<Triple> clients) throws RemoteException;
 

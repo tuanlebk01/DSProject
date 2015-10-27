@@ -424,7 +424,9 @@ public class Client implements ClientInterface {
 		return groupJoined;
 	}
 
-	public HashMap<String, ArrayList<String>> getGroupsInfo() throws RemoteException {
+	public HashMap<String, ArrayList<String>> getGroupsInfo() throws RemoteException, NotBoundException {
+		leaderRegistry = LocateRegistry.getRegistry(IpOfLeader, 1234);
+		ci = (ClientInterface) leaderRegistry.lookup(myLeader);
 		groupsInfo = ci.askNSforGroupsInfo();
 		return groupsInfo;
 	}
