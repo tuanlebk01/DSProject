@@ -465,7 +465,9 @@ public class Client implements ClientInterface {
 		return clients;
 	}
 
-
+	public void setOrdered(boolean b) {
+		cm.setOrdered(b);
+	}
 
 	public ArrayList<String> getListOfClientsInMyGroup() throws RemoteException {
 		return listOfClientsInMyGroup;
