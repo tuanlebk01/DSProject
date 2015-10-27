@@ -543,7 +543,11 @@ public class GUI {
 		listOfMembers = mapOfGroups.get(myGroupName);
 
 		for (int i = 0; i < listOfGroups.size(); i++) {
+			if(listOfGroups.get(i).equals(myGroupName)) {
+				groupList.add(i, listOfGroups.get(i) + " <---");
+			} else {
 			groupList.add(i, listOfGroups.get(i));
+			}
 		}
 
 		for (int i = 0; i < listOfMembers.size(); i++) {
