@@ -32,6 +32,7 @@ public class Client implements ClientInterface {
 	private String myUserName;
 	private String myGroup;
 	private String myLeader;
+	private String myOldLeader;
 	private String IpOfLeader;
 	private boolean groupCreated;
 	private boolean groupJoined;
@@ -296,14 +297,16 @@ public class Client implements ClientInterface {
 					System.out.println("remove member");
 					groupsInfo = ns.getGroupsInfo();
 					listOfClientsInMyGroup = groupsInfo.get(myGroup);
+					myOldLeader = myLeader;
 					myLeader = startElection();
-					
+					sharegroup(1); // update new leader for members
+					sharegroup(2); // remove old leader from client list of members
 				}
 
 			} else {
 
 				ci.removeFromGroup(groupName, userName);
-				sharegroup();
+				sharegroup(2); // update client list for members
 			}
 	}
 
@@ -345,27 +348,76 @@ public class Client implements ClientInterface {
 
 	}
 
-	public void sharegroup() throws RemoteException {
+	public void sharegroup(int option) throws RemoteException, NotBoundException {
 
-        for (int i = 0; i < clients.size(); i++) {
 
-        	String ip = clients.get(i).getIp().toString().split("/")[1];
-
-        	registry = LocateRegistry.getRegistry(ip, 1234);
-    		try {
-
-    			if(!clients.get(i).getUsername().equals(myUserName)) {
-    				System.out.println(myUserName + " : " + clients.get(i).getUsername());
-
-    				ci = (ClientInterface) registry.lookup(clients.get(i).getUsername());
-    			}
-
-				ci.setClientList(clients);
-
-    		} catch (NotBoundException e) {
-				e.printStackTrace();
+//        for (int i = 0; i < clients.size(); i++) {
+//
+//        	String ip = clients.get(i).getIp().toString().split("/")[1];
+//
+//        	registry = LocateRegistry.getRegistry(ip, 1234);
+//    		try {
+//
+//    			if(!clients.get(i).getUsername().equals(myUserName)) {
+//    				System.out.println(myUserName + " : " + clients.get(i).getUsername());
+//
+//    				ci = (ClientInterface) registry.lookup(clients.get(i).getUsername());
+//    			}
+//
+//				ci.setClientList(clients);
+//
+//    		} catch (NotBoundException e) {
+//				e.printStackTrace();
+//			}
+//		}
+		if (option == 1) {
+			for (int i = 0; i < clients.size(); i++){
+				if (!clients.get(i).getUsername().equals(myOldLeader)){
+					String ip = clients.get(i).getIp().toString().split("/")[1];
+					Registry registry = LocateRegistry.getRegistry(ip, 1234);
+					ci = (ClientInterface) registry.lookup(clients.get(i).getUsername());
+					ci.setNewLeader(myLeader);
+					ns.updateNewLeader(this.myGroup, this.myUserName);
+					System.out.println("new leader from option 1: " +myLeader);
+					
+				}
 			}
 		}
+		
+		if (option == 2) {
+			int k = 100000000; //any number here
+			leaderRegistry = LocateRegistry.getRegistry(IpOfLeader, 1234);
+			ci = (ClientInterface) leaderRegistry.lookup(myLeader);
+			clients = ci.getClientlist(myGroup);
+			System.out.println("sizeeeeeee: " +clients.size() +"    " +clientInfo );
+			for (int i = 0; i < clients.size(); i++) {
+				if (clients.get(i).getUsername().equals(myUserName)) {
+					k = i;
+				}
+			}
+			clients.remove(k); // remove itself from the client list
+			System.out.println("sizeeeeeee: " +clients.size());
+//			Registry registry = LocateRegistry.getRegistry("localhost", 1234);
+//			registry.unbind(myUserName);
+			for (int i = 0; i < clients.size(); i++){
+					String ip = clients.get(i).getIp().toString().split("/")[1];
+					Registry registry1 = LocateRegistry.getRegistry(ip, 1234);
+					ci = (ClientInterface) registry1.lookup(clients.get(i).getUsername());
+					ci.removeFromGroup(this.myGroup, myUserName);
+					ci.setClientList(clients);
+					ArrayList<Triple> abc = ci.getClientListFromMember();
+					
+					for (int j = 0; j < abc.size(); j++) {
+						System.out.println("client list from option 2: " +abc.get(j).getUsername() + " from user: " +abc.get(i).getUsername());
+					}
+			}
+			if (!myOldLeader.equals(myLeader)) {
+				Registry registry = LocateRegistry.getRegistry("localhost", 1234);
+				registry.unbind(myUserName);
+			}
+		
+		}
+		
 	}
 
 	public boolean isGroupJoined() {

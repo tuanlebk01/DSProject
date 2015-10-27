@@ -42,7 +42,7 @@ public interface ClientInterface extends Remote, Serializable {
 			throws RemoteException;
 	public void setClientInterfaces(HashMap<Integer, ClientInterface> clientInterfaces) throws RemoteException;
 
-	public void sharegroup() throws RemoteException;
+	public void sharegroup(int option) throws RemoteException, NotBoundException;
 
 	public HashMap<String, ArrayList<String>> getGroupsInfo() throws RemoteException;
 
