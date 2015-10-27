@@ -47,7 +47,7 @@ public class Client implements ClientInterface {
 			ServerNotActiveException, NotBoundException, UnknownHostException {
 
 		this.myUserName = userName;
-		this.registry = LocateRegistry.getRegistry("localhost",
+		this.registry = LocateRegistry.getRegistry("Mcgonagall.cs.umu.se",
 				portNr);
 
 		ns = (NameServerInterface) registry.lookup("NamingService");
