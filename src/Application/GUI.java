@@ -449,6 +449,7 @@ public class GUI {
 			try {
 
 				client = new Client();
+				System.out.println("Client: " + userName);
 				connectButton.setText("Disconnect");
 				clientID = client.connectToNameServer(userName, portNr);
 
