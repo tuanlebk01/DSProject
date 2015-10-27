@@ -47,7 +47,7 @@ public class Client implements ClientInterface {
 			ServerNotActiveException, NotBoundException, UnknownHostException {
 
 		this.myUserName = userName;
-		this.registry = LocateRegistry.getRegistry("localhost",
+		this.registry = LocateRegistry.getRegistry("Mcgonagall.cs.umu.se",
 				portNr);
 
 		ns = (NameServerInterface) registry.lookup("NamingService");
@@ -147,7 +147,7 @@ public class Client implements ClientInterface {
 		for (int j = 0; j < clients.size(); j++) {
 			System.out.println("my client list: " +clients.get(j).getUsername() + " from user: " +myUserName);
 		}
-		
+
 		cm = new CommunicationModule(myUserName, clientID, clients);
 		int temp = clients.size();
 		for (int i = 0; i < temp; i++){
@@ -379,11 +379,11 @@ public class Client implements ClientInterface {
 					ci.setNewLeader(myLeader);
 					ns.updateNewLeader(this.myGroup, this.myUserName);
 					System.out.println("new leader from option 1: " +myLeader);
-					
+
 				}
 			}
 		}
-		
+
 		if (option == 2) {
 			int k = 100000000; //any number here
 			leaderRegistry = LocateRegistry.getRegistry(IpOfLeader, 1234);
@@ -406,18 +406,18 @@ public class Client implements ClientInterface {
 					ci.removeFromGroup(this.myGroup, myUserName);
 					ci.setClientList(clients);
 					ArrayList<Triple> abc = ci.getClientListFromMember();
-					
+
 					for (int j = 0; j < abc.size(); j++) {
 						System.out.println("client list from option 2: " +abc.get(j).getUsername() + " from user: " +abc.get(i).getUsername());
 					}
 			}
-			if (!myOldLeader.equals(myLeader)) {
+			//if (!myOldLeader.equals(myLeader)) {
 				Registry registry = LocateRegistry.getRegistry("localhost", 1234);
 				registry.unbind(myUserName);
-			}
-		
+			//}
+
 		}
-		
+
 	}
 
 	public boolean isGroupJoined() {
