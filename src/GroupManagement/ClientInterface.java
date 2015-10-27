@@ -62,4 +62,6 @@ public interface ClientInterface extends Remote, Serializable {
 
 	public ArrayList<Triple> getClientListFromMember() throws RemoteException;
 
+    public HashMap<Integer, Integer> getLastAcceptedSeqNr() throws RemoteException;
+
 }

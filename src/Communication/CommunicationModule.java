@@ -61,6 +61,7 @@ public class CommunicationModule {
         textMessage = new TextMessage(counter, message, userName, clientID);
         Registry registry;
 
+		System.out.println("client size in Join group: "+clients.size());
 		System.out.println("Message ready to send");
         for(int i= 0; i < clients.size(); i++){
     		System.out.println("Looping through all clients " + clients.get(i).getUsername());
@@ -263,8 +264,10 @@ public class CommunicationModule {
      * also added.
      */
     public void addAnotherClientInterface(Triple triple){
-    	clients.add(triple);
-        lastAcceptedSeqNr.put(triple.getClientID(), 0);
+    	if(!triple.getUsername().equals(userName)){
+    		clients.add(triple);
+    		lastAcceptedSeqNr.put(triple.getClientID(), 0);
+    	}
     }
 
     /** Removes a client from the communication module. The counter for the sequence number is removed. It is important
@@ -283,5 +286,13 @@ public class CommunicationModule {
 
     public void setOrdered(boolean ordered){
         this.ordered = ordered;
+    }
+
+    public HashMap<Integer, Integer> getLastAcceptedSeqNr(){
+    	return lastAcceptedSeqNr;
+    }
+
+    public void  setLastAcceptedSeqNr(HashMap<Integer, Integer> lastAcceptedSeqNr){
+    	this.lastAcceptedSeqNr = lastAcceptedSeqNr;
     }
 }

@@ -104,6 +104,7 @@ public class Client implements ClientInterface {
 
 		this.myGroup = groupName;
 		this.myLeader = leaderName;
+		ClientInterface ciLeader;
 
 		clientInfo.setGroup(groupName);
 
@@ -126,8 +127,8 @@ public class Client implements ClientInterface {
 
 
 		leaderRegistry = LocateRegistry.getRegistry(IpOfLeader, 1234);
-		ci = (ClientInterface) leaderRegistry.lookup(myLeader);
-		clients = ci.getClientlist(groupName);
+		ciLeader = (ClientInterface) leaderRegistry.lookup(myLeader);
+		clients = ciLeader.getClientlist(groupName);
 
 
 		for (int i = 0; i < clients.size(); i++){
@@ -136,11 +137,13 @@ public class Client implements ClientInterface {
 				Registry goRegistry = LocateRegistry.getRegistry(ip, 1234);
 				ci = (ClientInterface) goRegistry.lookup(clients.get(i).getUsername());
 				ci.setClientList(clients);
-				ArrayList<Triple> abc = ci.getClientListFromMember();
-				for (int j = 0; j < abc.size(); j++) {
-					System.out.println("client list: " +abc.get(j).getUsername() + " from user: " +abc.get(i).getUsername());
-				}
+
 				ci.addClientInterface(clientInfo);
+
+				ArrayList<Triple> abc = ci.getClientListFromMember();
+//				for (int j = 0; j < abc.size(); j++) {
+//					System.out.println("client list: " +abc.get(j).getUsername() + " from user: " +abc.get(i).getUsername());
+//				}
 			}
 		}
 		setClientList(clients);
@@ -149,6 +152,9 @@ public class Client implements ClientInterface {
 		}
 
 		cm = new CommunicationModule(myUserName, clientID, clients);
+		cm.setLastAcceptedSeqNr(ciLeader.getLastAcceptedSeqNr());
+
+
 		int temp = clients.size();
 		for (int i = 0; i < temp; i++){
 			if (!clients.get(i).getUsername().equals(myUserName)){
@@ -464,10 +470,9 @@ public class Client implements ClientInterface {
 		return listOfClientsInMyGroup;
 	}
 
-	public void setOrdered(boolean b) {
-		cm.setOrdered(b);
-
-	}
+    public HashMap<Integer, Integer> getLastAcceptedSeqNr() throws RemoteException{
+    	return cm.getLastAcceptedSeqNr();
+    }
 }
 
 
