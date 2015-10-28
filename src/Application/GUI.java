@@ -256,10 +256,12 @@ public class GUI {
 	    @Override
 	    public void actionPerformed(ActionEvent e) {
 	        JCheckBox cbLog = (JCheckBox) e.getSource();
-	        if (cbLog.isSelected()) {
-	            client.setOrdered(true);
-	        } else {
-	        	client.setOrdered(false);
+	        if (connectButton.getText().equals("Disconnect")) {
+	        	if (cbLog.isSelected()) {
+	            	client.setOrdered(true);
+	        	} else {
+	        		client.setOrdered(false);
+	        	}
 	        }
 	    }
 	}
@@ -284,10 +286,23 @@ public class GUI {
 										try {
 
 											leaders = client.getGroupLeaders();
-											String group = source.getSelectedValue().toString();
+											String group = "";
+											if(source.getSelectedValue().toString() != null) {
+												group = source.getSelectedValue().toString();
+											}
 											String leader = leaders.get(group);
-
-
+											if(group != null) {
+												
+												System.out
+														.println(group);
+												if(group.endsWith("<---")) {
+													String tmp = group.substring(0, group.length() - 5);
+													if(myGroupName.equals(tmp)) {
+														JOptionPane.showMessageDialog(frame, "Can't join your own group.");
+														return;
+													}
+												}
+											}
 											leaderOfMyGroup = client.joinGroup(group, leader);
 											myGroupName = group;
 
@@ -364,7 +379,12 @@ public class GUI {
 						"Enter group name");
 
 				if (input != null && (input.length() > 1)) {
-
+					if(leaderOfMyGroup != null) {
+						if(leaderOfMyGroup.equals(userName) || myGroupName != null) {
+							JOptionPane.showMessageDialog(frame, "Can't create new group when already in a group, disconnect first.");
+							return;
+						}
+					}
 					try {
 						groupCreated = client.createGroup(input, userName);
 
@@ -512,7 +532,7 @@ public class GUI {
 
 	private void updateLists() {
 
-		listOfMembers.clear();
+//		listOfMembers.clear();
 		listOfGroups.clear();
 		groupList.clear();
 		userList.clear();
@@ -584,11 +604,15 @@ public class GUI {
 	}
 
 	public void getQueue() {
-		ArrayList<TextMessage> queue = client.getMessagesInQueue();
-		for(int i = 0; i < queue.size(); i++) {
-
-			chatArea.append("Message in queue: " + queue.get(i).getSeqNr() + "\n");
-
+		if (connectButton.getText().equals("Connect")) {
+			JOptionPane.showMessageDialog(frame, "You need to connect first.");
+			return;
+		}
+		if(myGroupName != null) {
+			ArrayList<TextMessage> queue = client.getMessagesInQueue();
+			for(int i = 0; i < queue.size(); i++) {
+				chatArea.append("Message in queue: " + queue.get(i).getSeqNr() + "\n");
+			}
 		}
 	}
 
