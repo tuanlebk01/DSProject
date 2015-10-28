@@ -286,23 +286,24 @@ public class GUI {
 										try {
 
 											leaders = client.getGroupLeaders();
-											String group = "";
-											if(source.getSelectedValue().toString() != null) {
+											String group = "###";
+											if(source.getSelectedValue() != null) {
 												group = source.getSelectedValue().toString();
 											}
+											
 											String leader = leaders.get(group);
-											if(group != null) {
-												
-												System.out
-														.println(group);
-												if(group.endsWith("<---")) {
+											
+											if(group.equals("###")) {
+												JOptionPane.showMessageDialog(frame, "Can't join your own group.");
+												return;
+												} else if (group.endsWith("<---")) {
 													String tmp = group.substring(0, group.length() - 5);
-													if(myGroupName.equals(tmp)) {
-														JOptionPane.showMessageDialog(frame, "Can't join your own group.");
-														return;
-													}
+												if (myGroupName.equals(tmp) || leaderOfMyGroup.equals(userName)) {
+													JOptionPane.showMessageDialog(frame, "Can't join your own group.");
+													return;
 												}
 											}
+											
 											leaderOfMyGroup = client.joinGroup(group, leader);
 											myGroupName = group;
 
