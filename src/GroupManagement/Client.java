@@ -1,6 +1,7 @@
 package GroupManagement;
 
 
+import java.io.IOException;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.rmi.AlreadyBoundException;
@@ -47,7 +48,7 @@ public class Client implements ClientInterface {
 			ServerNotActiveException, NotBoundException, UnknownHostException {
 
 		this.myUserName = userName;
-		this.registry = LocateRegistry.getRegistry("Severus.cs.umu.se",
+		this.registry = LocateRegistry.getRegistry("localhost",
 				portNr);
 
 		ns = (NameServerInterface) registry.lookup("NamingService");
@@ -91,7 +92,7 @@ public class Client implements ClientInterface {
 			AlreadyBoundException, NotBoundException {
 
 		this.myGroup = groupName;
-		this.myLeader = leaderName;
+		this.myLeader = "User1";
 		ClientInterface ciLeader;
 
 		clientInfo.setGroup(groupName);
@@ -108,7 +109,6 @@ public class Client implements ClientInterface {
 	         Registry registry1 = LocateRegistry.createRegistry(1234);
 	         registry1.bind(myUserName,ci);
 		}
-
 
 		leaderRegistry = LocateRegistry.getRegistry(IpOfLeader, 1234);
 		ciLeader = (ClientInterface) leaderRegistry.lookup(myLeader);
@@ -161,13 +161,12 @@ public class Client implements ClientInterface {
 			String tempClient = clientList.get(i).getUsername();
 			if (tempClient.equals(groupLeader)) {
 				ip = clientList.get(i).getIp().toString().split("/")[1];
-
 			}
 		}
-
 		leaderRegistry = LocateRegistry.getRegistry(ip, 1234);
+		///
 		ci = (ClientInterface) leaderRegistry.lookup(groupLeader);
-
+		///
 
 		groupJoined = ci.addMemberToGroup(myUserName);
 
@@ -419,6 +418,17 @@ public class Client implements ClientInterface {
     public void updateIpOfLeader(String Ip) throws RemoteException{
     	IpOfLeader = Ip;
     	System.out.println("ipofleader: "+IpOfLeader);
+    }
+    
+    public void registryNewLeader() throws RemoteException{
+    	ci = (ClientInterface) UnicastRemoteObject.exportObject(this, 0);
+		Registry registry = LocateRegistry.getRegistry(1234);
+		try {
+			registry.bind(myUserName, ci);
+		} catch (AlreadyBoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
     }
 }
 

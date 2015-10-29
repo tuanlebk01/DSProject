@@ -48,6 +48,7 @@ public class NameServer extends RemoteServer implements NameServerInterface {
 				.exportObject(this, 0);
 		Registry registry = LocateRegistry.createRegistry(port);
 		registry.bind(NameServer.Name, nameServer);
+		LocateRegistry.createRegistry(1234);
 
 	}
 
