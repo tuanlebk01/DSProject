@@ -305,7 +305,7 @@ public class Client implements ClientInterface {
 				System.out.println("my leader in opt 1: " +myLeader);
 				if (clients.get(i).getUsername().equals(myLeader)) {
 					IpLeader = clients.get(i).getIp().toString().split("/")[1];
-					System.out.println("ip of leader from opt1: " + clients.get(i).getIp());
+					System.out.println("ip of leader from opt1: " + IpLeader);
 				}
 			}
 			for (int i = 0; i < clients.size(); i++){
@@ -319,11 +319,14 @@ public class Client implements ClientInterface {
 				}
 			}
 			ns.updateNewLeader(this.myGroup, this.myUserName);
+			IpOfLeader = IpLeader;
+
 		}
 
 		if (option == 2) {
 			System.out.println("opt 2 running");
 			int k = 100000000; //any number here
+			System.out.println("ip of leader from opt2: " + IpOfLeader);
 			leaderRegistry = LocateRegistry.getRegistry(IpOfLeader, 1234);
 			ci = (ClientInterface) leaderRegistry.lookup(myLeader);
 			clients = ci.getClientlist(myGroup);
