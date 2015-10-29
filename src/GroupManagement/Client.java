@@ -92,7 +92,8 @@ public class Client implements ClientInterface {
 			AlreadyBoundException, NotBoundException {
 
 		this.myGroup = groupName;
-		this.myLeader = "User1";
+		// Bug here since GUI passes with old leader instead of new leader
+		this.myLeader = leaderName;
 		ClientInterface ciLeader;
 
 		clientInfo.setGroup(groupName);
