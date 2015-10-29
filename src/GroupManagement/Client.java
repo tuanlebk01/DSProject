@@ -149,6 +149,7 @@ public class Client implements ClientInterface {
 	}
 
     public void setNewLeader(String leader) throws RemoteException{
+    	System.out.println("changed leader in: " + myUserName + " too " + leader);
         myLeader = leader;
     }
 
@@ -233,15 +234,16 @@ public class Client implements ClientInterface {
 
 			} else if(userName.equals(myLeader)) {
 
+				System.out.println("IpOfLeader 1: " + IpOfLeader);
+
 				if(listOfClientsInMyGroup.size() == 1) {
 
-				System.out.println("Leader leaving its own group and it was empty");
-
-				ns.removeGroup(groupName);
+					System.out.println("Leader leaving its own group and it was empty");
+					ns.removeGroup(groupName);
 
 				} else {
 
-					ns.removeMemberFromGroup(groupName, userName);
+					//ns.removeMemberFromGroup(groupName, userName);
 					System.out.println("remove member");
 					groupsInfo = ns.getGroupsInfo();
 					listOfClientsInMyGroup = groupsInfo.get(myGroup);
@@ -298,17 +300,19 @@ public class Client implements ClientInterface {
 	public void sharegroup(int option) throws RemoteException, NotBoundException {
 
 		if (option == 1) {
+			System.out.println("Client size: " + clients.size());
 			for (int i = 0; i < clients.size(); i++){
+				System.out.println("Loop nr " + i);
 				if (!clients.get(i).getUsername().equals(myOldLeader)){
 					String ip = clients.get(i).getIp().toString().split("/")[1];
 					Registry registry = LocateRegistry.getRegistry(ip, 1234);
 					ci = (ClientInterface) registry.lookup(clients.get(i).getUsername());
 					ci.setNewLeader(myLeader);
-					ns.updateNewLeader(this.myGroup, this.myUserName);
 					System.out.println("new leader from option 1: " +myLeader);
 
 				}
 			}
+			ns.updateNewLeader(this.myGroup, this.myUserName);
 		}
 
 		if (option == 2) {
@@ -326,7 +330,7 @@ public class Client implements ClientInterface {
 			clients.remove(k); // remove itself from the client list
 
 			ns.removeMemberFromGroup(myGroup, myUserName);
-
+			System.out.println("client size: " +clients.size());
 			for (int i = 0; i < clients.size(); i++){
 
 				String ip = clients.get(i).getIp().toString().split("/")[1];
@@ -337,9 +341,7 @@ public class Client implements ClientInterface {
 			}
 			Registry registry = LocateRegistry.getRegistry("localhost", 1234);
 			registry.unbind(myUserName);
-
 		}
-
 	}
 
 	public boolean isGroupJoined() {
@@ -347,13 +349,21 @@ public class Client implements ClientInterface {
 	}
 
 	public HashMap<String, ArrayList<String>> getGroupsInfo() throws RemoteException, NotBoundException {
-		leaderRegistry = LocateRegistry.getRegistry(IpOfLeader, 1234);
-		ci = (ClientInterface) leaderRegistry.lookup(myLeader);
+
+
+		System.out.println("client size: " + clients.size());
+		System.out.println("Username "+myUserName);
+		System.out.println("Leader " + myLeader);
 		try {
+		if(!myUserName.equals(myLeader)){
+			leaderRegistry = LocateRegistry.getRegistry(IpOfLeader, 1234);
+			ci = (ClientInterface) leaderRegistry.lookup(myLeader);
+		}
 
 			groupsInfo = ci.askNSforGroupsInfo();
 		} catch (Exception e) {
-			System.out.println("asd");
+			System.out.println("ERROR");
+			e.printStackTrace();
 		}
 		return groupsInfo;
 	}

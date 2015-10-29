@@ -71,9 +71,9 @@ public class CommunicationModule {
         	}else {
         		System.out.println("Sending to: " + clients.get(i).getUsername());
 
-            	registry = LocateRegistry.getRegistry(clients.get(i).getIp().toString().split("/")[1], 1234);
+        		registry = LocateRegistry.getRegistry(clients.get(i).getIp().toString().split("/")[1], 1234);
                ci = (ClientInterface) registry.lookup(clients.get(i).getUsername());
-                ci.addMessageToQueue(textMessage);
+               ci.addMessageToQueue(textMessage);
         	}
         }
 
