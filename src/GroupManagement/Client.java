@@ -234,8 +234,6 @@ public class Client implements ClientInterface {
 
 			} else if(userName.equals(myLeader)) {
 
-				System.out.println("IpOfLeader 1: " + IpOfLeader);
-
 				if(listOfClientsInMyGroup.size() == 1) {
 
 					System.out.println("Leader leaving its own group and it was empty");
@@ -300,16 +298,24 @@ public class Client implements ClientInterface {
 	public void sharegroup(int option) throws RemoteException, NotBoundException {
 
 		if (option == 1) {
-			System.out.println("Client size: " + clients.size());
+			System.out.println("Client size from opt 1: " + clients.size());
+			String IpLeader = null;
+
 			for (int i = 0; i < clients.size(); i++){
-				System.out.println("Loop nr " + i);
+				System.out.println("my leader in opt 1: " +myLeader);
+				if (clients.get(i).getUsername().equals(myLeader)) {
+					IpLeader = clients.get(i).getIp().toString().split("/")[1];
+					System.out.println("ip of leader from opt1: " + clients.get(i).getIp());
+				}
+			}
+			for (int i = 0; i < clients.size(); i++){
 				if (!clients.get(i).getUsername().equals(myOldLeader)){
 					String ip = clients.get(i).getIp().toString().split("/")[1];
 					Registry registry = LocateRegistry.getRegistry(ip, 1234);
 					ci = (ClientInterface) registry.lookup(clients.get(i).getUsername());
 					ci.setNewLeader(myLeader);
+					ci.updateIpOfLeader(IpLeader);
 					System.out.println("new leader from option 1: " +myLeader);
-
 				}
 			}
 			ns.updateNewLeader(this.myGroup, this.myUserName);
@@ -358,9 +364,9 @@ public class Client implements ClientInterface {
 		if(!myUserName.equals(myLeader)){
 			leaderRegistry = LocateRegistry.getRegistry(IpOfLeader, 1234);
 			ci = (ClientInterface) leaderRegistry.lookup(myLeader);
+			groupsInfo = ci.askNSforGroupsInfo();
 		}
 
-			groupsInfo = ci.askNSforGroupsInfo();
 		} catch (Exception e) {
 			System.out.println("ERROR");
 			e.printStackTrace();
@@ -406,6 +412,10 @@ public class Client implements ClientInterface {
 
     public HashMap<Integer, Integer> getLastAcceptedSeqNr() throws RemoteException{
     	return cm.getLastAcceptedSeqNr();
+    }
+    public void updateIpOfLeader(String Ip) throws RemoteException{
+    	IpOfLeader = Ip;
+    	System.out.println("ipofleader: "+IpOfLeader);
     }
 }
 

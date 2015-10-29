@@ -64,4 +64,6 @@ public interface ClientInterface extends Remote, Serializable {
 
     public HashMap<Integer, Integer> getLastAcceptedSeqNr() throws RemoteException;
 
+    public void updateIpOfLeader(String Ip) throws RemoteException;
+
 }
