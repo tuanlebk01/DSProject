@@ -62,7 +62,6 @@ public class CommunicationModule {
         textMessage = new TextMessage(counter, message, userName, clientID);
         Registry registry;
         boolean timeOut = false;
-        int k = 0;
         int l = 0;
     	System.out.println("In CM: "+clients.size());
 
@@ -72,41 +71,27 @@ public class CommunicationModule {
 
         	if(clients.get(i).getClientID() == clientID){
         		addMessageToQueue(textMessage);
-        		k = i; // get index of sender
         	}else {
         		System.out.println("Sending to: " + clients.get(i).getUsername());
 
         		registry = LocateRegistry.getRegistry(clients.get(i).getIp().toString().split("/")[1], 1234);
-        		//while (!go) {
-        			//count++;
         	            	try {
         	            		ci = (ClientInterface) registry.lookup(clients.get(i).getUsername());
         	            		if (ci != null) {
         	            			ci.addMessageToQueue(textMessage);
 								}
 							} catch (Exception e) {
-								System.out.println("CRASH in SendMessage: "+clients.get(i).getUsername());
-								System.out.println("meet go condition");
         	                	timeOut = true;
+        	                	addMessageToQueue(textMessage);
 							}
-        	                //if(count == 2){
-//        	                	System.out.println("meet go condition");
-//        	                	go = true;
-//        	                	timeOut = true;
-        	                	
-        	                //}
-				//}
         		if (timeOut) {
-        			System.out.println("meet timeout condition");
                 	for (int j = 0; j < clients.size(); j++) {
 						if (clients.get(j).getUsername().equals(userName)) {
 							l = j;
 						}
 					}
                 	ci = (ClientInterface) registry.lookup(clients.get(l).getUsername()); // use interface of sender
-                	System.out.println("client interface of: "+clients.get(l).getUsername());
                 	ci.handleError(clients.get(i).getUsername());
-                	System.out.println("crashed user: "+clients.get(i).getUsername());
 				}
         		
                

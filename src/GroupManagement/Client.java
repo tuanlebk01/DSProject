@@ -324,7 +324,6 @@ public class Client implements ClientInterface {
 		}
 
 		if (option == 2) {
-			System.out.println("opt 2 running");
 			int k = 100000000; //any number here
 			System.out.println("ip of leader from opt2: " + IpOfLeader);
 			leaderRegistry = LocateRegistry.getRegistry(IpOfLeader, 1234);
@@ -354,20 +353,14 @@ public class Client implements ClientInterface {
 	}
 	
 	public void handleError(String crashedUserName) throws RemoteException, NotBoundException{
-		System.out.println("crashed user: " +crashedUserName + " leader: "+myLeader + " client size: "+clients.size());
 		for (int i = 0; i < clients.size(); i++) {
 			if (crashedUserName.equals(myLeader)) {
-				System.out.println("if 1");
-				//groupsInfo = ns.getGroupsInfo();
-				//listOfClientsInMyGroup = groupsInfo.get(myGroup);
 				myOldLeader = myLeader;
 				myLeader = startElection();
 				sharegroup(1); // update new leader for members
 				shareGroupForCrashedInfo(crashedUserName);; // remove old leader from client list of members
 			}
 			else{
-				System.out.println("elseif 1");
-				//removeFromGroup(myGroup, crashedUserName); // remove crashed client from sender
 				shareGroupForCrashedInfo(crashedUserName); // update client list for members
 			}
 		}
@@ -456,7 +449,6 @@ public void shareGroupForCrashedInfo(String crashedUserName) throws RemoteExcept
 		crashedUser = clients.get(k); // getting triple of crashed user
 		clients.remove(k); // remove crashed client from the client list of sender
 		ns.removeMemberFromGroup(myGroup, crashedUserName); // remove crashed client from the NS
-		System.out.println("client size in shareGroupForCrashedInfo: " +clients.size());
 		for (int i = 0; i < clients.size(); i++){
 			if (!clients.get(i).getUsername().equals(crashedUserName)) {
 				String ip = clients.get(i).getIp().toString().split("/")[1];
