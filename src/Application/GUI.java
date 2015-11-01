@@ -538,11 +538,11 @@ public class GUI {
 		groupList.clear();
 		userList.clear();
 
-		try {
-			mapOfGroups = client.getGroupsInfo();
-		} catch (RemoteException | NotBoundException e) {
-			e.printStackTrace();
-		}
+//		try {
+//			mapOfGroups = client.getGroupsInfo();
+//		} catch (RemoteException | NotBoundException e) {
+//			e.printStackTrace();
+//		}
 
 
 		Iterator it = mapOfGroups.entrySet().iterator();
@@ -598,7 +598,7 @@ public class GUI {
         TimerTask task2 = new TimerTask() {
 
             public void run() {
-	           	updateLists();
+//	           	updateLists();
             }
         };
         timer.schedule(task2, 0, 2000);

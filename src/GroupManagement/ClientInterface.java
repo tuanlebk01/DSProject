@@ -67,5 +67,9 @@ public interface ClientInterface extends Remote, Serializable {
     public void updateIpOfLeader(String Ip) throws RemoteException;
     
     public void registryNewLeader() throws RemoteException;
+    
+    public void handleError(String userName) throws RemoteException, NotBoundException;
+    
+    public void shareGroupForCrashedInfo(String crashedUserName) throws RemoteException, NotBoundException;
 
 }
