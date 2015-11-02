@@ -48,7 +48,7 @@ public class Client extends Observable implements ClientInterface {
 			ServerNotActiveException, NotBoundException, UnknownHostException {
 
 		this.myUserName = userName;
-		this.registry = LocateRegistry.getRegistry("localhost",
+		this.registry = LocateRegistry.getRegistry("Bellatrix.cs.umu.se",
 				portNr);
 
 		ns = (NameServerInterface) registry.lookup("NamingService");
@@ -91,9 +91,9 @@ public class Client extends Observable implements ClientInterface {
 			throws RemoteException, ServerNotActiveException,
 			AlreadyBoundException, NotBoundException {
 
-		this.myGroup = groupName;
+		myGroup = groupName;
 		// Bug here since GUI passes with old leader instead of new leader
-		this.myLeader = leaderName;
+		myLeader = leaderName;
 		ClientInterface ciLeader;
 		clientInfo.setGroup(groupName);
 		connectToGroupLeader(myLeader);
@@ -220,6 +220,8 @@ public class Client extends Observable implements ClientInterface {
 					listOfClientsInMyGroup = groupsInfo.get(myGroup);
 					myOldLeader = myLeader;
 					myLeader = startElection();
+					System.out.println("mygroup: " + myGroup + "   ; leader: " + myLeader);
+					ns.updateNewLeader(myGroup, myLeader);
 					sharegroup(1); // update new leader for members
 					sharegroup(2); // remove old leader from client list of members
 				}
@@ -310,7 +312,7 @@ public class Client extends Observable implements ClientInterface {
 			registry.unbind(myUserName);
 		}
 	}
-	
+
 	public void handleError(String crashedUserName) throws RemoteException, NotBoundException{
 		for (int i = 0; i < clients.size(); i++) {
 			if (crashedUserName.equals(myLeader)) {
@@ -384,7 +386,7 @@ public class Client extends Observable implements ClientInterface {
     		listOfClientsInMyGroup.add(member);
     	}
 	}
-    
+
     public void removeMemberFromListOfClientsInMyGroup(String member) throws RemoteException {
     	if(listOfClientsInMyGroup.contains(member)) {
     		listOfClientsInMyGroup.remove(member);
@@ -397,7 +399,7 @@ public class Client extends Observable implements ClientInterface {
     public void updateIpOfLeader(String Ip) throws RemoteException{
     	IpOfLeader = Ip;
     }
-    
+
     public void shareGroupForCrashedInfo(String crashedUserName) throws RemoteException, NotBoundException{
 		int k = 100000000; //any number here
 		Triple crashedUser;
@@ -429,9 +431,9 @@ public class Client extends Observable implements ClientInterface {
 
 	@Override
 	public void registryNewLeader() throws RemoteException {
-		
+
 	}
-	
+
 	public void notifyOthers() throws RemoteException, NotBoundException {
 		for (int i = 0; i < clients.size(); i++) {
 			if(!clients.get(i).getUsername().equals(myUserName)) {

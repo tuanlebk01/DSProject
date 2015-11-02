@@ -289,9 +289,9 @@ public class GUI implements Observer {
 											if(source.getSelectedValue() != null) {
 												group = source.getSelectedValue().toString();
 											}
-											
+
 											String leader = leaders.get(group);
-											
+
 											if(group.equals("###")) {
 												JOptionPane.showMessageDialog(frame, "Can't join your own group.");
 												return;
@@ -302,11 +302,12 @@ public class GUI implements Observer {
 													return;
 												}
 											}
-											
+
 											if(listOfMembers.contains(userName)) {
 												JOptionPane.showMessageDialog(frame, "Username already exists.");
 												return;
 											}
+											System.out.println("1: " + leader);
 											leaderOfMyGroup = client.joinGroup(group, leader);
 											myGroupName = group;
 
@@ -319,7 +320,7 @@ public class GUI implements Observer {
 
 												JOptionPane.showMessageDialog(null,
 														"Joined group: " + myGroupName);
-												
+
 												memberJoined();
 												client.addObserver(gui);
 												updateLists();
@@ -385,15 +386,21 @@ public class GUI implements Observer {
 							Iterator it = mapOfGroups.entrySet().iterator();
 							while (it.hasNext()) {
 								Map.Entry pair = (Map.Entry) it.next();
-								listOfGroups.add(pair.getKey().toString());
+								if(!listOfGroups.contains(pair.getKey().toString())) {
+									listOfGroups.add(pair.getKey().toString());
+								}
 //										System.out.println("GUI:");
 //										System.out.println(pair.getKey() + " = " + pair.getValue());
 							}
 
 							listOfMembers = client.getListOfClientsInMyGroup();
 
+							System.out.println("x: " + listOfGroups);
+
 							for (int i = 0; i < listOfGroups.size(); i++) {
-								groupList.add(i, listOfGroups.get(i));
+								if(!groupList.contains(listOfGroups)) {
+									groupList.add(i, listOfGroups.get(i));
+								}
 							}
 
 							for (int i = 0; i < listOfMembers.size(); i++) {
@@ -521,23 +528,23 @@ public class GUI implements Observer {
 			ex.printStackTrace();
 		}
 	}
-	
+
 	public void update(Observable obj, Object arg) {
 		updateLists();
 	}
-		
+
 	public void updateLists() {
 
 		listOfGroups.clear();
 		groupList.clear();
 		userList.clear();
-		
+
 		try {
 			listOfMembers = client.getListOfClientsInMyGroup();
 		} catch (RemoteException ex) {
 			ex.printStackTrace();
 		}
-		
+
 		Iterator it = mapOfGroups.entrySet().iterator();
 		while (it.hasNext()) {
 			Map.Entry pair = (Map.Entry) it.next();
@@ -555,7 +562,7 @@ public class GUI implements Observer {
 		}
 
 		leaderOfMyGroup = client.getMyLeader();
-		
+
 		for (int i = 0; i < listOfMembers.size(); i++) {
 			if(listOfMembers.get(i).equals(leaderOfMyGroup)) {
 				userList.add(i, listOfMembers.get(i) + " : <--- Leader");
