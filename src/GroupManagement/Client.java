@@ -48,7 +48,7 @@ public class Client extends Observable implements ClientInterface {
 			ServerNotActiveException, NotBoundException, UnknownHostException {
 
 		this.myUserName = userName;
-		this.registry = LocateRegistry.getRegistry("localhost",
+		this.registry = LocateRegistry.getRegistry("Bellatrix.cs.umu.se",
 				portNr);
 
 		ns = (NameServerInterface) registry.lookup("NamingService");
@@ -310,7 +310,7 @@ public class Client extends Observable implements ClientInterface {
 			registry.unbind(myUserName);
 		}
 	}
-	
+
 	public void handleError(String crashedUserName) throws RemoteException, NotBoundException{
 		for (int i = 0; i < clients.size(); i++) {
 			if (crashedUserName.equals(myLeader)) {
@@ -384,7 +384,7 @@ public class Client extends Observable implements ClientInterface {
     		listOfClientsInMyGroup.add(member);
     	}
 	}
-    
+
     public void removeMemberFromListOfClientsInMyGroup(String member) throws RemoteException {
     	if(listOfClientsInMyGroup.contains(member)) {
     		listOfClientsInMyGroup.remove(member);
@@ -397,7 +397,7 @@ public class Client extends Observable implements ClientInterface {
     public void updateIpOfLeader(String Ip) throws RemoteException{
     	IpOfLeader = Ip;
     }
-    
+
     public void shareGroupForCrashedInfo(String crashedUserName) throws RemoteException, NotBoundException{
 		int k = 100000000; //any number here
 		Triple crashedUser;
@@ -429,9 +429,9 @@ public class Client extends Observable implements ClientInterface {
 
 	@Override
 	public void registryNewLeader() throws RemoteException {
-		
+
 	}
-	
+
 	public void notifyOthers() throws RemoteException, NotBoundException {
 		for (int i = 0; i < clients.size(); i++) {
 			if(!clients.get(i).getUsername().equals(myUserName)) {
