@@ -91,9 +91,9 @@ public class Client extends Observable implements ClientInterface {
 			throws RemoteException, ServerNotActiveException,
 			AlreadyBoundException, NotBoundException {
 
-		this.myGroup = groupName;
+		myGroup = groupName;
 		// Bug here since GUI passes with old leader instead of new leader
-		this.myLeader = leaderName;
+		myLeader = leaderName;
 		ClientInterface ciLeader;
 		clientInfo.setGroup(groupName);
 		connectToGroupLeader(myLeader);
@@ -220,6 +220,8 @@ public class Client extends Observable implements ClientInterface {
 					listOfClientsInMyGroup = groupsInfo.get(myGroup);
 					myOldLeader = myLeader;
 					myLeader = startElection();
+					System.out.println("mygroup: " + myGroup + "   ; leader: " + myLeader);
+					ns.updateNewLeader(myGroup, myLeader);
 					sharegroup(1); // update new leader for members
 					sharegroup(2); // remove old leader from client list of members
 				}
