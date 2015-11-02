@@ -1,7 +1,6 @@
 package GroupManagement;
 
 
-import java.io.IOException;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.rmi.AlreadyBoundException;
@@ -13,10 +12,11 @@ import java.rmi.server.ServerNotActiveException;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.*;
 
+import Application.GUI;
 import Communication.CommunicationModule;
 import Communication.TextMessage;
 
-public class Client implements ClientInterface {
+public class Client extends Observable implements ClientInterface {
 
 	private static final long serialVersionUID = 1L;
 	private Registry registry;
@@ -95,12 +95,8 @@ public class Client implements ClientInterface {
 		// Bug here since GUI passes with old leader instead of new leader
 		this.myLeader = leaderName;
 		ClientInterface ciLeader;
-
 		clientInfo.setGroup(groupName);
-
 		connectToGroupLeader(myLeader);
-
-
 
 		try {
 			ci = (ClientInterface) UnicastRemoteObject.exportObject(this, 0);
@@ -121,11 +117,8 @@ public class Client implements ClientInterface {
 				String ip = clients.get(i).getIp().toString().split("/")[1];
 				Registry goRegistry = LocateRegistry.getRegistry(ip, 1234);
 				ci = (ClientInterface) goRegistry.lookup(clients.get(i).getUsername());
-				System.out.println("Client size, join group: " + clients.size());
 				ci.setClientList(clients);
-
 				ci.addClientInterface(clientInfo);
-
 			}
 		}
 
@@ -133,9 +126,6 @@ public class Client implements ClientInterface {
 		cm.setLastAcceptedSeqNr(ciLeader.getLastAcceptedSeqNr());
 
 		setClientList(clients);
-
-
-
 		int temp2 = clients.size();
 		for (int i = 0; i < temp2; i++){
 			if (!clients.get(i).getUsername().equals(myUserName)){
@@ -143,16 +133,17 @@ public class Client implements ClientInterface {
 			}
 		}
 		listOfClientsInMyGroup = ciLeader.getListOfClientsInMyGroup();
-		System.out.println("this is a list of Clients in my group: " + listOfClientsInMyGroup);
 		getGroupsInfo();
 		return myLeader;
-
 	}
 
     public void setNewLeader(String leader) throws RemoteException{
-    	System.out.println("changed leader in: " + myUserName + " too " + leader);
         myLeader = leader;
     }
+
+	public String getMyLeader() {
+		return myLeader;
+	}
 
 	public boolean connectToGroupLeader(String groupLeader) throws RemoteException, AlreadyBoundException, NotBoundException {
 		Registry leaderRegistry;
@@ -168,26 +159,18 @@ public class Client implements ClientInterface {
 		///
 		ci = (ClientInterface) leaderRegistry.lookup(groupLeader);
 		///
-
 		groupJoined = ci.addMemberToGroup(myUserName);
-
 		this.IpOfLeader = ip;
 		return groupJoined;
-
 	}
 
 
-//	THIS BELONGS TO THE LEADER
 	public boolean addMemberToGroup(String userName) throws RemoteException {
-
 		groupJoined = ns.addMember(myGroup, userName);
 		groupsInfo = ns.getGroupsInfo();
 		listOfClientsInMyGroup = groupsInfo.get(myGroup);
 		clients = ns.getGroupTriples(myGroup);
-
-		//sharegroup();
 		return groupJoined;
-
 	}
 
 	public HashMap<String, String> getGroupLeaders() throws RemoteException {
@@ -207,23 +190,18 @@ public class Client implements ClientInterface {
 	}
 
 	public String startElection() throws RemoteException {
-
 		for (int i = 0; i < clients.size(); i++) {
 			if (clients.get(i).getUsername().equals(myLeader)) {
 				clients.remove(i);
 			}
 		}
-
 		Collections.sort(clients, new Comparator<Triple>() {
 			@Override
 			public int compare(Triple t1, Triple t2) {
 				return t1.getClientID() - t2.getClientID();
 			}
-
 		});
-
 		return clients.get(0).getUsername();
-
 	}
 
 	public void disconnect(String groupName, String userName) throws RemoteException, java.rmi.NotBoundException {
@@ -235,14 +213,9 @@ public class Client implements ClientInterface {
 			} else if(userName.equals(myLeader)) {
 
 				if(listOfClientsInMyGroup.size() == 1) {
-
-					System.out.println("Leader leaving its own group and it was empty");
 					ns.removeGroup(groupName);
 
 				} else {
-
-					//ns.removeMemberFromGroup(groupName, userName);
-					System.out.println("remove member");
 					groupsInfo = ns.getGroupsInfo();
 					listOfClientsInMyGroup = groupsInfo.get(myGroup);
 					myOldLeader = myLeader;
@@ -252,27 +225,17 @@ public class Client implements ClientInterface {
 				}
 
 			} else {
-				System.out.println("else");
-				ci.removeFromGroup(groupName, userName);
 				sharegroup(2); // update client list for members
 			}
 	}
 
 
-	public void removeFromGroup(String groupName, String userName) throws RemoteException {
-		clients.remove(userName);
-	}
-
 	public void broadcastTestMessages(int nrOftestMSG) throws RemoteException, java.rmi.NotBoundException {
-
 		cm.sendMessagesInRandomOrder(nrOftestMSG);
-
 	}
 
 	public void broadcastTestMessages2(int nrOftestMSG) throws RemoteException, java.rmi.NotBoundException {
-
 		cm.sendMessageWithOneDrop(nrOftestMSG);
-
 	}
 
 	public ArrayList<TextMessage> getMessages() {
@@ -292,20 +255,16 @@ public class Client implements ClientInterface {
 			HashMap<Integer, ClientInterface> clientInterfaces)
 			throws RemoteException {
 		this.clientInterfaces = clientInterfaces;
-
 	}
 
 	public void sharegroup(int option) throws RemoteException, NotBoundException {
 
 		if (option == 1) {
-			System.out.println("Client size from opt 1: " + clients.size());
 			String IpLeader = null;
 
 			for (int i = 0; i < clients.size(); i++){
-				System.out.println("my leader in opt 1: " +myLeader);
 				if (clients.get(i).getUsername().equals(myLeader)) {
 					IpLeader = clients.get(i).getIp().toString().split("/")[1];
-					System.out.println("ip of leader from opt1: " + IpLeader);
 				}
 			}
 			for (int i = 0; i < clients.size(); i++){
@@ -315,17 +274,14 @@ public class Client implements ClientInterface {
 					ci = (ClientInterface) registry.lookup(clients.get(i).getUsername());
 					ci.setNewLeader(myLeader);
 					ci.updateIpOfLeader(IpLeader);
-					System.out.println("new leader from option 1: " +myLeader);
 				}
 			}
 			ns.updateNewLeader(this.myGroup, this.myUserName);
 			IpOfLeader = IpLeader;
-
 		}
 
 		if (option == 2) {
 			int k = 100000000; //any number here
-			System.out.println("ip of leader from opt2: " + IpOfLeader);
 			leaderRegistry = LocateRegistry.getRegistry(IpOfLeader, 1234);
 			ci = (ClientInterface) leaderRegistry.lookup(myLeader);
 			clients = ci.getClientlist(myGroup);
@@ -338,7 +294,6 @@ public class Client implements ClientInterface {
 			clients.remove(k); // remove itself from the client list
 
 			ns.removeMemberFromGroup(myGroup, myUserName); // remove itself from the NS
-			System.out.println("client size in opt 2: " +clients.size());
 			for (int i = 0; i < clients.size(); i++){
 
 				String ip = clients.get(i).getIp().toString().split("/")[1];
@@ -346,6 +301,10 @@ public class Client implements ClientInterface {
 				ci = (ClientInterface) registry1.lookup(clients.get(i).getUsername());
 				ci.setClientList(clients);
 				ci.removeClientInterface(clientInfo);
+				ci.removeMemberFromListOfClientsInMyGroup(myUserName);
+				ci.setNewLeader(myLeader);
+				setValue(myUserName);
+				ci.setValue(myUserName);
 			}
 			Registry registry = LocateRegistry.getRegistry("localhost", 1234);
 			registry.unbind(myUserName);
@@ -372,17 +331,12 @@ public class Client implements ClientInterface {
 
 	public HashMap<String, ArrayList<String>> getGroupsInfo() throws RemoteException, NotBoundException {
 
-
-		System.out.println("client size: " + clients.size());
-		System.out.println("Username "+myUserName);
-		System.out.println("Leader " + myLeader);
 		try {
-		if(!myUserName.equals(myLeader)){
+			if(!myUserName.equals(myLeader)){
 			leaderRegistry = LocateRegistry.getRegistry(IpOfLeader, 1234);
 			ci = (ClientInterface) leaderRegistry.lookup(myLeader);
 			groupsInfo = ci.askNSforGroupsInfo();
 		}
-
 		} catch (Exception e) {
 			System.out.println("ERROR");
 			e.printStackTrace();
@@ -396,7 +350,6 @@ public class Client implements ClientInterface {
 	}
 
 	public void setClientList(ArrayList<Triple> clients ) throws RemoteException {
-		System.out.println("clients size: " + clients.size());
 		this.clients = clients;
 		cm.setClientList(clients);
 	}
@@ -426,15 +379,26 @@ public class Client implements ClientInterface {
 		return listOfClientsInMyGroup;
 	}
 
-    public HashMap<Integer, Integer> getLastAcceptedSeqNr() throws RemoteException{
+    public void addMemberToListOfClientsInMyGroup(String member) throws RemoteException {
+    	if(!listOfClientsInMyGroup.contains(member)) {
+    		listOfClientsInMyGroup.add(member);
+    	}
+	}
+    
+    public void removeMemberFromListOfClientsInMyGroup(String member) throws RemoteException {
+    	if(listOfClientsInMyGroup.contains(member)) {
+    		listOfClientsInMyGroup.remove(member);
+    	}
+	}
+
+	public HashMap<Integer, Integer> getLastAcceptedSeqNr() throws RemoteException{
     	return cm.getLastAcceptedSeqNr();
     }
     public void updateIpOfLeader(String Ip) throws RemoteException{
     	IpOfLeader = Ip;
-    	System.out.println("ipofleader: "+IpOfLeader);
     }
     
-public void shareGroupForCrashedInfo(String crashedUserName) throws RemoteException, NotBoundException{
+    public void shareGroupForCrashedInfo(String crashedUserName) throws RemoteException, NotBoundException{
 		int k = 100000000; //any number here
 		Triple crashedUser;
 		leaderRegistry = LocateRegistry.getRegistry(IpOfLeader, 1234);
@@ -455,20 +419,47 @@ public void shareGroupForCrashedInfo(String crashedUserName) throws RemoteExcept
 				Registry registry1 = LocateRegistry.getRegistry(ip, 1234);
 				ci = (ClientInterface) registry1.lookup(clients.get(i).getUsername());
 				ci.setClientList(clients);
-				ci.removeClientInterface(crashedUser); 
+				ci.removeClientInterface(crashedUser);
+				ci.removeMemberFromListOfClientsInMyGroup(myUserName);
+				ci.setValue(myUserName);
 				System.out.println("crashed user in shareGroupForCrashedInfo: "+crashedUser);
 			}
-			
 		}
+    }
+
+	@Override
+	public void registryNewLeader() throws RemoteException {
 		
-}
-
-@Override
-public void registryNewLeader() throws RemoteException {
-	// TODO Auto-generated method stub
+	}
 	
-}
+	public void notifyOthers() throws RemoteException, NotBoundException {
+		for (int i = 0; i < clients.size(); i++) {
+			if(!clients.get(i).getUsername().equals(myUserName)) {
+				String ip = clients.get(i).getIp().toString().split("/")[1];
+				Registry registry1 = LocateRegistry.getRegistry(ip, 1234);
+				ci = (ClientInterface) registry1.lookup(clients.get(i).getUsername());
+				ci.addMemberToListOfClientsInMyGroup(myUserName);
+				ci.setValue(myUserName);
+			}
+		}
+	}
 
+	private String watchedValue;
+
+	@Override
+	public void updateGroupList(String value) throws RemoteException {
+		watchedValue = value;
+	}
+
+	public void setValue(String value) throws RemoteException {
+		if(!watchedValue.equals(value)) {
+		watchedValue = value;
+		setChanged();
+		notifyObservers();
+		clearChanged();
+		watchedValue = "asd";
+		}
+	}
 }
 
 

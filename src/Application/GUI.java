@@ -1,11 +1,8 @@
 package Application;
 
-import java.awt.BorderLayout;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.KeyEvent;
-import java.net.InetAddress;
 import java.rmi.AlreadyBoundException;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
@@ -14,11 +11,12 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.Observable;
+import java.util.Observer;
 import java.util.Timer;
 import java.util.TimerTask;
 
 import javax.swing.AbstractAction;
-import javax.swing.AbstractButton;
 import javax.swing.DefaultListModel;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
@@ -29,16 +27,16 @@ import javax.swing.JOptionPane;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
-import javax.swing.ScrollPaneConstants;
 import javax.swing.SwingUtilities;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
+import javax.swing.text.DefaultCaret;
 
 import Communication.TextMessage;
 import GroupManagement.Client;
 import GroupManagement.NameServer;
 
-public class GUI {
+public class GUI implements Observer {
 
 	private Client client;
 	private JLabel userNameLabel;
@@ -79,7 +77,7 @@ public class GUI {
 	private String myGroupName = null;
 	private boolean fancyPrinting1 = true;
 	private boolean groupJoined;
-
+	private static GUI gui;
 	public static void main(String[] args) {
 		try {
 			new NameServer();
@@ -88,7 +86,7 @@ public class GUI {
 		}
 		SwingUtilities.invokeLater(new Runnable() {
 		    public void run() {
-		    	new GUI();
+		    	gui = new GUI();
 	        }
 	 	});
 	}
@@ -196,13 +194,14 @@ public class GUI {
 		msgField.setColumns(10);
 		scrollPane = new JScrollPane(msgField);
 		scrollPane.setBounds(28, 377, 325, 97);
+		DefaultCaret caret = (DefaultCaret)chatArea.getCaret();
+		caret.setUpdatePolicy(DefaultCaret.ALWAYS_UPDATE);
 		frame.getContentPane().add(scrollPane);
 
 		checkbox = new JCheckBox(new CheckboxAction("Ordered"));
 		checkbox.setSelected(true);
 		checkbox.setBounds(175, 35, 85, 25);
 		frame.getContentPane().add(checkbox);
-
 		createGroup();
 		joinGroup();
 
@@ -304,44 +303,26 @@ public class GUI {
 												}
 											}
 											
+											if(listOfMembers.contains(userName)) {
+												JOptionPane.showMessageDialog(frame, "Username already exists.");
+												return;
+											}
 											leaderOfMyGroup = client.joinGroup(group, leader);
 											myGroupName = group;
+
 
 											groupJoined = client.isGroupJoined();
 
 											if(groupJoined) {
 
-
-												groupList.clear();
-												userList.clear();
-												listOfGroups.clear();
-												listOfMembers.clear();
-
 												mapOfGroups = client.getGroupsInfo();
-
-												Iterator it = mapOfGroups.entrySet().iterator();
-												while (it.hasNext()) {
-													Map.Entry pair = (Map.Entry) it.next();
-													listOfGroups.add(pair.getKey().toString());
-												}
-
-												listOfMembers = mapOfGroups.get(myGroupName);
-
-												for (int i = 0; i < listOfGroups.size(); i++) {
-													groupList.add(i, listOfGroups.get(i));
-												}
-
-												for (int i = 0; i < listOfMembers.size(); i++) {
-													if( listOfMembers.get(i).equals(leaderOfMyGroup)) {
-														userList.add(i, listOfMembers.get(i) + " : L");
-													} else {
-														userList.add(i, listOfMembers.get(i));
-													}
-												}
 
 												JOptionPane.showMessageDialog(null,
 														"Joined group: " + myGroupName);
-
+												
+												memberJoined();
+												client.addObserver(gui);
+												updateLists();
 												startThread();
 
 											} else {
@@ -409,7 +390,7 @@ public class GUI {
 //										System.out.println(pair.getKey() + " = " + pair.getValue());
 							}
 
-							listOfMembers = mapOfGroups.get(myGroupName);
+							listOfMembers = client.getListOfClientsInMyGroup();
 
 							for (int i = 0; i < listOfGroups.size(); i++) {
 								groupList.add(i, listOfGroups.get(i));
@@ -417,7 +398,7 @@ public class GUI {
 
 							for (int i = 0; i < listOfMembers.size(); i++) {
 								if( listOfMembers.get(i).equals(leaderOfMyGroup)) {
-									userList.add(i, listOfMembers.get(i) + " : L");
+									userList.add(i, listOfMembers.get(i) + " : <--- Leader");
 								} else {
 									userList.add(i, listOfMembers.get(i));
 								}
@@ -425,6 +406,8 @@ public class GUI {
 
 //							JOptionPane.showMessageDialog(null,
 //									"Group created with name: " + input);
+							client.updateGroupList(userName);
+							client.addObserver(gui);
 							startThread();
 
 						} else {
@@ -470,7 +453,6 @@ public class GUI {
 			try {
 
 				client = new Client();
-				System.out.println("Client: " + userName);
 				connectButton.setText("Disconnect");
 				clientID = client.connectToNameServer(userName, portNr);
 
@@ -531,20 +513,31 @@ public class GUI {
 		}
 	}
 
-	private void updateLists() {
+	public void memberJoined() {
+		try {
+			client.updateGroupList(userName);
+			client.notifyOthers();
+		} catch (RemoteException | NotBoundException ex) {
+			ex.printStackTrace();
+		}
+	}
+	
+	public void update(Observable obj, Object arg) {
+		updateLists();
+	}
+		
+	public void updateLists() {
 
-//		listOfMembers.clear();
 		listOfGroups.clear();
 		groupList.clear();
 		userList.clear();
-
-//		try {
-//			mapOfGroups = client.getGroupsInfo();
-//		} catch (RemoteException | NotBoundException e) {
-//			e.printStackTrace();
-//		}
-
-
+		
+		try {
+			listOfMembers = client.getListOfClientsInMyGroup();
+		} catch (RemoteException ex) {
+			ex.printStackTrace();
+		}
+		
 		Iterator it = mapOfGroups.entrySet().iterator();
 		while (it.hasNext()) {
 			Map.Entry pair = (Map.Entry) it.next();
@@ -553,19 +546,19 @@ public class GUI {
 //					System.out.println(pair.getKey() + " = " + pair.getValue());
 		}
 
-		listOfMembers = mapOfGroups.get(myGroupName);
-
 		for (int i = 0; i < listOfGroups.size(); i++) {
 			if(listOfGroups.get(i).equals(myGroupName)) {
 				groupList.add(i, listOfGroups.get(i) + " <---");
 			} else {
-			groupList.add(i, listOfGroups.get(i));
+				groupList.add(i, listOfGroups.get(i));
 			}
 		}
 
+		leaderOfMyGroup = client.getMyLeader();
+		
 		for (int i = 0; i < listOfMembers.size(); i++) {
-			if( listOfMembers.get(i).equals(leaderOfMyGroup)) {
-				userList.add(i, listOfMembers.get(i) + " : L");
+			if(listOfMembers.get(i).equals(leaderOfMyGroup)) {
+				userList.add(i, listOfMembers.get(i) + " : <--- Leader");
 			} else {
 				userList.add(i, listOfMembers.get(i));
 			}
@@ -593,15 +586,6 @@ public class GUI {
         };
 
         timer.schedule(task, 0, 250);
-
-
-        TimerTask task2 = new TimerTask() {
-
-            public void run() {
-//	           	updateLists();
-            }
-        };
-        timer.schedule(task2, 0, 2000);
 	}
 
 	public void getQueue() {
@@ -667,7 +651,6 @@ public class GUI {
 	}
 
 	public void writeMsg(String userName, String message) {
-
 			chatArea.append(message + "\n");
 	}
 

@@ -36,8 +36,6 @@ public interface ClientInterface extends Remote, Serializable {
 
 	public void disconnect(String groupName, String userName) throws RemoteException, java.rmi.NotBoundException;
 
-	public void removeFromGroup(String groupName, String userName) throws RemoteException;
-
 	public HashMap<Integer, ClientInterface> getInterfaceOfGroup()
 			throws RemoteException;
 	public void setClientInterfaces(HashMap<Integer, ClientInterface> clientInterfaces) throws RemoteException;
@@ -71,5 +69,15 @@ public interface ClientInterface extends Remote, Serializable {
     public void handleError(String userName) throws RemoteException, NotBoundException;
     
     public void shareGroupForCrashedInfo(String crashedUserName) throws RemoteException, NotBoundException;
+    
+    public void notifyOthers() throws RemoteException, NotBoundException;
 
+	public void updateGroupList(String value) throws RemoteException;
+	
+	public void setValue(String value) throws RemoteException;
+	
+	public void addMemberToListOfClientsInMyGroup(String member) throws RemoteException;
+	
+	public void removeMemberFromListOfClientsInMyGroup(String member) throws RemoteException;
+    
 }

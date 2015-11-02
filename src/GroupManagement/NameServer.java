@@ -59,7 +59,6 @@ public class NameServer extends RemoteServer implements NameServerInterface {
 		String str = getClientHost();
 		clientInfo = new Triple(clientID, userName, InetAddress.getByName(str));
 		listOfClients.add(clientInfo);
-
 		return clientID;
 	}
 

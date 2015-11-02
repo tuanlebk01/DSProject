@@ -155,7 +155,7 @@ public class CommunicationModule {
         for (int j=0; j<messages.size();j++){
             for(int k= 0; k < clients.size(); k++){
             	Registry registry = LocateRegistry.getRegistry(clients.get(k).getIp().toString().split("/")[1], 1234);
-           	 ci = (ClientInterface) registry.lookup(clients.get(k).getUsername());
+            	ci = (ClientInterface) registry.lookup(clients.get(k).getUsername());
                 ci.addMessageToQueue(messages.get(j));
             }
         }
