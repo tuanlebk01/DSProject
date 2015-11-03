@@ -56,6 +56,7 @@ public class GUI implements Observer {
 	private JButton getMSGButton;
 	private JButton dropMSGButton;
 	private JCheckBox checkbox;
+	private JCheckBox debugbox;
 	private DefaultListModel groupList = new DefaultListModel();
 	private DefaultListModel userList = new DefaultListModel();
 	private JList listGroup = new JList(groupList);
@@ -78,6 +79,7 @@ public class GUI implements Observer {
 	private boolean fancyPrinting1 = true;
 	private boolean groupJoined;
 	private static GUI gui;
+	
 	public static void main(String[] args) {
 		try {
 			new NameServer();
@@ -202,6 +204,12 @@ public class GUI implements Observer {
 		checkbox.setSelected(true);
 		checkbox.setBounds(175, 35, 85, 25);
 		frame.getContentPane().add(checkbox);
+		
+		debugbox = new JCheckBox(new CheckboxAction2("Enable debug window"));
+		debugbox.setSelected(false);
+		debugbox.setBounds(10, 35, 150, 25);
+		frame.getContentPane().add(debugbox);
+		
 		createGroup();
 		joinGroup();
 
@@ -264,7 +272,25 @@ public class GUI implements Observer {
 	        }
 	    }
 	}
+	
+	class CheckboxAction2 extends AbstractAction {
+	    public CheckboxAction2(String text) {
+	        super(text);
+	    }
 
+	    @Override
+	    public void actionPerformed(ActionEvent e) {
+	        JCheckBox cbLog2 = (JCheckBox) e.getSource();
+	        if (connectButton.getText().equals("Disconnect")) {
+	        	if (cbLog2.isSelected()) {
+	            	Debugwindow dw = new Debugwindow();
+	        	} else {
+	        		System.out.println("deselected");
+	        	}
+	        }
+	    }
+	}
+	    
 	private void joinGroup() {
 		listGroup.addListSelectionListener(new ListSelectionListener() {
 			public void valueChanged(ListSelectionEvent evt) {

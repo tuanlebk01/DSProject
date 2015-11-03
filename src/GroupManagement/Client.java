@@ -48,7 +48,7 @@ public class Client extends Observable implements ClientInterface {
 			ServerNotActiveException, NotBoundException, UnknownHostException {
 
 		this.myUserName = userName;
-		this.registry = LocateRegistry.getRegistry("Bellatrix.cs.umu.se",
+		this.registry = LocateRegistry.getRegistry("localhost",
 				portNr);
 
 		ns = (NameServerInterface) registry.lookup("NamingService");
