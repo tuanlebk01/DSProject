@@ -71,14 +71,20 @@ public class GUI implements Observer {
 	private ArrayList<String> listOfMembers = new ArrayList<String>();
 	private HashMap<String, ArrayList<String>> mapOfGroups = new HashMap<String, ArrayList<String>>();
 	private HashMap<String, String> leaders = new HashMap<String, String>();
-	private int clientID;
 	private boolean groupCreated;
 	private boolean isLeader = false;
 	private String leaderOfMyGroup;
 	private String myGroupName = null;
+	private String host;
 	private boolean fancyPrinting1 = true;
 	private boolean groupJoined;
 	private static GUI gui;
+	private Debugwindow dw;
+	private int clientID;
+	private int xCord = 700;
+	private int yCord = 530;
+	private JLabel lblHost;
+	private JTextField hostField;
 	
 	public static void main(String[] args) {
 		try {
@@ -99,11 +105,11 @@ public class GUI implements Observer {
 
 		userNameLabel = new JLabel("Username");
 		userNameLabel.setFont(new Font("Tahoma", Font.PLAIN, 12));
-		userNameLabel.setBounds(28, 5, 73, 22);
+		userNameLabel.setBounds(28, 36, 73, 22);
 		frame.getContentPane().add(userNameLabel);
 
 		userNameTextField = new JTextField();
-		userNameTextField.setBounds(91, 7, 125, 20);
+		userNameTextField.setBounds(99, 38, 125, 20);
 		frame.getContentPane().add(userNameTextField);
 		userNameTextField.setColumns(10);
 		userNameTextField.setText("User1");
@@ -163,13 +169,13 @@ public class GUI implements Observer {
 
 		randomMSGField = new JTextField();
 		randomMSGField.setColumns(10);
-		randomMSGField.setBounds(275, 37, 60, 20);
+		randomMSGField.setBounds(275, 66, 60, 20);
 		randomMSGField.setText("10");
 		frame.getContentPane().add(randomMSGField);
 
 		dropMSGField = new JTextField();
 		dropMSGField.setColumns(10);
-		dropMSGField.setBounds(275, 67, 60, 20);
+		dropMSGField.setBounds(275, 96, 60, 20);
 		dropMSGField.setText("10");
 		frame.getContentPane().add(dropMSGField);
 
@@ -202,13 +208,24 @@ public class GUI implements Observer {
 
 		checkbox = new JCheckBox(new CheckboxAction("Ordered"));
 		checkbox.setSelected(true);
-		checkbox.setBounds(175, 35, 85, 25);
+		checkbox.setBounds(182, 64, 85, 25);
 		frame.getContentPane().add(checkbox);
 		
 		debugbox = new JCheckBox(new CheckboxAction2("Enable debug window"));
 		debugbox.setSelected(false);
-		debugbox.setBounds(10, 35, 150, 25);
+		debugbox.setBounds(30, 64, 150, 25);
 		frame.getContentPane().add(debugbox);
+		
+		lblHost = new JLabel("Host");
+		lblHost.setFont(new Font("Tahoma", Font.PLAIN, 12));
+		lblHost.setBounds(28, 4, 73, 22);
+		frame.getContentPane().add(lblHost);
+		
+		hostField = new JTextField();
+		hostField.setText("localhost");
+		hostField.setColumns(10);
+		hostField.setBounds(99, 6, 125, 20);
+		frame.getContentPane().add(hostField);
 		
 		createGroup();
 		joinGroup();
@@ -250,7 +267,7 @@ public class GUI implements Observer {
 		});
 
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		frame.setSize(700, 530);
+		frame.setSize(xCord, yCord);
 		frame.setLocationRelativeTo(null);
 		frame.setVisible(true);
 	}
@@ -283,9 +300,11 @@ public class GUI implements Observer {
 	        JCheckBox cbLog2 = (JCheckBox) e.getSource();
 	        if (connectButton.getText().equals("Disconnect")) {
 	        	if (cbLog2.isSelected()) {
-	            	Debugwindow dw = new Debugwindow();
+	            	dw = new Debugwindow();
 	        	} else {
-	        		System.out.println("deselected");
+	        		if(dw != null) {
+	        			dw.removeWindow();
+	        		}
 	        	}
 	        }
 	    }
@@ -487,7 +506,7 @@ public class GUI implements Observer {
 
 				client = new Client();
 				connectButton.setText("Disconnect");
-				clientID = client.connectToNameServer(userName, portNr);
+				clientID = client.connectToNameServer(userName, host, portNr);
 
 				mapOfGroups = client.askNSforGroupsInfo();
 				listOfGroups.clear();
@@ -541,6 +560,7 @@ public class GUI implements Observer {
 			userList.clear();
 			groupList.clear();
 			connectButton.setText("Connect");
+//			frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 			System.exit(0);
 
 		}

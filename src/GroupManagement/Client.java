@@ -43,12 +43,12 @@ public class Client extends Observable implements ClientInterface {
 		super();
 	}
 
-	public int connectToNameServer(String userName, int portNr)
+	public int connectToNameServer(String userName, String host, int portNr)
 			throws RemoteException, AlreadyBoundException,
 			ServerNotActiveException, NotBoundException, UnknownHostException {
 
 		this.myUserName = userName;
-		this.registry = LocateRegistry.getRegistry("localhost",
+		this.registry = LocateRegistry.getRegistry(host,
 				portNr);
 
 		ns = (NameServerInterface) registry.lookup("NamingService");

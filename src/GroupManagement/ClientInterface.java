@@ -17,7 +17,7 @@ public interface ClientInterface extends Remote, Serializable {
 
 	public void addMessageToQueue (TextMessage message) throws RemoteException;
 
-	public int connectToNameServer(String userName, int portNr)
+	public int connectToNameServer(String userName, String host, int portNr)
 			throws RemoteException, AlreadyBoundException,
 			ServerNotActiveException, NotBoundException, UnknownHostException;
 
