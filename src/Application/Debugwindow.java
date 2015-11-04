@@ -60,6 +60,13 @@ public class Debugwindow {
 		frame.setLocation(1315, 255);
 		frame.setVisible(true);
 		
+		frame.addWindowListener(new java.awt.event.WindowAdapter() {
+		    @Override
+		    public void windowClosing(java.awt.event.WindowEvent windowEvent) {
+		    	frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+		    }
+		});
+		
 	}
 	
 	public void addTolist1(String message) {
@@ -75,7 +82,4 @@ public class Debugwindow {
 	public void addTolist4() {
 	}
 	
-	public void removeWindow() {
-		frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-	}
 }
