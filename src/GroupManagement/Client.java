@@ -48,8 +48,7 @@ public class Client extends Observable implements ClientInterface {
 			ServerNotActiveException, NotBoundException, UnknownHostException {
 
 		this.myUserName = userName;
-		this.registry = LocateRegistry.getRegistry(host,
-				portNr);
+		this.registry = LocateRegistry.getRegistry(host, portNr);
 
 		ns = (NameServerInterface) registry.lookup("NamingService");
 		clientID = ns.registerChatClient(userName);

@@ -62,7 +62,8 @@ public class Debugwindow {
 		
 	}
 	
-	public void addTolist1() {
+	public void addTolist1(String message) {
+		list1.addElement(message);
 	}
 	
 	public void addTolist2() {

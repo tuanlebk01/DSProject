@@ -693,7 +693,8 @@ public class GUI implements Observer {
 		}
 		if(myGroupName != null) {
 			String message = msgField.getText();
-			message = "[" + userNameTextField.getText() + "] " + message;
+			message = userNameTextField.getText() + ": " + message;
+			dw.addTolist1(message);
 			msgField.setText("");
 			try {
 				client.broadcastMessage(message);
