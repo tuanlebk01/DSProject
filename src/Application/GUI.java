@@ -298,13 +298,9 @@ public class GUI implements Observer {
 	    @Override
 	    public void actionPerformed(ActionEvent e) {
 	        JCheckBox cbLog2 = (JCheckBox) e.getSource();
-	        if (connectButton.getText().equals("Disconnect")) {
-	        	if (cbLog2.isSelected()) {
-	            	dw = new Debugwindow();
-	        	} else {
-	        		if(dw != null) {
-	        			dw.removeWindow();
-	        		}
+	        if (cbLog2.isSelected()) {
+	        	if(dw == null) {
+	        		dw = new Debugwindow();
 	        	}
 	        }
 	    }
