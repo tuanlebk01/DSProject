@@ -277,7 +277,7 @@ public class Client extends Observable implements ClientInterface {
 					ci.updateIpOfLeader(IpLeader);
 				}
 			}
-			ns.updateNewLeader(this.myGroup, this.myUserName);
+			ns.updateNewLeader(myGroup, myLeader);
 			IpOfLeader = IpLeader;
 		}
 
