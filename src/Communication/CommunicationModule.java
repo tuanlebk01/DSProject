@@ -82,7 +82,6 @@ public class CommunicationModule {
 								}
 							} catch (Exception e) {
         	                	timeOut = true;
-        	                	addMessageToQueue(textMessage);
 							}
         		if (timeOut) {
                 	for (int j = 0; j < clients.size(); j++) {

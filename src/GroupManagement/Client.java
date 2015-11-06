@@ -69,10 +69,19 @@ public class Client extends Observable implements ClientInterface {
 		try {
 			ci = (ClientInterface) UnicastRemoteObject.exportObject(this, 0);
 			Registry registry = LocateRegistry.getRegistry(1234);
-			registry.bind(userName, ci);
+			try {
+				registry.bind(userName, ci);
+			} catch (Exception e) {
+				registry.rebind(userName, ci);
+			}
+			
 		} catch (Exception e) {
 	         Registry registry = LocateRegistry.createRegistry(1234);
-	         registry.bind(userName, ci);
+	         try {
+					registry.bind(userName, ci);
+				} catch (Exception e1) {
+					registry.rebind(userName, ci);
+				}
 		}
 
 		groupCreated = ns.createGroup(groupName, userName);
@@ -100,10 +109,19 @@ public class Client extends Observable implements ClientInterface {
 		try {
 			ci = (ClientInterface) UnicastRemoteObject.exportObject(this, 0);
 			Registry registry1 = LocateRegistry.getRegistry(1234);
-			registry1.bind(myUserName,ci);
+			try {
+				registry1.bind(myUserName,ci);
+			} catch (Exception e) {
+				registry1.rebind(myUserName,ci);
+			}
+			
 		} catch (Exception e) {
 	         Registry registry1 = LocateRegistry.createRegistry(1234);
-	         registry1.bind(myUserName,ci);
+	         try {
+					registry1.bind(myUserName,ci);
+				} catch (Exception e1) {
+					registry1.rebind(myUserName,ci);
+				}
 		}
 
 		leaderRegistry = LocateRegistry.getRegistry(IpOfLeader, 1234);
@@ -307,8 +325,7 @@ public class Client extends Observable implements ClientInterface {
 				setValue(myUserName);
 				ci.setValue(myUserName);
 			}
-			Registry registry = LocateRegistry.getRegistry("localhost", 1234);
-			registry.unbind(myUserName);
+			
 		}
 	}
 
@@ -411,7 +428,7 @@ public class Client extends Observable implements ClientInterface {
 				k = i;
 			}
 		}
-		crashedUser = clients.get(k); // getting triple of crashed user
+		crashedUser = clients.get(k); // get triple of crashed user
 		clients.remove(k); // remove crashed client from the client list of sender
 		ns.removeMemberFromGroup(myGroup, crashedUserName); // remove crashed client from the NS
 		for (int i = 0; i < clients.size(); i++){
