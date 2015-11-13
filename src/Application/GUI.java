@@ -307,7 +307,7 @@ public class GUI implements Observer {
 	        JCheckBox cbLog2 = (JCheckBox) e.getSource();
 	        if (cbLog2.isSelected()) {
 	        	if(dw == null) {
-	        		dw = new Debugwindow();
+	        		dw = new Debugwindow(client);
 	        	}
 	        }
 	    }
@@ -686,7 +686,9 @@ public class GUI implements Observer {
 		if(myGroupName != null) {
 			String message = msgField.getText();
 			message = userNameTextField.getText() + ": " + message;
-//			dw.addTolist1(message);
+			if(dw != null) {
+				dw.messageQueue(message);
+			}
 			msgField.setText("");
 			try {
 				client.broadcastMessage(message);

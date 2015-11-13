@@ -1,14 +1,19 @@
 package Application;
 
+import java.awt.Button;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+
 import javax.swing.DefaultListModel;
 import javax.swing.JFrame;
-import javax.swing.JTextField;
 import javax.swing.JLabel;
 import javax.swing.JList;
-import javax.swing.ListModel;
 import javax.swing.JButton;
 import javax.swing.JToggleButton;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
 
+import GroupManagement.Client;
 
 public class Debugwindow {
 
@@ -21,24 +26,37 @@ public class Debugwindow {
 	private JList list_3 = new JList(list3);
 	private DefaultListModel list4 = new DefaultListModel();
 	private JList list_4 = new JList(list4);
+	
 	private JLabel label1;
 	private JLabel label2;
 	private JLabel label3;
 	private JLabel label4;
+	private JButton button1;
+	private JButton button2;
+	private JButton button3;
+	private JButton button4;
+	private JToggleButton toggleButton1;
+	private JToggleButton toggleButton2;
+	private JToggleButton toggleButton3;
+	private JToggleButton toggleButton4;
 	
-	public Debugwindow() {
+	private Client client;
+	
+	public Debugwindow(Client client) {
+		
+		this.client = client;
 		frame.getContentPane().setLayout(null);
 		
-		label1 = new JLabel("List 1");
-		label1.setBounds(59, 11, 46, 14);
+		label1 = new JLabel("Message queue");
+		label1.setBounds(23, 11, 102, 14);
 		frame.getContentPane().add(label1);
 		
-		label2 = new JLabel("List 2");
-		label2.setBounds(333, 11, 46, 14);
+		label2 = new JLabel("Holdback queue");
+		label2.setBounds(307, 11, 102, 14);
 		frame.getContentPane().add(label2);
 		
-		label3 = new JLabel("List 3");
-		label3.setBounds(59, 256, 46, 14);
+		label3 = new JLabel("Blocked queue");
+		label3.setBounds(23, 256, 91, 14);
 		frame.getContentPane().add(label3);
 		
 		label4 = new JLabel("List 4");
@@ -57,43 +75,44 @@ public class Debugwindow {
 		list_4.setBounds(288, 281, 136, 200);
 		frame.getContentPane().add(list_4);
 		
-		JButton btnNewButton = new JButton("Button 1");
-		btnNewButton.setBounds(167, 33, 89, 23);
-		frame.getContentPane().add(btnNewButton);
+		button1 = new JButton("Select msg");
+		button1.setBounds(167, 33, 102, 23);
+		frame.getContentPane().add(button1);
 		
-		JButton btnNewButton_1 = new JButton("Button 2");
-		btnNewButton_1.setBounds(167, 67, 89, 23);
-		frame.getContentPane().add(btnNewButton_1);
+		button2 = new JButton("Select msg");
+		button2.setBounds(167, 67, 102, 23);
+		frame.getContentPane().add(button2);
 		
-		JButton btnNewButton_2 = new JButton("Button 3");
-		btnNewButton_2.setBounds(167, 278, 89, 23);
-		frame.getContentPane().add(btnNewButton_2);
+		button3 = new JButton("Select msg");
+		button3.setBounds(167, 278, 102, 23);
+		frame.getContentPane().add(button3);
 		
-		JButton btnNewButton_3 = new JButton("Button 4");
-		btnNewButton_3.setBounds(167, 311, 89, 23);
-		frame.getContentPane().add(btnNewButton_3);
+		button4 = new JButton("Select msg");
+		button4.setBounds(167, 311, 102, 23);
+		frame.getContentPane().add(button4);
 		
-		JToggleButton tglbtnNewToggleButton = new JToggleButton("Toggle 1");
-		tglbtnNewToggleButton.setBounds(156, 143, 121, 23);
-		frame.getContentPane().add(tglbtnNewToggleButton);
+		toggleButton1 = new JToggleButton("Toggle Block 1");
+		toggleButton1.setBounds(156, 143, 121, 23);
+		frame.getContentPane().add(toggleButton1);
 		
-		JToggleButton tglbtnNewToggleButton_1 = new JToggleButton("Toggle 2");
-		tglbtnNewToggleButton_1.setBounds(156, 177, 121, 23);
-		frame.getContentPane().add(tglbtnNewToggleButton_1);
+		toggleButton2 = new JToggleButton("Toggle Block 2");
+		toggleButton2.setBounds(156, 177, 121, 23);
+		frame.getContentPane().add(toggleButton2);
 		
-		JToggleButton tglbtnNewToggleButton_2 = new JToggleButton("Toggle 3");
-		tglbtnNewToggleButton_2.setBounds(156, 392, 121, 23);
-		frame.getContentPane().add(tglbtnNewToggleButton_2);
+		toggleButton3 = new JToggleButton("Toggle Block 3");
+		toggleButton3.setBounds(156, 392, 121, 23);
+		frame.getContentPane().add(toggleButton3);
 		
-		JToggleButton tglbtnNewToggleButton_3 = new JToggleButton("Toggle 4");
-		tglbtnNewToggleButton_3.setBounds(156, 426, 121, 23);
-		frame.getContentPane().add(tglbtnNewToggleButton_3);
+		toggleButton4 = new JToggleButton("Toggle Block 4");
+		toggleButton4.setBounds(156, 426, 121, 23);
+		frame.getContentPane().add(toggleButton4);
 		
 		
 		frame.setSize(450, 530);
 		frame.setLocation(1315, 255);
 		frame.setVisible(true);
 		
+		// To close debugwindow and keeping client alive
 		frame.addWindowListener(new java.awt.event.WindowAdapter() {
 		    @Override
 		    public void windowClosing(java.awt.event.WindowEvent windowEvent) {
@@ -103,14 +122,36 @@ public class Debugwindow {
 		
 	}
 	
-	public void addTolist1(String message) {
-		list1.addElement(message);
+	public void messageQueue(String message) {
+		
+		list1.add(list1.getSize(), message);
+
+		list_1.addListSelectionListener(new ListSelectionListener() {
+			public void valueChanged(ListSelectionEvent evt) {
+				if (evt.getValueIsAdjusting()) {
+					final JList source = (JList) evt.getSource();
+					button1.addActionListener(new ActionListener() {
+						public void actionPerformed(ActionEvent a) {
+							String msg = "###";
+							if(source.getSelectedValue() != null) {
+								msg = source.getSelectedValue().toString();
+								System.out.println("msg: " + msg);
+								holdbackQueue(msg);
+								int selectedIndex = list_1.getSelectedIndex();
+								list1.remove(selectedIndex);
+							}
+						}
+					});
+				}
+			}
+		});
 	}
 	
-	public void addTolist2() {
+	public void holdbackQueue(String message) {
+		list2.add(list2.getSize(), message);
 	}
 	
-	public void addTolist3() {
+	public void blockQueue() {
 	}
 	
 	public void addTolist4() {
