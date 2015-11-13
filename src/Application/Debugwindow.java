@@ -6,6 +6,8 @@ import javax.swing.JTextField;
 import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.ListModel;
+import javax.swing.JButton;
+import javax.swing.JToggleButton;
 
 
 public class Debugwindow {
@@ -55,6 +57,38 @@ public class Debugwindow {
 		list_4.setBounds(288, 281, 136, 200);
 		frame.getContentPane().add(list_4);
 		
+		JButton btnNewButton = new JButton("New button");
+		btnNewButton.setBounds(156, 33, 89, 23);
+		frame.getContentPane().add(btnNewButton);
+		
+		JButton btnNewButton_1 = new JButton("New button");
+		btnNewButton_1.setBounds(189, 67, 89, 23);
+		frame.getContentPane().add(btnNewButton_1);
+		
+		JButton btnNewButton_2 = new JButton("New button");
+		btnNewButton_2.setBounds(156, 281, 89, 23);
+		frame.getContentPane().add(btnNewButton_2);
+		
+		JButton btnNewButton_3 = new JButton("New button");
+		btnNewButton_3.setBounds(189, 315, 89, 23);
+		frame.getContentPane().add(btnNewButton_3);
+		
+		JToggleButton tglbtnNewToggleButton = new JToggleButton("New toggle button");
+		tglbtnNewToggleButton.setBounds(156, 143, 121, 23);
+		frame.getContentPane().add(tglbtnNewToggleButton);
+		
+		JToggleButton tglbtnNewToggleButton_1 = new JToggleButton("New toggle button");
+		tglbtnNewToggleButton_1.setBounds(156, 177, 121, 23);
+		frame.getContentPane().add(tglbtnNewToggleButton_1);
+		
+		JToggleButton tglbtnNewToggleButton_2 = new JToggleButton("New toggle button");
+		tglbtnNewToggleButton_2.setBounds(156, 392, 121, 23);
+		frame.getContentPane().add(tglbtnNewToggleButton_2);
+		
+		JToggleButton tglbtnNewToggleButton_3 = new JToggleButton("New toggle button");
+		tglbtnNewToggleButton_3.setBounds(156, 426, 121, 23);
+		frame.getContentPane().add(tglbtnNewToggleButton_3);
+		
 		
 		frame.setSize(450, 530);
 		frame.setLocation(1315, 255);
@@ -81,5 +115,4 @@ public class Debugwindow {
 	
 	public void addTolist4() {
 	}
-	
 }
