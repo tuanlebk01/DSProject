@@ -88,7 +88,6 @@ public class Client extends Observable implements ClientInterface {
 		clients.add(clientInfo);
 		groupsInfo = ns.getGroupsInfo();
 		listOfClientsInMyGroup = groupsInfo.get(groupName);
-
 		cm = new CommunicationModule(myUserName, clientID, clients);
 
 		return groupCreated;
@@ -100,7 +99,6 @@ public class Client extends Observable implements ClientInterface {
 			AlreadyBoundException, NotBoundException {
 
 		myGroup = groupName;
-		// Bug here since GUI passes with old leader instead of new leader
 		myLeader = leaderName;
 		ClientInterface ciLeader;
 		clientInfo.setGroup(groupName);
@@ -224,11 +222,9 @@ public class Client extends Observable implements ClientInterface {
 	public void disconnect(String groupName, String userName) throws RemoteException, java.rmi.NotBoundException {
 
 			if(groupName == null) {
-
 				ns.leaveServer(groupName, clientID);
 
 			} else if(userName.equals(myLeader)) {
-
 				if(listOfClientsInMyGroup.size() == 1) {
 					ns.removeGroup(groupName);
 
@@ -237,7 +233,6 @@ public class Client extends Observable implements ClientInterface {
 					listOfClientsInMyGroup = groupsInfo.get(myGroup);
 					myOldLeader = myLeader;
 					myLeader = startElection();
-					System.out.println("mygroup: " + myGroup + "   ; leader: " + myLeader);
 					ns.updateNewLeader(myGroup, myLeader);
 					sharegroup(1); // update new leader for members
 					sharegroup(2); // remove old leader from client list of members
@@ -265,14 +260,11 @@ public class Client extends Observable implements ClientInterface {
         return cm.getQueue();
     }
 
-	public HashMap<Integer, ClientInterface> getInterfaceOfGroup()
-			throws RemoteException {
+	public HashMap<Integer, ClientInterface> getInterfaceOfGroup() throws RemoteException {
 		return clientInterfaces;
 	}
 
-	public void setClientInterfaces(
-			HashMap<Integer, ClientInterface> clientInterfaces)
-			throws RemoteException {
+	public void setClientInterfaces(HashMap<Integer, ClientInterface> clientInterfaces) throws RemoteException {
 		this.clientInterfaces = clientInterfaces;
 	}
 
@@ -308,9 +300,9 @@ public class Client extends Observable implements ClientInterface {
 			for (int i = 0; i < clients.size(); i++) {
 				if (clients.get(i).getUsername().equals(myUserName)) {
 					k = i;
+					clients.remove(k); // remove itself from the client list
 				}
 			}
-			clients.remove(k); // remove itself from the client list
 
 			ns.removeMemberFromGroup(myGroup, myUserName); // remove itself from the NS
 			for (int i = 0; i < clients.size(); i++){
@@ -330,14 +322,14 @@ public class Client extends Observable implements ClientInterface {
 	}
 
 	public void handleError(String crashedUserName) throws RemoteException, NotBoundException{
+		System.out.println("user: " + crashedUserName + " has crashed");
 		for (int i = 0; i < clients.size(); i++) {
 			if (crashedUserName.equals(myLeader)) {
 				myOldLeader = myLeader;
 				myLeader = startElection();
 				sharegroup(1); // update new leader for members
-				shareGroupForCrashedInfo(crashedUserName);; // remove old leader from client list of members
-			}
-			else{
+				shareGroupForCrashedInfo(crashedUserName); // remove old leader from client list of members
+			} else {
 				shareGroupForCrashedInfo(crashedUserName); // update client list for members
 			}
 		}
@@ -418,6 +410,8 @@ public class Client extends Observable implements ClientInterface {
 
     public void shareGroupForCrashedInfo(String crashedUserName) throws RemoteException, NotBoundException{
 		int k = 100000000; //any number here
+		
+		
 		Triple crashedUser;
 		leaderRegistry = LocateRegistry.getRegistry(IpOfLeader, 1234);
 		ci = (ClientInterface) leaderRegistry.lookup(myLeader);
@@ -429,6 +423,10 @@ public class Client extends Observable implements ClientInterface {
 			}
 		}
 		crashedUser = clients.get(k); // get triple of crashed user
+		
+		System.out.println("crashed user detected from client: " + myUserName);
+		System.out.println("crashed user is: " + crashedUserName);
+		
 		clients.remove(k); // remove crashed client from the client list of sender
 		ns.removeMemberFromGroup(myGroup, crashedUserName); // remove crashed client from the NS
 		for (int i = 0; i < clients.size(); i++){
@@ -438,9 +436,9 @@ public class Client extends Observable implements ClientInterface {
 				ci = (ClientInterface) registry1.lookup(clients.get(i).getUsername());
 				ci.setClientList(clients);
 				ci.removeClientInterface(crashedUser);
-				ci.removeMemberFromListOfClientsInMyGroup(myUserName);
+				ci.removeMemberFromListOfClientsInMyGroup(crashedUserName);
+				setValue(clients.get(i).getUsername());
 				ci.setValue(myUserName);
-				System.out.println("crashed user in shareGroupForCrashedInfo: "+crashedUser);
 			}
 		}
     }
@@ -462,7 +460,7 @@ public class Client extends Observable implements ClientInterface {
 		}
 	}
 
-	private String watchedValue;
+	private String watchedValue = "";
 
 	@Override
 	public void updateGroupList(String value) throws RemoteException {
@@ -471,11 +469,10 @@ public class Client extends Observable implements ClientInterface {
 
 	public void setValue(String value) throws RemoteException {
 		if(!watchedValue.equals(value)) {
-		watchedValue = value;
-		setChanged();
-		notifyObservers();
-		clearChanged();
-		watchedValue = "asd";
+			setChanged();
+			notifyObservers();
+			clearChanged();
+			watchedValue = "asd";
 		}
 	}
 }

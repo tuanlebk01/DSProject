@@ -3,6 +3,9 @@ package Application;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
+import java.awt.event.WindowListener;
 import java.rmi.AlreadyBoundException;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
@@ -31,6 +34,8 @@ import javax.swing.SwingUtilities;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.text.DefaultCaret;
+
+import com.sun.org.apache.xerces.internal.util.SynchronizedSymbolTable;
 
 import Communication.TextMessage;
 import GroupManagement.Client;
@@ -85,6 +90,8 @@ public class GUI implements Observer {
 	private int yCord = 530;
 	private JLabel lblHost;
 	private JTextField hostField;
+	private Timer timer;
+	private TimerTask task;
 	
 	public static void main(String[] args) {
 		try {
@@ -332,9 +339,9 @@ public class GUI implements Observer {
 											}
 
 											String leader = leaders.get(group);
-
+											
 											if(group.equals("###")) {
-												JOptionPane.showMessageDialog(frame, "Can't join your own group.");
+												JOptionPane.showMessageDialog(frame, "Select group to join.");
 												return;
 												} else if (group.endsWith("<---")) {
 													String tmp = group.substring(0, group.length() - 5);
@@ -348,11 +355,9 @@ public class GUI implements Observer {
 												JOptionPane.showMessageDialog(frame, "Username already exists.");
 												return;
 											}
-											System.out.println("1: " + leader);
+											
 											leaderOfMyGroup = client.joinGroup(group, leader);
 											myGroupName = group;
-
-
 											groupJoined = client.isGroupJoined();
 
 											if(groupJoined) {
@@ -421,7 +426,6 @@ public class GUI implements Observer {
 							groupList.clear();
 							userList.clear();
 
-
 							mapOfGroups = client.askNSforGroupsInfo();
 
 							Iterator it = mapOfGroups.entrySet().iterator();
@@ -430,13 +434,9 @@ public class GUI implements Observer {
 								if(!listOfGroups.contains(pair.getKey().toString())) {
 									listOfGroups.add(pair.getKey().toString());
 								}
-//										System.out.println("GUI:");
-//										System.out.println(pair.getKey() + " = " + pair.getValue());
 							}
 
 							listOfMembers = client.getListOfClientsInMyGroup();
-
-							System.out.println("x: " + listOfGroups);
 
 							for (int i = 0; i < listOfGroups.size(); i++) {
 								if(!groupList.contains(listOfGroups)) {
@@ -483,16 +483,14 @@ public class GUI implements Observer {
 	public void connect(String connect) {
 		if (connectButton.getText().equals("Connect")) {
 			if (userNameTextField.getText().length() < 1) {
-				JOptionPane
-						.showMessageDialog(frame, "You need to type a name.");
+				JOptionPane.showMessageDialog(frame, "You need to type a name.");
 				return;
 			} else {
 				userName = userNameTextField.getText();
 			}
 
 			if (portNrField.getText().length() < 1) {
-				JOptionPane
-						.showMessageDialog(frame, "You need to type a port.");
+				JOptionPane.showMessageDialog(frame, "You need to type a port.");
 				return;
 			} else {
 				portNr = Integer.parseInt(portNrField.getText());
@@ -515,8 +513,6 @@ public class GUI implements Observer {
 					Map.Entry pair = (Map.Entry) it.next();
 					listOfGroups.add(pair.getKey().toString());
 					listOfMembers.add(pair.getValue().toString());
-//							System.out.println("GUI:");
-//							System.out.println(pair.getKey() + " = " + pair.getValue());
 					it.remove();
 				}
 
@@ -535,7 +531,7 @@ public class GUI implements Observer {
 				System.out.println("GUI: Connected to nameserver");
 
 			} catch (Exception ex) {
-				 ex.printStackTrace();
+				ex.printStackTrace();
 				connectButton.setText("Connect");
 				JOptionPane.showMessageDialog(frame,
 						"Error, could not connect.");
@@ -547,18 +543,21 @@ public class GUI implements Observer {
 			} catch (RemoteException | NotBoundException e) {
 				e.printStackTrace();
 			}
-
-			listOfMembers.clear();
-			listOfGroups.clear();
+			connectButton.setText("Connect");
+			if(timer != null) {
+				timer.cancel();
+				timer.purge();
+			}
+			if(task != null) {
+				task.cancel();
+			}
+	        myGroupName = null;
+	        leaderOfMyGroup = null;
 			groupList.clear();
 			userList.clear();
 			chatArea.setText("");
-			userList.clear();
-			groupList.clear();
-			connectButton.setText("Connect");
-//			frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-			System.exit(0);
-
+			msgField.setText("");
+			client = null;
 		}
 	}
 
@@ -576,13 +575,13 @@ public class GUI implements Observer {
 	}
 
 	public void updateLists() {
-
 		listOfGroups.clear();
 		groupList.clear();
 		userList.clear();
 
 		try {
 			listOfMembers = client.getListOfClientsInMyGroup();
+			System.out.println("this is " + userName + " list: " + listOfMembers);
 		} catch (RemoteException ex) {
 			ex.printStackTrace();
 		}
@@ -591,8 +590,6 @@ public class GUI implements Observer {
 		while (it.hasNext()) {
 			Map.Entry pair = (Map.Entry) it.next();
 			listOfGroups.add(pair.getKey().toString());
-//					System.out.println("GUI:");
-//					System.out.println(pair.getKey() + " = " + pair.getValue());
 		}
 
 		for (int i = 0; i < listOfGroups.size(); i++) {
@@ -614,12 +611,12 @@ public class GUI implements Observer {
 		}
 	}
 
-	private void startThread() {
+	public void startThread() {
 
-        final Timer timer = new Timer(true);
+        timer = new Timer(true);
         ArrayList<TextMessage> textMessages;
 
-        TimerTask task = new TimerTask() {
+        task = new TimerTask() {
 
             public void run() {
 	           	ArrayList<TextMessage> textMessages;
@@ -633,7 +630,6 @@ public class GUI implements Observer {
 	            }
             }
         };
-
         timer.schedule(task, 0, 250);
 	}
 

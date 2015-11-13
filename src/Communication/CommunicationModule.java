@@ -63,26 +63,20 @@ public class CommunicationModule {
         Registry registry;
         boolean timeOut = false;
         int l = 0;
-    	System.out.println("In CM: "+clients.size());
-
-
 
         for(int i= 0; i < clients.size(); i++){
-
         	if(clients.get(i).getClientID() == clientID){
         		addMessageToQueue(textMessage);
-        	}else {
-        		System.out.println("Sending to: " + clients.get(i).getUsername());
-
+        	} else {
         		registry = LocateRegistry.getRegistry(clients.get(i).getIp().toString().split("/")[1], 1234);
-        	            	try {
-        	            		ci = (ClientInterface) registry.lookup(clients.get(i).getUsername());
-        	            		if (ci != null) {
-        	            			ci.addMessageToQueue(textMessage);
-								}
-							} catch (Exception e) {
-        	                	timeOut = true;
-							}
+        			try {
+        	        	ci = (ClientInterface) registry.lookup(clients.get(i).getUsername());
+        	            if (ci != null) {
+        	            	ci.addMessageToQueue(textMessage);
+						}
+					} catch (Exception e) {
+        	        timeOut = true;
+				}
         		if (timeOut) {
                 	for (int j = 0; j < clients.size(); j++) {
 						if (clients.get(j).getUsername().equals(userName)) {
@@ -92,11 +86,8 @@ public class CommunicationModule {
                 	ci = (ClientInterface) registry.lookup(clients.get(l).getUsername()); // use interface of sender
                 	ci.handleError(clients.get(i).getUsername());
 				}
-        		
-               
         	}
         }
-
         counter++;
     }
 
