@@ -75,11 +75,11 @@ public class Debugwindow {
 		list_4.setBounds(288, 281, 136, 200);
 		frame.getContentPane().add(list_4);
 		
-		button1 = new JButton("Select msg");
+		button1 = new JButton("Block msg");
 		button1.setBounds(167, 33, 102, 23);
 		frame.getContentPane().add(button1);
 		
-		button2 = new JButton("Select msg");
+		button2 = new JButton("Unblock msg");
 		button2.setBounds(167, 67, 102, 23);
 		frame.getContentPane().add(button2);
 		
