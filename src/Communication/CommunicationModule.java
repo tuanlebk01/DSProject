@@ -16,295 +16,405 @@ import java.util.*;
  * Created by Johan Hagner - c11jhr
  */
 public class CommunicationModule {
+	private int timeOutTime = 5000; // Milliseconds
+	private int counter=0;
+	private ArrayList<TextMessage> waitingMessages;
 
-    private int counter=0;
-    private ArrayList<TextMessage> waitingMessages;
-    private String userName;
-    private int clientID;
-    private  HashMap <Integer, Integer> lastAcceptedSeqNr;
-    private ArrayList <TextMessage> acceptedMessages = new ArrayList<>();
+	// NEW --
+	private ArrayList<TextMessage> outgoingMessageQueue;
+	private ArrayList<TextMessage> incomingMessageQueue;
+	private ArrayList<TextMessage> waitingQueue;
+	private boolean holdOutgoingMessages = false; // should start false
+	private boolean holdIncomingMessages = false; // should start false
+
+	private String userName;
+	private int clientID;
+	private HashMap <Integer, Integer> lastAcceptedSeqNr;
+	private ArrayList <TextMessage> acceptedMessages = new ArrayList<>();
 	private ArrayList<Triple> clients;
-    private boolean ordered=true;
-    
+	private boolean ordered=true;
 
 
-    /** The communication module keep track of the sequence numbers received by any client.
-     *
-     * @param userName - userName of the client that created the communication module
-     * @param clientID - clientId of the client that created the communication module
-     * @param clients
-     */
-    public CommunicationModule(String userName, int clientID, ArrayList<Triple> clients){
-        counter = 1;
-        this.userName = userName;
-        this.clientID = clientID;
-        this.clients = clients;
-        waitingMessages = new ArrayList<>();
-
-        this.lastAcceptedSeqNr = new HashMap<>();
 
 
-        for(int i = 0; i < clients.size(); i++ ) {
-        	lastAcceptedSeqNr.put(clients.get(i).getClientID(), 0);
-        }
+	/** The communication module keep track of the sequence numbers received by any client.
+	 *
+	 * @param userName - userName of the client that created the communication module
+	 * @param clientID - clientId of the client that created the communication module
+	 * @param clients
+	 */
+	public CommunicationModule(String userName, int clientID, ArrayList<Triple> clients){
+		counter = 1;
+		this.userName = userName;
+		this.clientID = clientID;
+		this.clients = clients;
+		waitingMessages = new ArrayList<>();
 
-    }
+		// NEW --
+		outgoingMessageQueue = new ArrayList<>();
+		incomingMessageQueue = new ArrayList<>();
+		waitingQueue = new ArrayList<>();
 
-    /** Sends the message to all clientInterfaces that the communication module have knowledge of.
-     *
-     * @param message - The string that the message contains
-     * @throws RemoteException
-     * @throws NotBoundException
-     */
-    public void sendMessage(String message) throws RemoteException, NotBoundException{
-        TextMessage textMessage = null;
-        ClientInterface ci;
-        textMessage = new TextMessage(counter, message, userName, clientID);
-        Registry registry;
-        boolean timeOut = false;
-        int l = 0;
+		this.lastAcceptedSeqNr = new HashMap<>();
 
-        for(int i= 0; i < clients.size(); i++){
-        	if(clients.get(i).getClientID() == clientID){
-        		addMessageToQueue(textMessage);
-        	} else {
-        		registry = LocateRegistry.getRegistry(clients.get(i).getIp().toString().split("/")[1], 1234);
-        			try {
-        	        	ci = (ClientInterface) registry.lookup(clients.get(i).getUsername());
-        	            if (ci != null) {
-        	            	ci.addMessageToQueue(textMessage);
+
+		for(int i = 0; i < clients.size(); i++ ) {
+			lastAcceptedSeqNr.put(clients.get(i).getClientID(), 0);
+		}
+
+	}
+
+	/** Sends the message to all clientInterfaces that the communication module have knowledge of.
+	 *
+	 * @param message - The string that the message contains
+	 * @throws RemoteException
+	 * @throws NotBoundException
+	 */
+	public void sendMessage(String message) throws RemoteException, NotBoundException{
+		TextMessage textMessage = null;
+		ClientInterface ci;
+		textMessage = new TextMessage(counter, message, userName, clientID);
+		Registry registry;
+		boolean timeOut = false;
+		int l = 0;
+
+		// NEW (if and else statement)
+		if(holdOutgoingMessages){
+			outgoingMessageQueue.add(textMessage);
+		} else {
+			for(int i= 0; i < clients.size(); i++){
+				if(clients.get(i).getClientID() == clientID){
+					addMessageToQueue(textMessage);
+				} else {
+					registry = LocateRegistry.getRegistry(clients.get(i).getIp().toString().split("/")[1], 1234);
+					try {
+						ci = (ClientInterface) registry.lookup(clients.get(i).getUsername());
+						if (ci != null) {
+							ci.addMessageToQueue(textMessage);
 						}
 					} catch (Exception e) {
-        	        timeOut = true;
-				}
-        		if (timeOut) {
-                	for (int j = 0; j < clients.size(); j++) {
-						if (clients.get(j).getUsername().equals(userName)) {
-							l = j;
-						}
+						timeOut = true;
 					}
-                	ci = (ClientInterface) registry.lookup(clients.get(l).getUsername()); // use interface of sender
-                	ci.handleError(clients.get(i).getUsername());
+					if (timeOut) {
+						for (int j = 0; j < clients.size(); j++) {
+							if (clients.get(j).getUsername().equals(userName)) {
+								l = j;
+							}
+						}
+						ci = (ClientInterface) registry.lookup(clients.get(l).getUsername()); // use interface of sender
+						ci.handleError(clients.get(i).getUsername());
+					}
 				}
-        	}
-        }
-        counter++;
-    }
+			}
+		}		
+		counter++;
+	}
 
-    /** This method sends a number of testMessages in a random order to all the clientInterfaces. The number of messages
-     *  is specified by the parameter. These messages are considered to be legit messages and are handled the same way
-     *  as any other message. The actual string is predetermined and follows the following format:
-     *      - "Textmessage nr: x" where x is the number of the message.
-     *
-     * @param numberOfMessages - number of messages to send
-     * @throws RemoteException
-     */
-    public void sendMessagesInRandomOrder(int numberOfMessages) throws RemoteException, java.rmi.NotBoundException{
+	/** This method sends a number of testMessages in a random order to all the clientInterfaces. The number of messages
+	 *  is specified by the parameter. These messages are considered to be legit messages and are handled the same way
+	 *  as any other message. The actual string is predetermined and follows the following format:
+	 *      - "Textmessage nr: x" where x is the number of the message.
+	 *
+	 * @param numberOfMessages - number of messages to send
+	 * @throws RemoteException
+	 */
+	public void sendMessagesInRandomOrder(int numberOfMessages) throws RemoteException, java.rmi.NotBoundException{
 
-        List<TextMessage> messages = new ArrayList<>();
-        ClientInterface ci;
-        int tempCounter = 0;
-        for (int i = 0; i < numberOfMessages; i++)
-        {
-            messages.add(new TextMessage(i+counter, "Seq nr: " + (i+counter), userName, clientID));
-            tempCounter++;
-        }
-        counter = counter + tempCounter;
+		List<TextMessage> messages = new ArrayList<>();
+		ClientInterface ci;
+		int tempCounter = 0;
+		for (int i = 0; i < numberOfMessages; i++)
+		{
+			messages.add(new TextMessage(i+counter, "Seq nr: " + (i+counter), userName, clientID));
+			tempCounter++;
+		}
+		counter = counter + tempCounter;
 
-        Collections.shuffle(messages);
+		Collections.shuffle(messages);
 
-        for (int l=0; l<messages.size();l++){
-                messages.get(l).addStringToMessage(" -  Was sent as message nr: "+l);
-        }
+		for (int l=0; l<messages.size();l++){
+			messages.get(l).addStringToMessage(" -  Was sent as message nr: "+l);
+		}
 
-        for (int j=0; j<messages.size();j++){
-            for(int k= 0; k < clients.size(); k++){
-            	Registry registry = LocateRegistry.getRegistry(clients.get(k).getIp().toString().split("/")[1], 1234);
-            	 ci = (ClientInterface) registry.lookup(clients.get(k).getUsername());
-                if (messages.get(j)!= null){
-                	ci.addMessageToQueue(messages.get(j));
-                }
-            }
-        }
-    }
-    public void sendMessageWithOneDrop(int numberOfMessages) throws RemoteException, java.rmi.NotBoundException{
+		for (int j=0; j<messages.size();j++){
+			for(int k= 0; k < clients.size(); k++){
+				Registry registry = LocateRegistry.getRegistry(clients.get(k).getIp().toString().split("/")[1], 1234);
+				ci = (ClientInterface) registry.lookup(clients.get(k).getUsername());
+				if (messages.get(j)!= null){
+					ci.addMessageToQueue(messages.get(j));
+				}
+			}
+		}
+	}
+	public void sendMessageWithOneDrop(int numberOfMessages) throws RemoteException, java.rmi.NotBoundException{
 
-        List<TextMessage> messages = new ArrayList<>();
-        ClientInterface ci;
-        int tempCounter = 0;
-        for (int i = 0; i < numberOfMessages; i++)
-        {
-            messages.add(new TextMessage(i+counter, "Seq nr: " + (i+counter), userName, clientID));
-            tempCounter++;
-        }
+		List<TextMessage> messages = new ArrayList<>();
+		ClientInterface ci;
+		int tempCounter = 0;
+		for (int i = 0; i < numberOfMessages; i++)
+		{
+			messages.add(new TextMessage(i+counter, "Seq nr: " + (i+counter), userName, clientID));
+			tempCounter++;
+		}
 
-        counter = counter + tempCounter;
+		counter = counter + tempCounter;
 
-        messages.remove(messages.size()/2);
+		messages.remove(messages.size()/2);
 
-        for (int j=0; j<messages.size();j++){
-            for(int k= 0; k < clients.size(); k++){
-            	Registry registry = LocateRegistry.getRegistry(clients.get(k).getIp().toString().split("/")[1], 1234);
-            	ci = (ClientInterface) registry.lookup(clients.get(k).getUsername());
-                ci.addMessageToQueue(messages.get(j));
-            }
-        }
-    }
+		for (int j=0; j<messages.size();j++){
+			for(int k= 0; k < clients.size(); k++){
+				Registry registry = LocateRegistry.getRegistry(clients.get(k).getIp().toString().split("/")[1], 1234);
+				ci = (ClientInterface) registry.lookup(clients.get(k).getUsername());
+				ci.addMessageToQueue(messages.get(j));
+			}
+		}
+	}
 
 
-    /** This method receives a message and determines if the message should be accepted in the right order or if it
-     * arrived in the wrong order. In that case the message is held of until the right message arrives or the first
-     * message times out.
-     *
-     * WARNING - this method should only be invoked from another client's communication module
-     *
-     * @param textMessage - The text message to arrive
-     */
-    public void addMessageToQueue (TextMessage textMessage){
-        int id = textMessage.getClientID();
+	/** This method receives a message and determines if the message should be accepted in the right order or if it
+	 * arrived in the wrong order. In that case the message is held of until the right message arrives or the first
+	 * message times out.
+	 *
+	 * WARNING - this method should only be invoked from another client's communication module
+	 *
+	 * @param textMessage - The text message to arrive
+	 */
+	public void addMessageToQueue (TextMessage textMessage){
+		int id = textMessage.getClientID();
 
-        if(ordered){
+		if(holdIncomingMessages){
+			incomingMessageQueue.add(textMessage);
+		} else {
+			if(ordered){
 
-        	System.out.println(lastAcceptedSeqNr.keySet());
-            int seqNr = lastAcceptedSeqNr.get(id);
+				System.out.println(lastAcceptedSeqNr.keySet());
+				int seqNr = lastAcceptedSeqNr.get(id);
 
-            if (textMessage.getSeqNr() <= (seqNr+1) ){
-                AcceptMessage(textMessage, id);
-            } else {
-                new InnerThread(id, textMessage);
-            }
-        } else {
-            AcceptMessage(textMessage, textMessage.getClientID());
-        }
-    }
+				if (textMessage.getSeqNr() <= (seqNr+1) ){
+					AcceptMessage(textMessage, id);
+				} else {
+					waitingQueue.add(textMessage);
+					new InnerThread(id, textMessage);
+				}
+			} else {
+				AcceptMessage(textMessage, textMessage.getClientID());
+			}
+		}
+	}
 
-    /** This is the thread that holds a message if it arrived in the wrong order until it can be accepted in right
-     * order of time out.
-     *
-     */
-    private class InnerThread extends Thread {
-        private int timeOutTime = 5000; // Milliseconds
-        private boolean timedOut = false;
-        private boolean accepted = false;
-        private int clientID;
-        long time1;
-        private TextMessage message;
+	/** This is the thread that holds a message if it arrived in the wrong order until it can be accepted in right
+	 * order of time out.
+	 *
+	 */
+	private class InnerThread extends Thread {
 
-        InnerThread(int clientID, TextMessage message) {
-            this.clientID = clientID;
-            this.message = message;
-            waitingMessages.add(message);
-            start();
-        }
+		private boolean timedOut = false;
+		private boolean accepted = false;
+		private int clientID;
+		long time1;
+		private TextMessage message;
 
-        public void run() {
+		InnerThread(int clientID, TextMessage message) {
+			this.clientID = clientID;
+			this.message = message;
+			waitingMessages.add(message);
+			start();
+		}
 
-            time1 = System.currentTimeMillis();
-            long time2;
-            while (!timedOut){
-            	try {
+		public void run() {
+
+			time1 = System.currentTimeMillis();
+			long time2;
+			while (!timedOut){
+				try {
 					Thread.sleep(200);
 				} catch (InterruptedException e) {
 					e.printStackTrace();
 				}
-               	time2 = System.currentTimeMillis();
-                if(time2 >= time1 + timeOutTime){
-                    timedOut = true;
-                }
-                checkIfAcceptMessage(message);
-            }
-            if(!accepted){
-            	AcceptMessage(message, clientID);
-            }
-        }
+				time2 = System.currentTimeMillis();
+				if(time2 >= time1 + timeOutTime){
+					timedOut = true;
+				}
+				checkIfAcceptMessage(message);
+			}
+			if(!accepted){
+				AcceptMessage(message, clientID);
+			}
+		}
 
 
 
-        private synchronized void checkIfAcceptMessage(TextMessage message){
+		private synchronized void checkIfAcceptMessage(TextMessage message){
 
-            if (message.getSeqNr() == (lastAcceptedSeqNr.get(clientID))+1){
-                AcceptMessage(message, clientID);
-                accepted = true;
-            }
-        }
+			if (message.getSeqNr() == (lastAcceptedSeqNr.get(clientID))+1){
+				AcceptMessage(message, clientID);
+				accepted = true;
+			}
+		}
 
-        /** Accepts a message and adds it to the list of accepted messages. It also updates the lastAccepted message if
-         * the sequence number is greater than the lastAccepted.
-         *
-         * @param message - Message to accept
-         * @param clientID - clientID of the client that sent the message.
-         */
-        private synchronized void AcceptMessage(TextMessage message, int clientID){
-            acceptedMessages.add(message);
-            waitingMessages.remove(message);
-            if(message.getSeqNr()>lastAcceptedSeqNr.get(clientID)){
-                lastAcceptedSeqNr.remove(clientID);
-                lastAcceptedSeqNr.put(clientID, message.getSeqNr());
-            }
-        }
-    }
+		/** Accepts a message and adds it to the list of accepted messages. It also updates the lastAccepted message if
+		 * the sequence number is greater than the lastAccepted.
+		 *
+		 * @param message - Message to accept
+		 * @param clientID - clientID of the client that sent the message.
+		 */
+		private synchronized void AcceptMessage(TextMessage message, int clientID){
+			waitingQueue.remove(message);
+			acceptedMessages.add(message);
+			waitingMessages.remove(message);
+			if(message.getSeqNr()>lastAcceptedSeqNr.get(clientID)){
+				lastAcceptedSeqNr.remove(clientID);
+				lastAcceptedSeqNr.put(clientID, message.getSeqNr());
+			}
+		}
+	}
 
-    /** Duplicate of the AcceptMessage because of scope for runnable InnerThread.
-     *
-     */
-    private synchronized void AcceptMessage(TextMessage message, int clientID){
-        acceptedMessages.add(message);
-        if(message.getSeqNr()>lastAcceptedSeqNr.get(clientID)){
-            lastAcceptedSeqNr.remove(clientID);
-            lastAcceptedSeqNr.put(clientID, message.getSeqNr());
-        }
-    }
+	/** Duplicate of the AcceptMessage because of scope for runnable InnerThread.
+	 *
+	 */
+	private synchronized void AcceptMessage(TextMessage message, int clientID){
+		waitingQueue.remove(message);
+		acceptedMessages.add(message);
+		if(message.getSeqNr()>lastAcceptedSeqNr.get(clientID)){
+			lastAcceptedSeqNr.remove(clientID);
+			lastAcceptedSeqNr.put(clientID, message.getSeqNr());
+		}
+	}
 
-    /** This method returns the list of messages that have been accepted and in the right order. The list of accepted
-     * messages is then cleared, ready to filled again.
-     *
-     * @return - Array list of messages
-     */
-    public synchronized ArrayList<TextMessage> getAcceptedMessages(){
+	/** This method returns the list of messages that have been accepted and in the right order. The list of accepted
+	 * messages is then cleared, ready to filled again.
+	 *
+	 * @return - Array list of messages
+	 */
+	public synchronized ArrayList<TextMessage> getAcceptedMessages(){
 
-        ArrayList<TextMessage> temp = acceptedMessages;
+		ArrayList<TextMessage> temp = acceptedMessages;
 
-        acceptedMessages = new ArrayList<>();
-        return  temp;
-    }
+		acceptedMessages = new ArrayList<>();
+		return  temp;
+	}
 
-    /** Add another client interface to the communication module. A counter for the sequence number from that client is
-     * also added.
-     */
-    public void addAnotherClientInterface(Triple triple){
-    	if(!triple.getUsername().equals(userName)){
-    		//clients.add(triple);
-    		lastAcceptedSeqNr.put(triple.getClientID(), 0);
-    	}
-    }
+	/** Add another client interface to the communication module. A counter for the sequence number from that client is
+	 * also added.
+	 */
+	public void addAnotherClientInterface(Triple triple){
+		if(!triple.getUsername().equals(userName)){
+			//clients.add(triple);
+			lastAcceptedSeqNr.put(triple.getClientID(), 0);
+		}
+	}
 
-    /** Removes a client from the communication module. The counter for the sequence number is removed. It is important
-     * that this method is called whenever a client leaves a group so it the communication module does not try to send
-     * messages to that client any longer.
-     *
-     */
-    public void removeClientInterface (Triple triple){
-    	clients.remove(triple);
-        lastAcceptedSeqNr.remove(triple.getClientID());
-    }
+	/** Removes a client from the communication module. The counter for the sequence number is removed. It is important
+	 * that this method is called whenever a client leaves a group so it the communication module does not try to send
+	 * messages to that client any longer.
+	 *
+	 */
+	public void removeClientInterface (Triple triple){
+		clients.remove(triple);
+		lastAcceptedSeqNr.remove(triple.getClientID());
+	}
 
-    public ArrayList<TextMessage> getQueue(){
-        return waitingMessages;
-    }
+	public ArrayList<TextMessage> getQueue(){
+		return waitingMessages;
+	}
 
-    public void setOrdered(boolean ordered){
-        this.ordered = ordered;
-    }
+	public void setOrdered(boolean ordered){
+		this.ordered = ordered;
+	}
 
-    public void setClientList(ArrayList<Triple> clients){
-    	this.clients = clients;
-    }
+	public void setClientList(ArrayList<Triple> clients){
+		this.clients = clients;
+	}
 
-    public HashMap<Integer, Integer> getLastAcceptedSeqNr(){
-    	return lastAcceptedSeqNr;
-    }
+	public HashMap<Integer, Integer> getLastAcceptedSeqNr(){
+		return lastAcceptedSeqNr;
+	}
 
-    public void  setLastAcceptedSeqNr(HashMap<Integer, Integer> lastAcceptedSeqNr){
-    	this.lastAcceptedSeqNr = lastAcceptedSeqNr;
-    }
+	public void  setLastAcceptedSeqNr(HashMap<Integer, Integer> lastAcceptedSeqNr){
+		this.lastAcceptedSeqNr = lastAcceptedSeqNr;
+	}
+
+
+	// NEW --
+	public void releaseMsgFromIncomingQuene(TextMessage textMessage){
+		int id = textMessage.getClientID();
+		if(ordered){
+
+			System.out.println(lastAcceptedSeqNr.keySet());
+			int seqNr = lastAcceptedSeqNr.get(id);
+
+			if (textMessage.getSeqNr() <= (seqNr+1) ){
+				AcceptMessage(textMessage, id);
+			} else {
+				new InnerThread(id, textMessage);
+			}
+		} else {
+			AcceptMessage(textMessage, textMessage.getClientID());
+		}
+		incomingMessageQueue.remove(textMessage);
+	}
+
+	// NEW --
+	public void releaseMsgFromOutgoingQuene(TextMessage textMessage) throws RemoteException, NotBoundException{
+
+		ClientInterface ci;
+		Registry registry;
+		boolean timeOut = false;
+		int l = 0;
+		for(int i= 0; i < clients.size(); i++){
+			if(clients.get(i).getClientID() == clientID){
+				addMessageToQueue(textMessage);
+			} else {
+				registry = LocateRegistry.getRegistry(clients.get(i).getIp().toString().split("/")[1], 1234);
+				try {
+					ci = (ClientInterface) registry.lookup(clients.get(i).getUsername());
+					if (ci != null) {
+						ci.addMessageToQueue(textMessage);
+					}
+				} catch (Exception e) {
+					timeOut = true;
+				}
+				if (timeOut) {
+					for (int j = 0; j < clients.size(); j++) {
+						if (clients.get(j).getUsername().equals(userName)) {
+							l = j;
+						}
+					}
+					ci = (ClientInterface) registry.lookup(clients.get(l).getUsername()); // use interface of sender
+					ci.handleError(clients.get(i).getUsername());
+				}
+			}
+		}
+		outgoingMessageQueue.remove(textMessage);
+	}
+
+	// NEW --
+	public ArrayList<TextMessage> getOutgoingMessageQueue(){
+		return outgoingMessageQueue;
+	}
+	
+	// NEW --
+	public ArrayList<TextMessage> getIncomingMessageQueue(){
+		return incomingMessageQueue;
+	}
+	
+	// NEW --
+	public ArrayList<TextMessage> getWaitingMessageQueue(){
+		return waitingQueue;
+	}
+	
+	// NEW --
+	public void setTimeOutTime(int timeOutTime){
+		this.timeOutTime = timeOutTime;
+	}
+	
+	// NEW --
+	public void setHoldOutgoingMessages(boolean b){
+		holdOutgoingMessages = b;
+	}
+	
+	// NEW --
+	public void setHoldIncomingMessagess(boolean b){
+		holdIncomingMessages = b;
+	}	
 }
