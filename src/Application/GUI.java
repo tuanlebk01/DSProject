@@ -92,7 +92,7 @@ public class GUI implements Observer {
 	private JTextField hostField;
 	private Timer timer;
 	private TimerTask task;
-	
+
 	public static void main(String[] args) {
 		try {
 			new NameServer();
@@ -217,23 +217,23 @@ public class GUI implements Observer {
 		checkbox.setSelected(true);
 		checkbox.setBounds(182, 64, 85, 25);
 		frame.getContentPane().add(checkbox);
-		
+
 		debugbox = new JCheckBox(new CheckboxAction2("Enable debug window"));
 		debugbox.setSelected(false);
 		debugbox.setBounds(30, 64, 150, 25);
 		frame.getContentPane().add(debugbox);
-		
+
 		lblHost = new JLabel("Host");
 		lblHost.setFont(new Font("Tahoma", Font.PLAIN, 12));
 		lblHost.setBounds(28, 4, 73, 22);
 		frame.getContentPane().add(lblHost);
-		
+
 		hostField = new JTextField();
 		hostField.setText("localhost");
 		hostField.setColumns(10);
 		hostField.setBounds(99, 6, 125, 20);
 		frame.getContentPane().add(hostField);
-		
+
 		createGroup();
 		joinGroup();
 
@@ -296,7 +296,7 @@ public class GUI implements Observer {
 	        }
 	    }
 	}
-	
+
 	class CheckboxAction2 extends AbstractAction {
 	    public CheckboxAction2(String text) {
 	        super(text);
@@ -312,7 +312,7 @@ public class GUI implements Observer {
 	        }
 	    }
 	}
-	    
+
 	private void joinGroup() {
 		listGroup.addListSelectionListener(new ListSelectionListener() {
 			public void valueChanged(ListSelectionEvent evt) {
@@ -339,7 +339,7 @@ public class GUI implements Observer {
 											}
 
 											String leader = leaders.get(group);
-											
+
 											if(group.equals("###")) {
 												JOptionPane.showMessageDialog(frame, "Select group to join.");
 												return;
@@ -355,7 +355,7 @@ public class GUI implements Observer {
 												JOptionPane.showMessageDialog(frame, "Username already exists.");
 												return;
 											}
-											
+
 											leaderOfMyGroup = client.joinGroup(group, leader);
 											myGroupName = group;
 											groupJoined = client.isGroupJoined();
@@ -487,6 +487,7 @@ public class GUI implements Observer {
 				return;
 			} else {
 				userName = userNameTextField.getText();
+				host = hostField.getText();
 			}
 
 			if (portNrField.getText().length() < 1) {
