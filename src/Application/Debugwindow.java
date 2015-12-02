@@ -3,13 +3,18 @@ package Application;
 import java.awt.Button;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.rmi.NotBoundException;
+import java.rmi.RemoteException;
 
+import javax.swing.ButtonModel;
 import javax.swing.DefaultListModel;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JButton;
 import javax.swing.JToggleButton;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
@@ -51,11 +56,11 @@ public class Debugwindow {
 		label1.setBounds(23, 11, 120, 14);
 		frame.getContentPane().add(label1);
 
-		label2 = new JLabel("Holdback queue");
+		label2 = new JLabel("Blocked queue");
 		label2.setBounds(360, 11, 120, 14);
 		frame.getContentPane().add(label2);
 
-		label3 = new JLabel("Blocked queue");
+		label3 = new JLabel("Holdback queue");
 		label3.setBounds(23, 256, 120, 14);
 		frame.getContentPane().add(label3);
 
@@ -123,21 +128,38 @@ public class Debugwindow {
 
 	public void messageQueue(String message) {
 
-		list1.add(list1.getSize(), message);
+		if(toggleButton1.isSelected()) {
+			if(list2.getSize() < 1) {
+				list2.add(list2.getSize(), message);
+			} else {
+				list3.add(list3.getSize(), message);
+			}
+		} else {
+			if(list2.size() == 0) {
+				try {
+					client.broadcastMessage(message);
+				} catch (RemoteException | NotBoundException e) {
+					e.printStackTrace();
+				}
+			} else {
+				list3.add(list3.getSize(), message);
+			}
+		}
 
-		list_1.addListSelectionListener(new ListSelectionListener() {
+
+		list_2.addListSelectionListener(new ListSelectionListener() {
 			public void valueChanged(ListSelectionEvent evt) {
 				if (evt.getValueIsAdjusting()) {
 					final JList source = (JList) evt.getSource();
-					button1.addActionListener(new ActionListener() {
+					button2.addActionListener(new ActionListener() {
 						public void actionPerformed(ActionEvent a) {
 							String msg = "###";
 							if(source.getSelectedValue() != null) {
 								msg = source.getSelectedValue().toString();
 								System.out.println("msg: " + msg);
-								holdbackQueue(msg);
-								int selectedIndex = list_1.getSelectedIndex();
-								list1.remove(selectedIndex);
+								int selectedIndex = list_2.getSelectedIndex();
+								list2.remove(selectedIndex);
+								list1.add(list1.getSize(), msg);
 							}
 						}
 					});
@@ -146,11 +168,16 @@ public class Debugwindow {
 		});
 	}
 
-	public void holdbackQueue(String message) {
-		list2.add(list2.getSize(), message);
+	public void blockQueue(String message) {
 	}
 
-	public void blockQueue() {
+	public void holdbackQueue() {
+
+		//add listener to list 2 and see if message is released.
+		for(int i = 0; i < list3.size(); i++) {
+			list1.add(list1.getSize(), list3.getElementAt(i));
+			list3.remove(i);
+		}
 	}
 
 	public void addTolist4() {
