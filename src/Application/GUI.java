@@ -689,12 +689,14 @@ public class GUI implements Observer {
 			message = userNameTextField.getText() + ": " + message;
 			if(dw != null) {
 				dw.messageQueue(message);
-			}
-			msgField.setText("");
-			try {
-				client.broadcastMessage(message);
-			} catch (RemoteException | NotBoundException e) {
-				e.printStackTrace();
+				msgField.setText("");
+			} else {
+				msgField.setText("");
+				try {
+					client.broadcastMessage(message);
+				} catch (RemoteException | NotBoundException e) {
+					e.printStackTrace();
+				}
 			}
 		}
 	}

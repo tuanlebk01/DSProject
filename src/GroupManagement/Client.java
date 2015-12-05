@@ -47,6 +47,10 @@ public class Client extends Observable implements ClientInterface {
 			throws RemoteException, AlreadyBoundException,
 			ServerNotActiveException, NotBoundException, UnknownHostException {
 
+		if(host.equals("localhost")) {
+			host = InetAddress.getLocalHost().getHostName().concat(".cs.umu.se");
+		}
+
 		this.myUserName = userName;
 		this.registry = LocateRegistry.getRegistry(host, portNr);
 
