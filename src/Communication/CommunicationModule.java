@@ -75,14 +75,16 @@ public class CommunicationModule {
 		ClientInterface ci;
 		textMessage = new TextMessage(counter, message, userName, clientID);
 		Registry registry;
-		boolean timeOut = false;
+		boolean  meetCondition= false;
 		int l = 0;
+		ArrayList<String> crashedUser = new ArrayList<>();
 
 		// NEW (if and else statement)
 		if(holdOutgoingMessages){
 			outgoingMessageQueue.add(textMessage);
 		} else {
 			for(int i= 0; i < clients.size(); i++){
+				System.out.println("client index: "+clients.get(i).getClientID() + " clientID: "+clientID +" client size: "+clients.size());
 				if(clients.get(i).getClientID() == clientID){
 					addMessageToQueue(textMessage);
 				} else {
@@ -93,26 +95,28 @@ public class CommunicationModule {
 							ci.addMessageToQueue(textMessage);
 						}
 					} catch (Exception e) {
-						timeOut = true;
+						crashedUser.add(clients.get(i).getUsername());
+						System.out.println("crashed user in catch: "+crashedUser);
 					}
-					if (timeOut) {
-						for (int j = 0; j < clients.size(); j++) {
-							if (clients.get(j).getUsername().equals(userName)) {
-								l = j;
-							}
-						}
-						System.out.println("handle error");
-						System.out.println("sender: "+clients.get(l).getUsername());
-						try {
-							Registry registryOfSender;
-							registryOfSender = LocateRegistry.getRegistry(clients.get(l).getIp().toString().split("/")[1], 1234);
-							ci = (ClientInterface) registryOfSender.lookup(clients.get(l).getUsername()); // use interface of sender
-							System.out.println("try statement");
-							ci.handleError(clients.get(i).getUsername());
-						} catch (Exception e) {
-							System.out.println("ERROR");
-						}
+				}
+			}
+			System.out.println("crashed user: "+crashedUser);
 
+			if (crashedUser.size() > 0) {
+				for (int j = 0; j < clients.size(); j++) {
+					if (clients.get(j).getUsername().equals(userName)) {
+						l = j;
+					}
+				}
+				for (int j = 0; j < crashedUser.size(); j++) {
+					try {
+						Registry registryOfSender;
+						registryOfSender = LocateRegistry.getRegistry(clients.get(l).getIp().toString().split("/")[1], 1234);
+						ci = (ClientInterface) registryOfSender.lookup(clients.get(l).getUsername()); // use interface of sender
+						System.out.println("try statement");
+						ci.handleError(crashedUser.get(j));
+					} catch (Exception e) {
+						System.out.println("ERROR");
 
 					}
 				}
