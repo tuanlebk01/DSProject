@@ -257,12 +257,8 @@ public class Client extends Observable implements ClientInterface {
 		cm.sendMessageWithOneDrop(nrOftestMSG);
 	}
 
-	public ArrayList<TextMessage> getMessages() {
-		return cm.getAcceptedMessages();
-	}
-
     public ArrayList<TextMessage> getMessagesInQueue() {
-        return cm.getQueue();
+        return cm.getWaitingMessageQueue();
     }
 
 	public HashMap<Integer, ClientInterface> getInterfaceOfGroup() throws RemoteException {
@@ -478,6 +474,74 @@ public class Client extends Observable implements ClientInterface {
 			notifyObservers();
 			clearChanged();
 			watchedValue = "asd";
+		}
+	}
+
+	public void setOutgoingMsg(boolean b) {
+		if(cm != null) {
+			cm.setHoldOutgoingMessages(b);
+		}
+	}
+
+	public void setIncommingMsg(boolean b) {
+		if(cm != null) {
+			cm.setHoldIncomingMessages(b);
+		}
+	}
+
+	public ArrayList<TextMessage> getOutgoingMsgQueue() {
+		if(cm != null) {
+			return cm.getOutgoingMessageQueue();
+		}
+		return null;
+	}
+
+	public ArrayList<TextMessage> getIncommingMsgQueue() {
+		if(cm != null) {
+			return cm.getIncomingMessageQueue();
+		}
+		return null;
+	}
+
+	public ArrayList<TextMessage> getHoldbackQueue() {
+		if(cm != null) {
+			return cm.getWaitingMessageQueue();
+		}
+		return null;
+	}
+
+	public ArrayList<TextMessage> getMessages() {
+		if(cm != null) {
+			return cm.getAcceptedMessages();
+		}
+		return null;
+	}
+
+	public void setTimeout() {
+		if(cm != null) {
+			cm.setTimeOutTime(99999999);
+		}
+	}
+
+	public void forwardMsg(TextMessage textMessage) {
+		if(cm != null) {
+			try {
+				cm.releaseMsgFromOutgoingQuene(textMessage);
+			} catch (RemoteException | NotBoundException e) {
+				e.printStackTrace();
+			}
+		}
+	}
+
+	public void releaseMsg(TextMessage textMessage) {
+		if(cm != null) {
+			cm.releaseMsgFromIncomingQuene(textMessage);
+		}
+	}
+
+	public void acceptMsg(TextMessage textMessage) {
+		if(cm != null) {
+			cm.acceptMessage(textMessage, textMessage.getClientID());
 		}
 	}
 }

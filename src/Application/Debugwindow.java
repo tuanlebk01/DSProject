@@ -5,9 +5,12 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
+import java.util.ArrayList;
 
+import javax.swing.AbstractAction;
 import javax.swing.ButtonModel;
 import javax.swing.DefaultListModel;
+import javax.swing.JCheckBox;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JList;
@@ -18,6 +21,8 @@ import javax.swing.event.ChangeListener;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
+import Application.GUI.CheckboxAction;
+import Communication.TextMessage;
 import GroupManagement.Client;
 
 public class Debugwindow {
@@ -44,19 +49,27 @@ public class Debugwindow {
 	private JToggleButton toggleButton2;
 	private JToggleButton toggleButton3;
 	private JToggleButton toggleButton4;
-
+	private JCheckBox checkbox;
+	private JCheckBox checkbox2;
 	private Client client;
+	private ArrayList<TextMessage> outgoingList;
+	private ArrayList<TextMessage> incommingList;
+	private ArrayList<TextMessage> holdbackList;
+	private ArrayList<TextMessage> acceptedList;
+
+	int selectedIndex = 999;
+	int selectedIndex2 = 999;
 
 	public Debugwindow(Client client) {
 
 		this.client = client;
 		frame.getContentPane().setLayout(null);
 
-		label1 = new JLabel("Message queue");
+		label1 = new JLabel("Outgoing Msg");
 		label1.setBounds(23, 11, 120, 14);
 		frame.getContentPane().add(label1);
 
-		label2 = new JLabel("Blocked queue");
+		label2 = new JLabel("Incomming Msg");
 		label2.setBounds(360, 11, 120, 14);
 		frame.getContentPane().add(label2);
 
@@ -64,8 +77,8 @@ public class Debugwindow {
 		label3.setBounds(23, 256, 120, 14);
 		frame.getContentPane().add(label3);
 
-		label4 = new JLabel("List 4");
-		label4.setBounds(400, 256, 120, 14);
+		label4 = new JLabel("");
+		label4.setBounds(360, 256, 120, 14);
 		frame.getContentPane().add(label4);
 
 		list_1.setBounds(10, 36, 150, 200);
@@ -80,41 +93,96 @@ public class Debugwindow {
 		list_4.setBounds(340, 281, 150, 200);
 		frame.getContentPane().add(list_4);
 
-		button1 = new JButton("Block message");
+		button1 = new JButton("Forward msg");
 		button1.setBounds(170, 50, 160, 23);
 		frame.getContentPane().add(button1);
 
-		button2 = new JButton("Unblock message");
+		button2 = new JButton("Release msg");
 		button2.setBounds(170, 85, 160, 23);
 		frame.getContentPane().add(button2);
 
-		button3 = new JButton("Select message");
-		button3.setBounds(170, 295, 160, 23);
+		button3 = new JButton("Accept msg");
+		button3.setBounds(170, 330, 160, 23);
 		frame.getContentPane().add(button3);
 
-		button4 = new JButton("Select message");
-		button4.setBounds(170, 330, 160, 23);
-		frame.getContentPane().add(button4);
+		checkbox = new JCheckBox(new CheckboxAction("Outgoing msg"));
+		checkbox.setSelected(true);
+		checkbox.setBounds(180, 140, 140, 23);
+		frame.getContentPane().add(checkbox);
 
-		toggleButton1 = new JToggleButton("Toggle Block 1");
-		toggleButton1.setBounds(180, 140, 140, 23);
-		frame.getContentPane().add(toggleButton1);
-
-		toggleButton2 = new JToggleButton("Toggle Block 2");
-		toggleButton2.setBounds(180, 175, 140, 23);
-		frame.getContentPane().add(toggleButton2);
-
-		toggleButton3 = new JToggleButton("Toggle Block 3");
-		toggleButton3.setBounds(180, 385, 140, 23);
-		frame.getContentPane().add(toggleButton3);
-
-		toggleButton4 = new JToggleButton("Toggle Block 4");
-		toggleButton4.setBounds(180, 420, 140, 23);
-		frame.getContentPane().add(toggleButton4);
+		checkbox2 = new JCheckBox(new CheckboxAction2("Incomming msg"));
+		checkbox2.setSelected(true);
+		checkbox2.setBounds(180, 175, 140, 23);
+		frame.getContentPane().add(checkbox2);
 
 		frame.setSize(500, 530);
 		frame.setLocation(1315, 255);
 		frame.setVisible(true);
+
+		client.setOutgoingMsg(true);
+		client.setIncommingMsg(true);
+		client.setTimeout();
+
+
+		list_1.addListSelectionListener(new ListSelectionListener() {
+			public void valueChanged(ListSelectionEvent evt) {
+				if (evt.getValueIsAdjusting()) {
+					final JList source = (JList) evt.getSource();
+					button1.addActionListener(new ActionListener() {
+						public void actionPerformed(ActionEvent a) {
+							String msg = "###";
+							if(source.getSelectedValue() != null) {
+								msg = source.getSelectedValue().toString();
+									int selectedIndex = source.getSelectedIndex();
+									selectMessages(selectedIndex);
+							}
+						}
+					});
+				}
+			}
+		});
+
+		list_2.addListSelectionListener(new ListSelectionListener() {
+			public void valueChanged(ListSelectionEvent evt) {
+				if (evt.getValueIsAdjusting()) {
+
+					final JList source = (JList) evt.getSource();
+
+					if(list_2.getSelectedIndex() != -1) {
+						selectedIndex = list_2.getSelectedIndex();
+					}
+
+					button2.addActionListener(new ActionListener() {
+						public void actionPerformed(ActionEvent a) {
+							if(selectedIndex != 999) {
+								releaseMessage(selectedIndex);
+							}
+						}
+					});
+				}
+			}
+		});
+
+		list_3.addListSelectionListener(new ListSelectionListener() {
+			public void valueChanged(ListSelectionEvent evt) {
+				if (evt.getValueIsAdjusting()) {
+
+					final JList source = (JList) evt.getSource();
+
+					if(list_3.getSelectedIndex() != -1) {
+						selectedIndex2 = list_3.getSelectedIndex();
+					}
+
+					button3.addActionListener(new ActionListener() {
+						public void actionPerformed(ActionEvent a) {
+							if(selectedIndex2 != 999) {
+								acceptMessage(selectedIndex2);
+							}
+						}
+					});
+				}
+			}
+		});
 
 		// To close debugwindow and keeping client alive
 		frame.addWindowListener(new java.awt.event.WindowAdapter() {
@@ -126,60 +194,112 @@ public class Debugwindow {
 
 	}
 
-	public void messageQueue(String message) {
+	class CheckboxAction extends AbstractAction {
+	    public CheckboxAction(String text) {
+	        super(text);
+	    }
 
-		if(toggleButton1.isSelected()) {
-			if(list2.getSize() < 1) {
-				list2.add(list2.getSize(), message);
-			} else {
-				list3.add(list3.getSize(), message);
-			}
-		} else {
-			if(list2.size() == 0) {
-				try {
-					client.broadcastMessage(message);
-				} catch (RemoteException | NotBoundException e) {
-					e.printStackTrace();
-				}
-			} else {
-				list3.add(list3.getSize(), message);
-			}
-		}
+	    @Override
+	    public void actionPerformed(ActionEvent e) {
+	        JCheckBox cbLog = (JCheckBox) e.getSource();
 
-
-		list_2.addListSelectionListener(new ListSelectionListener() {
-			public void valueChanged(ListSelectionEvent evt) {
-				if (evt.getValueIsAdjusting()) {
-					final JList source = (JList) evt.getSource();
-					button2.addActionListener(new ActionListener() {
-						public void actionPerformed(ActionEvent a) {
-							String msg = "###";
-							if(source.getSelectedValue() != null) {
-								msg = source.getSelectedValue().toString();
-								System.out.println("msg: " + msg);
-								int selectedIndex = list_2.getSelectedIndex();
-								list2.remove(selectedIndex);
-								list1.add(list1.getSize(), msg);
-							}
-						}
-					});
-				}
-			}
-		});
+	        	if (cbLog.isSelected()) {
+	            	client.setOutgoingMsg(true);
+	        	} else {
+	        		client.setOutgoingMsg(false);
+	        	}
+	    }
 	}
 
-	public void blockQueue(String message) {
+	class CheckboxAction2 extends AbstractAction {
+	    public CheckboxAction2(String text) {
+	        super(text);
+	    }
+
+	    @Override
+	    public void actionPerformed(ActionEvent e) {
+	        JCheckBox cbLog2 = (JCheckBox) e.getSource();
+	        	if (cbLog2.isSelected()) {
+	        		client.setIncommingMsg(true);
+	        	} else {
+	        		client.setIncommingMsg(false);
+	        	}
+	    }
+	}
+
+	public void outgoingQueue() {
+
+		list1.clear();
+		outgoingList = client.getOutgoingMsgQueue();
+
+		for(int i = 0; i < client.getOutgoingMsgQueue().size(); i++) {
+			list1.add(i, client.getOutgoingMsgQueue().get(i).getMessage());
+		}
+	}
+
+	public void incommingQueue() {
+
+		list2.clear();
+		incommingList = client.getIncommingMsgQueue();
+
+		for(int i = 0; i < client.getIncommingMsgQueue().size(); i++) {
+			list2.add(i, client.getIncommingMsgQueue().get(i).getMessage());
+		}
 	}
 
 	public void holdbackQueue() {
 
-		//add listener to list 2 and see if message is released.
-		for(int i = 0; i < list3.size(); i++) {
-			list1.add(list1.getSize(), list3.getElementAt(i));
-			list3.remove(i);
+		list3.clear();
+		holdbackList = client.getHoldbackQueue();
+
+		for(int i = 0; i < client.getHoldbackQueue().size(); i++) {
+			list3.add(i, client.getHoldbackQueue().get(i).getMessage());
 		}
 	}
 
-	public void addTolist4() {
+	public void acceptedQueue() {
+
+		if(list4.size() > 1) {
+			list4.clear();
+			acceptedList = client.getMessages();
+		}
+
+		for(int i = 0; i < client.getMessages().size(); i++) {
+			list4.add(i, client.getMessages().get(i).getMessage());
+		}
+	}
+
+	public void selectMessages(int selectedIndex) {
+
+		if(client != null) {
+			client.forwardMsg(outgoingList.get(selectedIndex));
+			outgoingQueue();
+		}
+	}
+
+	public void releaseMessage(int selectedIndex) {
+
+		if(client != null) {
+			if(incommingList.size() >= 0) {
+				if(!(selectedIndex >= incommingList.size())) {
+					client.releaseMsg(incommingList.get(selectedIndex));
+					selectedIndex = 999;
+					incommingQueue();
+				}
+			}
+		}
+	}
+
+	public void acceptMessage(int selectedIndex) {
+
+		if(client != null) {
+			if(holdbackList.size() >= 0) {
+				if(!(selectedIndex >= holdbackList.size())) {
+					client.acceptMsg(holdbackList.get(selectedIndex));
+					selectedIndex = 999;
+					holdbackQueue();
+				}
+			}
+		}
 	}
 }

@@ -306,8 +306,10 @@ public class GUI implements Observer {
 	    public void actionPerformed(ActionEvent e) {
 	        JCheckBox cbLog2 = (JCheckBox) e.getSource();
 	        if (cbLog2.isSelected()) {
-	        	if(dw == null) {
-	        		dw = new Debugwindow(client);
+	        	if(connectButton.getText().equals("Disconnect")) {
+	        		if(dw == null) {
+	        			dw = new Debugwindow(client);
+	        		}
 	        	}
 	        }
 	    }
@@ -618,10 +620,16 @@ public class GUI implements Observer {
         ArrayList<TextMessage> textMessages;
 
         task = new TimerTask() {
-
             public void run() {
 	           	ArrayList<TextMessage> textMessages;
 	           	textMessages = client.getMessages();
+
+	           	if(dw != null) {
+   					dw.incommingQueue();
+   					dw.holdbackQueue();
+   					dw.acceptedQueue();
+   				}
+
 	           	if(!(textMessages == null)) {
 	           		for(int i = 0; i < textMessages.size(); i++) {
 	           			if(!(textMessages.get(i) == null)){
@@ -631,7 +639,7 @@ public class GUI implements Observer {
 	            }
             }
         };
-        timer.schedule(task, 0, 250);
+        timer.schedule(task, 0, 500);
 	}
 
 	public void getQueue() {
@@ -687,16 +695,14 @@ public class GUI implements Observer {
 		if(myGroupName != null) {
 			String message = msgField.getText();
 			message = userNameTextField.getText() + ": " + message;
-			if(dw != null) {
-				dw.messageQueue(message);
-				msgField.setText("");
-			} else {
-				msgField.setText("");
-				try {
-					client.broadcastMessage(message);
-				} catch (RemoteException | NotBoundException e) {
-					e.printStackTrace();
+			msgField.setText("");
+			try {
+				client.broadcastMessage(message);
+				if(dw != null) {
+					dw.outgoingQueue();
 				}
+			} catch (RemoteException | NotBoundException e) {
+				e.printStackTrace();
 			}
 		}
 	}
