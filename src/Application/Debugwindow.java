@@ -105,12 +105,12 @@ public class Debugwindow {
 		button3.setBounds(170, 330, 160, 23);
 		frame.getContentPane().add(button3);
 
-		checkbox = new JCheckBox(new CheckboxAction("Outgoing messages"));
+		checkbox = new JCheckBox(new CheckboxAction("Outgoing msg"));
 		checkbox.setSelected(true);
 		checkbox.setBounds(180, 140, 140, 23);
 		frame.getContentPane().add(checkbox);
 
-		checkbox2 = new JCheckBox(new CheckboxAction2("Incomming messages"));
+		checkbox2 = new JCheckBox(new CheckboxAction2("Incomming msg"));
 		checkbox2.setSelected(true);
 		checkbox2.setBounds(180, 175, 140, 23);
 		frame.getContentPane().add(checkbox2);
