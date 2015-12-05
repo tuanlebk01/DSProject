@@ -224,6 +224,7 @@ public class Client extends Observable implements ClientInterface {
 	}
 
 	public void disconnect(String groupName, String userName) throws RemoteException, java.rmi.NotBoundException {
+		System.out.println("disconnect called");
 
 			if(groupName == null) {
 				ns.leaveServer(groupName, clientID);

@@ -99,8 +99,19 @@ public class CommunicationModule {
 								l = j;
 							}
 						}
-						ci = (ClientInterface) registry.lookup(clients.get(l).getUsername()); // use interface of sender
-						ci.handleError(clients.get(i).getUsername());
+						System.out.println("handle error");
+						System.out.println("sender: "+clients.get(l).getUsername());
+						try {
+							Registry registryOfSender;
+							registryOfSender = LocateRegistry.getRegistry(clients.get(l).getIp().toString().split("/")[1], 1234);
+							ci = (ClientInterface) registryOfSender.lookup(clients.get(l).getUsername()); // use interface of sender
+							System.out.println("try statement");
+							ci.handleError(clients.get(i).getUsername());
+						} catch (Exception e) {
+							System.out.println("ERROR");
+						}
+
+
 					}
 				}
 			}
