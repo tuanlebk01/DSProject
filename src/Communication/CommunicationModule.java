@@ -18,7 +18,6 @@ import java.util.*;
 public class CommunicationModule {
 	private int timeOutTime = 5000; // Milliseconds
 	private int counter=0;
-	private ArrayList<TextMessage> waitingMessages;
 
 	// NEW --
 	private ArrayList<TextMessage> outgoingMessageQueue;
@@ -48,7 +47,6 @@ public class CommunicationModule {
 		this.userName = userName;
 		this.clientID = clientID;
 		this.clients = clients;
-		waitingMessages = new ArrayList<>();
 
 		// NEW --
 		outgoingMessageQueue = new ArrayList<>();
@@ -106,7 +104,7 @@ public class CommunicationModule {
 					}
 				}
 			}
-		}		
+		}
 		counter++;
 	}
 
@@ -181,23 +179,20 @@ public class CommunicationModule {
 	 */
 	public void addMessageToQueue (TextMessage textMessage){
 		int id = textMessage.getClientID();
-
 		if(holdIncomingMessages){
 			incomingMessageQueue.add(textMessage);
 		} else {
 			if(ordered){
 
-				System.out.println(lastAcceptedSeqNr.keySet());
 				int seqNr = lastAcceptedSeqNr.get(id);
 
 				if (textMessage.getSeqNr() <= (seqNr+1) ){
-					AcceptMessage(textMessage, id);
+					acceptMessage(textMessage, id);
 				} else {
-					waitingQueue.add(textMessage);
 					new InnerThread(id, textMessage);
 				}
 			} else {
-				AcceptMessage(textMessage, textMessage.getClientID());
+				acceptMessage(textMessage, textMessage.getClientID());
 			}
 		}
 	}
@@ -217,7 +212,7 @@ public class CommunicationModule {
 		InnerThread(int clientID, TextMessage message) {
 			this.clientID = clientID;
 			this.message = message;
-			waitingMessages.add(message);
+			waitingQueue.add(message);
 			start();
 		}
 
@@ -261,7 +256,6 @@ public class CommunicationModule {
 		private synchronized void AcceptMessage(TextMessage message, int clientID){
 			waitingQueue.remove(message);
 			acceptedMessages.add(message);
-			waitingMessages.remove(message);
 			if(message.getSeqNr()>lastAcceptedSeqNr.get(clientID)){
 				lastAcceptedSeqNr.remove(clientID);
 				lastAcceptedSeqNr.put(clientID, message.getSeqNr());
@@ -272,7 +266,7 @@ public class CommunicationModule {
 	/** Duplicate of the AcceptMessage because of scope for runnable InnerThread.
 	 *
 	 */
-	private synchronized void AcceptMessage(TextMessage message, int clientID){
+	public synchronized void acceptMessage(TextMessage message, int clientID){
 		waitingQueue.remove(message);
 		acceptedMessages.add(message);
 		if(message.getSeqNr()>lastAcceptedSeqNr.get(clientID)){
@@ -314,9 +308,6 @@ public class CommunicationModule {
 		lastAcceptedSeqNr.remove(triple.getClientID());
 	}
 
-	public ArrayList<TextMessage> getQueue(){
-		return waitingMessages;
-	}
 
 	public void setOrdered(boolean ordered){
 		this.ordered = ordered;
@@ -340,16 +331,15 @@ public class CommunicationModule {
 		int id = textMessage.getClientID();
 		if(ordered){
 
-			System.out.println(lastAcceptedSeqNr.keySet());
 			int seqNr = lastAcceptedSeqNr.get(id);
 
 			if (textMessage.getSeqNr() <= (seqNr+1) ){
-				AcceptMessage(textMessage, id);
+				acceptMessage(textMessage, id);
 			} else {
 				new InnerThread(id, textMessage);
 			}
 		} else {
-			AcceptMessage(textMessage, textMessage.getClientID());
+			acceptMessage(textMessage, textMessage.getClientID());
 		}
 		incomingMessageQueue.remove(textMessage);
 	}
@@ -392,29 +382,29 @@ public class CommunicationModule {
 	public ArrayList<TextMessage> getOutgoingMessageQueue(){
 		return outgoingMessageQueue;
 	}
-	
+
 	// NEW --
 	public ArrayList<TextMessage> getIncomingMessageQueue(){
 		return incomingMessageQueue;
 	}
-	
+
 	// NEW --
 	public ArrayList<TextMessage> getWaitingMessageQueue(){
 		return waitingQueue;
 	}
-	
+
 	// NEW --
 	public void setTimeOutTime(int timeOutTime){
 		this.timeOutTime = timeOutTime;
 	}
-	
+
 	// NEW --
 	public void setHoldOutgoingMessages(boolean b){
 		holdOutgoingMessages = b;
 	}
-	
+
 	// NEW --
-	public void setHoldIncomingMessagess(boolean b){
+	public void setHoldIncomingMessages(boolean b){
 		holdIncomingMessages = b;
-	}	
+	}
 }
