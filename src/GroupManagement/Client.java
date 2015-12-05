@@ -74,7 +74,7 @@ public class Client extends Observable implements ClientInterface {
 			} catch (Exception e) {
 				registry.rebind(userName, ci);
 			}
-			
+
 		} catch (Exception e) {
 	         Registry registry = LocateRegistry.createRegistry(1234);
 	         try {
@@ -112,7 +112,7 @@ public class Client extends Observable implements ClientInterface {
 			} catch (Exception e) {
 				registry1.rebind(myUserName,ci);
 			}
-			
+
 		} catch (Exception e) {
 	         Registry registry1 = LocateRegistry.createRegistry(1234);
 	         try {
@@ -220,6 +220,7 @@ public class Client extends Observable implements ClientInterface {
 	}
 
 	public void disconnect(String groupName, String userName) throws RemoteException, java.rmi.NotBoundException {
+		System.out.println("disconnect called");
 
 			if(groupName == null) {
 				ns.leaveServer(groupName, clientID);
@@ -317,7 +318,7 @@ public class Client extends Observable implements ClientInterface {
 				setValue(myUserName);
 				ci.setValue(myUserName);
 			}
-			
+
 		}
 	}
 
@@ -410,8 +411,8 @@ public class Client extends Observable implements ClientInterface {
 
     public void shareGroupForCrashedInfo(String crashedUserName) throws RemoteException, NotBoundException{
 		int k = 100000000; //any number here
-		
-		
+
+
 		Triple crashedUser;
 		leaderRegistry = LocateRegistry.getRegistry(IpOfLeader, 1234);
 		ci = (ClientInterface) leaderRegistry.lookup(myLeader);
@@ -423,10 +424,10 @@ public class Client extends Observable implements ClientInterface {
 			}
 		}
 		crashedUser = clients.get(k); // get triple of crashed user
-		
+
 		System.out.println("crashed user detected from client: " + myUserName);
 		System.out.println("crashed user is: " + crashedUserName);
-		
+
 		clients.remove(k); // remove crashed client from the client list of sender
 		ns.removeMemberFromGroup(myGroup, crashedUserName); // remove crashed client from the NS
 		for (int i = 0; i < clients.size(); i++){
