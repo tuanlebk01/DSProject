@@ -99,21 +99,25 @@ public class CommunicationModule {
 			}
 
 			if (crashedUser.size() > 0) {
+				
 				for (int j = 0; j < clients.size(); j++) {
 					if (clients.get(j).getUsername().equals(userName)) {
 						l = j;
 					}
 				}
-				Registry registryOfSender;
-				System.out.println("XXX: "  + clients.get(l).getUsername());
-				System.out.println("ip: " + clients.get(l).getIp().toString().split("/")[1]);
-				registryOfSender = LocateRegistry.getRegistry(clients.get(l).getIp().toString().split("/")[1], 1234);
-				ci = (ClientInterface) registryOfSender.lookup(clients.get(l).getUsername()); // use interface of sender
-				try {
-					ci.handleError(crashedUser.get(0));
-				} catch (Exception e) {
-					System.out.println("handle error....");
-					e.printStackTrace();
+				for (int i = 0; i < crashedUser.size(); i++) {
+					try {
+						Registry registryOfSender;
+						System.out.println("XXX: "  + clients.get(l).getUsername());
+						System.out.println("ip: " + clients.get(l).getIp().toString().split("/")[1]);
+						registryOfSender = LocateRegistry.getRegistry(clients.get(l).getIp().toString().split("/")[1], 1234);
+						ci = (ClientInterface) registryOfSender.lookup(clients.get(l).getUsername()); // use interface of sender
+						System.out.println("crashed user in try catch: "+crashedUser.get(i));
+						ci.handleError(crashedUser.get(i));
+					} catch (Exception e) {
+						System.out.println("handle error....");
+						e.printStackTrace();
+					}
 				}
 			}
 		}
