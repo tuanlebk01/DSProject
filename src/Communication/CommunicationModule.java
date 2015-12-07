@@ -93,13 +93,12 @@ public class CommunicationModule {
 						}
 					} catch (Exception e) {
 						crashedUser.add(clients.get(i).getUsername());
-						System.out.println("crashed clients: " + clients.get(i).getUsername());
 					}
 				}
 			}
 
 			if (crashedUser.size() > 0) {
-				
+
 				for (int j = 0; j < clients.size(); j++) {
 					if (clients.get(j).getUsername().equals(userName)) {
 						l = j;
@@ -108,15 +107,10 @@ public class CommunicationModule {
 				for (int i = 0; i < crashedUser.size(); i++) {
 					try {
 						Registry registryOfSender;
-						System.out.println("XXX: "  + clients.get(l).getUsername());
-						System.out.println("ip: " + clients.get(l).getIp().toString().split("/")[1]);
 						registryOfSender = LocateRegistry.getRegistry(clients.get(l).getIp().toString().split("/")[1], 1234);
 						ci = (ClientInterface) registryOfSender.lookup(clients.get(l).getUsername()); // use interface of sender
-						System.out.println("crashed user in try catch: "+crashedUser.get(i));
 						ci.handleError(crashedUser.get(i));
-						// latest version
 					} catch (Exception e) {
-						System.out.println("handle error....");
 						e.printStackTrace();
 					}
 				}

@@ -29,6 +29,7 @@ public class NameServer extends RemoteServer implements NameServerInterface {
 		try {
 
 			new NameServer();
+			System.out.println("Nameserver running");
 
 		} catch (AlreadyBoundException e) {
 			e.printStackTrace();
@@ -59,7 +60,6 @@ public class NameServer extends RemoteServer implements NameServerInterface {
 		String str = getClientHost();
 		clientInfo = new Triple(clientID, userName, InetAddress.getByName(str));
 		listOfClients.add(clientInfo);
-		System.out.println("NS: List of groups: " + leaderInfo.keySet() + " 2:a listan: " + leaderInfo);
 		return clientID;
 	}
 
@@ -72,7 +72,7 @@ public class NameServer extends RemoteServer implements NameServerInterface {
 			tempList.add(userName);
 			groupUserlistMap.put(groupName, tempList);
 			leaderInfo.put(groupName, userName);
-			
+
 			for(int i = 0; i < listOfClients.size(); i++) {
 				if(userName.equals(listOfClients.get(i).getUsername())) {
 					listOfClients.get(i).setGroup(groupName);
@@ -116,8 +116,6 @@ public class NameServer extends RemoteServer implements NameServerInterface {
 				listOfClients.remove(i);
 			}
 		}
-
-		System.out.println("NS: User: " + userName + " left group: " + groupName);
 	}
 
 	public void leaveServer(String groupName, int ID) throws RemoteException {
@@ -129,10 +127,7 @@ public class NameServer extends RemoteServer implements NameServerInterface {
 
 			if(ID == triple.getClientID()) {
 				if(groupName == null) {
-
 					listOfClients.remove(i);
-					System.out.println("NS: The following user left the server: " + triple.getClientID());
-
 				}
 			}
 		}
@@ -142,8 +137,6 @@ public class NameServer extends RemoteServer implements NameServerInterface {
 
 		groupUserlistMap.remove(groupName);
 		leaderInfo.remove(groupName);
-		System.out.println("Group: " + groupName + " was removed");
-
 	}
 
 
