@@ -129,9 +129,6 @@ public class Client extends Observable implements ClientInterface {
 		leaderRegistry = LocateRegistry.getRegistry(IpOfLeader, 1234);
 		ciLeader = (ClientInterface) leaderRegistry.lookup(myLeader);
 		clients = ciLeader.getClientlist(groupName);
-		for (int i = 0; i < clients.size(); i++) {
-			System.out.println("client list in join function: "+clients.get(i).getUsername());
-		}
 
 		int temp = clients.size();
 		for (int i = 0; i < temp; i++){
@@ -227,8 +224,6 @@ public class Client extends Observable implements ClientInterface {
 	}
 
 	public void disconnect(String groupName, String userName) throws RemoteException, java.rmi.NotBoundException {
-		System.out.println("disconnect called");
-
 			if(groupName == null) {
 				ns.leaveServer(groupName, clientID);
 
@@ -321,12 +316,10 @@ public class Client extends Observable implements ClientInterface {
 				setValue(myUserName);
 				ci.setValue(myUserName);
 			}
-
 		}
 	}
 
 	public void handleError(String crashedUserName) throws RemoteException, NotBoundException{
-		System.out.println("user: " + crashedUserName + " has crashed");
 		for (int i = 0; i < clients.size(); i++) {
 			if (crashedUserName.equals(myLeader)) {
 				myOldLeader = myLeader;
@@ -336,9 +329,6 @@ public class Client extends Observable implements ClientInterface {
 			} else {
 				shareGroupForCrashedInfo(crashedUserName); // update client list for members
 			}
-		}
-		for (int i = 0; i < clients.size(); i++) {
-			System.out.println("client list in HandeEror: "+clients.get(i).getUsername());
 		}
 	}
 
@@ -355,7 +345,6 @@ public class Client extends Observable implements ClientInterface {
 			groupsInfo = ci.askNSforGroupsInfo();
 		}
 		} catch (Exception e) {
-			System.out.println("ERROR");
 			e.printStackTrace();
 		}
 		return groupsInfo;
@@ -431,12 +420,10 @@ public class Client extends Observable implements ClientInterface {
 		}
 		crashedUser = clients.get(k); // get triple of crashed user
 
-		System.out.println("crashed user detected from client: " + myUserName);
-		System.out.println("crashed user is: " + crashedUserName);
-
 		clients.remove(k); // remove crashed client from the client list of sender
 		ns.removeMemberFromGroup(myGroup, crashedUserName); // remove crashed client from the NS
 		for (int i = 0; i < clients.size(); i++){
+
 			if (!clients.get(i).getUsername().equals(crashedUserName)) {
 				String ip = clients.get(i).getIp().toString().split("/")[1];
 				Registry registry1 = LocateRegistry.getRegistry(ip, 1234);
@@ -445,16 +432,14 @@ public class Client extends Observable implements ClientInterface {
 				ci.removeClientInterface(crashedUser);
 				ci.removeMemberFromListOfClientsInMyGroup(crashedUserName);
 				setValue(clients.get(i).getUsername());
-				ci.setValue(myUserName);
-				System.out.println("setvalue: "+clients.get(i).getUsername() + " mynusername: "+myUserName);
+				if(clients.get(i).getUsername().equals(myUserName)) {
+					ci.setValue("asd");
+				} else {
+					ci.setValue(myUserName);
+				}
 			}
 		}
     }
-
-	@Override
-	public void registryNewLeader() throws RemoteException {
-
-	}
 
 	public void notifyOthers() throws RemoteException, NotBoundException {
 		for (int i = 0; i < clients.size(); i++) {
