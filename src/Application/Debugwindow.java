@@ -1,14 +1,10 @@
 package Application;
 
-import java.awt.Button;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.rmi.NotBoundException;
-import java.rmi.RemoteException;
 import java.util.ArrayList;
 
 import javax.swing.AbstractAction;
-import javax.swing.ButtonModel;
 import javax.swing.DefaultListModel;
 import javax.swing.JCheckBox;
 import javax.swing.JFrame;
@@ -16,12 +12,9 @@ import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JButton;
 import javax.swing.JToggleButton;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
-import Application.GUI.CheckboxAction;
 import Communication.TextMessage;
 import GroupManagement.Client;
 

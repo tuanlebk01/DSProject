@@ -461,6 +461,7 @@ public class Client extends Observable implements ClientInterface {
 	}
 
 	public void setValue(String value) throws RemoteException {
+		System.out.println("watched: " + watchedValue + " value: " + value);
 		if(!watchedValue.equals(value)) {
 			setChanged();
 			notifyObservers();

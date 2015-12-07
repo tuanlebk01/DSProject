@@ -540,6 +540,7 @@ public class GUI implements Observer {
 						"Error, could not connect.");
 
 			}
+
 		} else {
 			try {
 				client.disconnect(myGroupName, userName);
@@ -584,7 +585,6 @@ public class GUI implements Observer {
 
 		try {
 			listOfMembers = client.getListOfClientsInMyGroup();
-			System.out.println("this is " + userName + " list: " + listOfMembers);
 		} catch (RemoteException ex) {
 			ex.printStackTrace();
 		}

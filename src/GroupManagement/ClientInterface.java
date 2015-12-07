@@ -63,21 +63,19 @@ public interface ClientInterface extends Remote, Serializable {
     public HashMap<Integer, Integer> getLastAcceptedSeqNr() throws RemoteException;
 
     public void updateIpOfLeader(String Ip) throws RemoteException;
-    
-    public void registryNewLeader() throws RemoteException;
-    
+
     public void handleError(String userName) throws RemoteException, NotBoundException;
-    
+
     public void shareGroupForCrashedInfo(String crashedUserName) throws RemoteException, NotBoundException;
-    
+
     public void notifyOthers() throws RemoteException, NotBoundException;
 
 	public void updateGroupList(String value) throws RemoteException;
-	
+
 	public void setValue(String value) throws RemoteException;
-	
+
 	public void addMemberToListOfClientsInMyGroup(String member) throws RemoteException;
-	
+
 	public void removeMemberFromListOfClientsInMyGroup(String member) throws RemoteException;
-    
+
 }
