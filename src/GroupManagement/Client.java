@@ -48,7 +48,7 @@ public class Client extends Observable implements ClientInterface {
 			ServerNotActiveException, NotBoundException, UnknownHostException {
 
 		if(host.equals("localhost")) {
-			host = InetAddress.getLocalHost().getHostName().concat(".cs.umu.se");
+			host = InetAddress.getLocalHost().getHostName().concat("");
 		}
 
 		this.myUserName = userName;
@@ -320,15 +320,17 @@ public class Client extends Observable implements ClientInterface {
 	}
 
 	public void handleError(String crashedUserName) throws RemoteException, NotBoundException{
+		if (crashedUserName.equals(myLeader)) {
+			myOldLeader = myLeader;
+			myLeader = startElection();
+			sharegroup(1); // update new leader for members
+			System.out.println("leader case");
+			shareGroupForCrashedInfo(crashedUserName); // remove old leader from client list of members
+		} else {
+			shareGroupForCrashedInfo(crashedUserName); // update client list for members
+		}
 		for (int i = 0; i < clients.size(); i++) {
-			if (crashedUserName.equals(myLeader)) {
-				myOldLeader = myLeader;
-				myLeader = startElection();
-				sharegroup(1); // update new leader for members
-				shareGroupForCrashedInfo(crashedUserName); // remove old leader from client list of members
-			} else {
-				shareGroupForCrashedInfo(crashedUserName); // update client list for members
-			}
+			System.out.println("clients in handle error: "+clients.get(i).getUsername());
 		}
 	}
 
