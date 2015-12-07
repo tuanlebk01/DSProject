@@ -129,6 +129,9 @@ public class Client extends Observable implements ClientInterface {
 		leaderRegistry = LocateRegistry.getRegistry(IpOfLeader, 1234);
 		ciLeader = (ClientInterface) leaderRegistry.lookup(myLeader);
 		clients = ciLeader.getClientlist(groupName);
+		for (int i = 0; i < clients.size(); i++) {
+			System.out.println("client list in join function: "+clients.get(i).getUsername());
+		}
 
 		int temp = clients.size();
 		for (int i = 0; i < temp; i++){
@@ -334,6 +337,9 @@ public class Client extends Observable implements ClientInterface {
 				shareGroupForCrashedInfo(crashedUserName); // update client list for members
 			}
 		}
+		for (int i = 0; i < clients.size(); i++) {
+			System.out.println("client list in HandeEror: "+clients.get(i).getUsername());
+		}
 	}
 
 	public boolean isGroupJoined() {
@@ -440,6 +446,7 @@ public class Client extends Observable implements ClientInterface {
 				ci.removeMemberFromListOfClientsInMyGroup(crashedUserName);
 				setValue(clients.get(i).getUsername());
 				ci.setValue(myUserName);
+				System.out.println("setvalue: "+clients.get(i).getUsername() + " mynusername: "+myUserName);
 			}
 		}
     }
