@@ -324,13 +324,9 @@ public class Client extends Observable implements ClientInterface {
 			myOldLeader = myLeader;
 			myLeader = startElection();
 			sharegroup(1); // update new leader for members
-			System.out.println("leader case");
 			shareGroupForCrashedInfo(crashedUserName); // remove old leader from client list of members
 		} else {
 			shareGroupForCrashedInfo(crashedUserName); // update client list for members
-		}
-		for (int i = 0; i < clients.size(); i++) {
-			System.out.println("clients in handle error: "+clients.get(i).getUsername());
 		}
 	}
 
@@ -463,7 +459,6 @@ public class Client extends Observable implements ClientInterface {
 	}
 
 	public void setValue(String value) throws RemoteException {
-		System.out.println("watched: " + watchedValue + " value: " + value);
 		if(!watchedValue.equals(value)) {
 			setChanged();
 			notifyObservers();
