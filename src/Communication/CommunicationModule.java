@@ -99,7 +99,7 @@ public class CommunicationModule {
 			}
 
 			if (crashedUser.size() > 0) {
-				
+
 				for (int j = 0; j < clients.size(); j++) {
 					if (clients.get(j).getUsername().equals(userName)) {
 						l = j;
