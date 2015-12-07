@@ -115,7 +115,7 @@ public class CommunicationModule {
 						//CRASHES HERE
 						ci = (ClientInterface) registryOfSender.lookup(clients.get(l).getUsername()); // use interface of sender
 
-						ci.handleError(crashedUser.get(j));
+						//ci.handleError(crashedUser.get(j));
 
 					} catch (Exception e) {
 						System.out.println("handle error....");
