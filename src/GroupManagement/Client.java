@@ -101,13 +101,11 @@ public class Client extends Observable implements ClientInterface {
 	public String joinGroup(String groupName, String leaderName)
 			throws RemoteException, ServerNotActiveException,
 			AlreadyBoundException, NotBoundException {
-
 		myGroup = groupName;
 		myLeader = leaderName;
 		ClientInterface ciLeader;
 		clientInfo.setGroup(groupName);
 		connectToGroupLeader(myLeader);
-
 		try {
 			ci = (ClientInterface) UnicastRemoteObject.exportObject(this, 0);
 			Registry registry1 = LocateRegistry.getRegistry(1234);
@@ -168,6 +166,11 @@ public class Client extends Observable implements ClientInterface {
 		Registry leaderRegistry;
 		ArrayList<Triple> clientList = ns.getClientList();
 		String ip = null;
+		
+		for (int i = 0; i < clients.size(); i++) {
+			System.out.println("client list in joinGroup: " +clients.get(i).getUsername());
+		}
+		
 		for (int i = 0; i < clientList.size(); i++){
 			String tempClient = clientList.get(i).getUsername();
 			if (tempClient.equals(groupLeader)) {
@@ -229,6 +232,7 @@ public class Client extends Observable implements ClientInterface {
 
 			} else if(userName.equals(myLeader)) {
 				if(listOfClientsInMyGroup.size() == 1) {
+					ns.removeMemberFromGroup(myGroup, myUserName);
 					ns.removeGroup(groupName);
 
 				} else {
