@@ -101,13 +101,16 @@ public class Client extends Observable implements ClientInterface {
 	public String joinGroup(String groupName, String leaderName)
 			throws RemoteException, ServerNotActiveException,
 			AlreadyBoundException, NotBoundException {
-
 		myGroup = groupName;
 		myLeader = leaderName;
 		ClientInterface ciLeader;
 		clientInfo.setGroup(groupName);
 		connectToGroupLeader(myLeader);
-
+		ArrayList<Triple> tempClients = new ArrayList<Triple>();
+		tempClients = ns.getClientList();
+		for (int i = 0; i < tempClients.size(); i++) {
+			System.out.println("client list in joinGroup: " +tempClients.get(i).getUsername());
+		}
 		try {
 			ci = (ClientInterface) UnicastRemoteObject.exportObject(this, 0);
 			Registry registry1 = LocateRegistry.getRegistry(1234);
@@ -168,6 +171,11 @@ public class Client extends Observable implements ClientInterface {
 		Registry leaderRegistry;
 		ArrayList<Triple> clientList = ns.getClientList();
 		String ip = null;
+		
+		for (int i = 0; i < clients.size(); i++) {
+			System.out.println("client list in joinGroup: " +clients.get(i).getUsername());
+		}
+		
 		for (int i = 0; i < clientList.size(); i++){
 			String tempClient = clientList.get(i).getUsername();
 			if (tempClient.equals(groupLeader)) {
@@ -229,7 +237,9 @@ public class Client extends Observable implements ClientInterface {
 
 			} else if(userName.equals(myLeader)) {
 				if(listOfClientsInMyGroup.size() == 1) {
+					ns.removeMemberFromGroup(myGroup, myUserName);
 					ns.removeGroup(groupName);
+					
 
 				} else {
 					groupsInfo = ns.getGroupsInfo();
@@ -324,9 +334,13 @@ public class Client extends Observable implements ClientInterface {
 			myOldLeader = myLeader;
 			myLeader = startElection();
 			sharegroup(1); // update new leader for members
+			System.out.println("leader case");
 			shareGroupForCrashedInfo(crashedUserName); // remove old leader from client list of members
 		} else {
 			shareGroupForCrashedInfo(crashedUserName); // update client list for members
+		}
+		for (int i = 0; i < clients.size(); i++) {
+			System.out.println("clients in handle error: "+clients.get(i).getUsername());
 		}
 	}
 
@@ -459,6 +473,7 @@ public class Client extends Observable implements ClientInterface {
 	}
 
 	public void setValue(String value) throws RemoteException {
+		System.out.println("watched: " + watchedValue + " value: " + value);
 		if(!watchedValue.equals(value)) {
 			setChanged();
 			notifyObservers();

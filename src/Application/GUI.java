@@ -94,11 +94,11 @@ public class GUI implements Observer {
 	private TimerTask task;
 
 	public static void main(String[] args) {
-//		try {
-//			new NameServer();
-//		} catch (RemoteException | AlreadyBoundException ex) {
-//			System.out.println("GUI: NameServer already running");
-//		}
+		try {
+			new NameServer();
+		} catch (RemoteException | AlreadyBoundException ex) {
+			System.out.println("GUI: NameServer already running");
+		}
 		SwingUtilities.invokeLater(new Runnable() {
 		    public void run() {
 		    	gui = new GUI();
