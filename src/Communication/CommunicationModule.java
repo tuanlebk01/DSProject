@@ -108,7 +108,6 @@ public class CommunicationModule {
 						Registry registryOfSender;
 						registryOfSender = LocateRegistry.getRegistry(clients.get(l).getIp().toString().split("/")[1], 1234);
 						ci = (ClientInterface) registryOfSender.lookup(clients.get(l).getUsername()); // use interface of sender
-						System.out.println("crashed user in try catch: "+crashedUser.get(i));
 						ci.handleError(crashedUser.get(i));
 					} catch (Exception e) {
 						e.printStackTrace();
