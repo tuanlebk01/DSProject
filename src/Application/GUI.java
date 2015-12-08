@@ -380,8 +380,8 @@ public class GUI implements Observer {
 											| AlreadyBoundException
 											| NotBoundException e) {
 											JOptionPane.showMessageDialog(
-											null, "Failed to join group, Exception error");
-											e.printStackTrace();
+											null, "Failed to join group, leader in group probably crashed!");
+//											e.printStackTrace();
 										}
 									}
 								});
@@ -464,12 +464,12 @@ public class GUI implements Observer {
 							| NotBoundException | AlreadyBoundException e) {
 						JOptionPane
 								.showMessageDialog(null, "Group not created, Exception error");
-						 e.printStackTrace();
+//						 e.printStackTrace();
 //						System.out.println("GUI: Failed to create group, Exception error");
 					}
 
 				} else {
-					JOptionPane.showMessageDialog(null, "Group not created, wrong input, no error");
+					JOptionPane.showMessageDialog(null, "Group not created, faulty input.");
 //					System.out.println("GUI: Failed to create group, wrong input, no error");
 				}
 			}
@@ -528,10 +528,10 @@ public class GUI implements Observer {
 				System.out.println("GUI: Connected to nameserver");
 
 			} catch (Exception ex) {
-				ex.printStackTrace();
+//				ex.printStackTrace();
 				connectButton.setText("Connect");
 				JOptionPane.showMessageDialog(frame,
-						"Error, could not connect.");
+						"Error, could not connect to nameserver.");
 
 			}
 
@@ -539,7 +539,9 @@ public class GUI implements Observer {
 			try {
 				client.disconnect(myGroupName, userName);
 			} catch (RemoteException | NotBoundException e) {
-				e.printStackTrace();
+				JOptionPane.showMessageDialog(frame,
+						"Some error occurred disconnecting.");
+//				e.printStackTrace();
 			}
 			connectButton.setText("Connect");
 			if(timer != null) {
@@ -564,7 +566,9 @@ public class GUI implements Observer {
 			client.updateGroupList(userName);
 			client.notifyOthers();
 		} catch (RemoteException | NotBoundException ex) {
-			ex.printStackTrace();
+			JOptionPane.showMessageDialog(
+					null, "Could not connect to all clients in group, someone has probably crashed!");
+//			ex.printStackTrace();
 		}
 	}
 
