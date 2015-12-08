@@ -11,8 +11,6 @@ import java.rmi.registry.Registry;
 import java.rmi.server.ServerNotActiveException;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.*;
-
-import Application.GUI;
 import Communication.CommunicationModule;
 import Communication.TextMessage;
 
@@ -106,11 +104,17 @@ public class Client extends Observable implements ClientInterface {
 		ClientInterface ciLeader;
 		clientInfo.setGroup(groupName);
 		connectToGroupLeader(myLeader);
+
+		// Tuan updated here
+
 		ArrayList<Triple> tempClients = new ArrayList<Triple>();
 		tempClients = ns.getClientList();
 		for (int i = 0; i < tempClients.size(); i++) {
 			System.out.println("client list in joinGroup: " +tempClients.get(i).getUsername());
 		}
+
+		// To here
+
 		try {
 			ci = (ClientInterface) UnicastRemoteObject.exportObject(this, 0);
 			Registry registry1 = LocateRegistry.getRegistry(1234);
@@ -171,11 +175,7 @@ public class Client extends Observable implements ClientInterface {
 		Registry leaderRegistry;
 		ArrayList<Triple> clientList = ns.getClientList();
 		String ip = null;
-		
-		for (int i = 0; i < clients.size(); i++) {
-			System.out.println("client list in joinGroup: " +clients.get(i).getUsername());
-		}
-		
+
 		for (int i = 0; i < clientList.size(); i++){
 			String tempClient = clientList.get(i).getUsername();
 			if (tempClient.equals(groupLeader)) {
@@ -183,9 +183,7 @@ public class Client extends Observable implements ClientInterface {
 			}
 		}
 		leaderRegistry = LocateRegistry.getRegistry(ip, 1234);
-		///
 		ci = (ClientInterface) leaderRegistry.lookup(groupLeader);
-		///
 		groupJoined = ci.addMemberToGroup(myUserName);
 		this.IpOfLeader = ip;
 		return groupJoined;
@@ -237,9 +235,15 @@ public class Client extends Observable implements ClientInterface {
 
 			} else if(userName.equals(myLeader)) {
 				if(listOfClientsInMyGroup.size() == 1) {
+
+					// Tuan added this
+
 					ns.removeMemberFromGroup(myGroup, myUserName);
+
+					//
+
 					ns.removeGroup(groupName);
-					
+
 
 				} else {
 					groupsInfo = ns.getGroupsInfo();
@@ -334,13 +338,9 @@ public class Client extends Observable implements ClientInterface {
 			myOldLeader = myLeader;
 			myLeader = startElection();
 			sharegroup(1); // update new leader for members
-			System.out.println("leader case");
 			shareGroupForCrashedInfo(crashedUserName); // remove old leader from client list of members
 		} else {
 			shareGroupForCrashedInfo(crashedUserName); // update client list for members
-		}
-		for (int i = 0; i < clients.size(); i++) {
-			System.out.println("clients in handle error: "+clients.get(i).getUsername());
 		}
 	}
 
@@ -473,7 +473,6 @@ public class Client extends Observable implements ClientInterface {
 	}
 
 	public void setValue(String value) throws RemoteException {
-		System.out.println("watched: " + watchedValue + " value: " + value);
 		if(!watchedValue.equals(value)) {
 			setChanged();
 			notifyObservers();
