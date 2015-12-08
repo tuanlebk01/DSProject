@@ -32,9 +32,11 @@ public class NameServer extends RemoteServer implements NameServerInterface {
 			System.out.println("Nameserver running");
 
 		} catch (AlreadyBoundException e) {
-			e.printStackTrace();
+			System.out.println("Nameserver already running on this port!");
+//			e.printStackTrace();
 		} catch (RemoteException e) {
-			e.printStackTrace();
+			System.out.println("Something went wrong with the nameserver!");
+//			e.printStackTrace();
 		}
 	}
 
