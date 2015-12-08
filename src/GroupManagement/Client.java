@@ -140,6 +140,9 @@ public class Client extends Observable implements ClientInterface {
 				String ip = clients.get(i).getIp().toString().split("/")[1];
 				Registry goRegistry = LocateRegistry.getRegistry(ip, 1234);
 				ci = (ClientInterface) goRegistry.lookup(clients.get(i).getUsername());
+
+				//this will try to connect to crash clients, needs to be handled
+
 				ci.setClientList(clients);
 				ci.addClientInterface(clientInfo);
 			}

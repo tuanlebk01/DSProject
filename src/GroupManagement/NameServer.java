@@ -147,10 +147,6 @@ public class NameServer extends RemoteServer implements NameServerInterface {
 		return leaderInfo;
 	}
 
-	public void updateGroupLeaderInfo(String Groupname) throws RemoteException {
-
-	}
-
 	public ArrayList<Triple> getClientList() throws RemoteException {
 		return listOfClients;
 	}

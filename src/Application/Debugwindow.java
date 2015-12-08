@@ -14,7 +14,6 @@ import javax.swing.JButton;
 import javax.swing.JToggleButton;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
-
 import Communication.TextMessage;
 import GroupManagement.Client;
 
@@ -49,9 +48,8 @@ public class Debugwindow {
 	private ArrayList<TextMessage> incommingList;
 	private ArrayList<TextMessage> holdbackList;
 	private ArrayList<TextMessage> acceptedList;
-
-	int selectedIndex = 999;
-	int selectedIndex2 = 999;
+	private int selectedIndex = 999;
+	private int selectedIndex2 = 999;
 
 	public Debugwindow(Client client) {
 
@@ -236,7 +234,7 @@ public class Debugwindow {
 		incommingList = client.getIncommingMsgQueue();
 
 		for(int i = 0; i < client.getIncommingMsgQueue().size(); i++) {
-			list2.add(i, client.getIncommingMsgQueue().get(i).getMessage());
+				list2.add(i, client.getIncommingMsgQueue().get(i).getMessage());
 		}
 	}
 
