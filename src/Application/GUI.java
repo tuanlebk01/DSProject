@@ -3,9 +3,6 @@ package Application;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
-import java.awt.event.WindowListener;
 import java.rmi.AlreadyBoundException;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
@@ -34,9 +31,6 @@ import javax.swing.SwingUtilities;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.text.DefaultCaret;
-
-import com.sun.org.apache.xerces.internal.util.SynchronizedSymbolTable;
-
 import Communication.TextMessage;
 import GroupManagement.Client;
 import GroupManagement.NameServer;
@@ -94,11 +88,11 @@ public class GUI implements Observer {
 	private TimerTask task;
 
 	public static void main(String[] args) {
-		try {
-			new NameServer();
-		} catch (RemoteException | AlreadyBoundException ex) {
-			System.out.println("GUI: NameServer already running");
-		}
+//		try {
+//			new NameServer();
+//		} catch (RemoteException | AlreadyBoundException ex) {
+//			System.out.println("GUI: NameServer already running");
+//		}
 		SwingUtilities.invokeLater(new Runnable() {
 		    public void run() {
 		    	gui = new GUI();
@@ -454,29 +448,29 @@ public class GUI implements Observer {
 								}
 							}
 
-//							JOptionPane.showMessageDialog(null,
-//									"Group created with name: " + input);
+							JOptionPane.showMessageDialog(null,
+									"Group created with name: " + input);
 							client.updateGroupList(userName);
 							client.addObserver(gui);
 							startThread();
 
 						} else {
-//							JOptionPane.showMessageDialog(null,
-//									"Group not created, Nameserver error");
-							System.out.println("GUI: Failed to create group");
+							JOptionPane.showMessageDialog(null,
+									"Group not created, Nameserver error");
+//							System.out.println("GUI: Failed to create group");
 						}
 
 					} catch (RemoteException | ServerNotActiveException
 							| NotBoundException | AlreadyBoundException e) {
-//						JOptionPane
-//								.showMessageDialog(null, "Group not created, Exception error");
+						JOptionPane
+								.showMessageDialog(null, "Group not created, Exception error");
 						 e.printStackTrace();
-						System.out.println("GUI: Failed to create group, Exception error");
+//						System.out.println("GUI: Failed to create group, Exception error");
 					}
 
 				} else {
-//					JOptionPane.showMessageDialog(null, "Group not created, wrong input, no error");
-					System.out.println("GUI: Failed to create group, wrong input, no error");
+					JOptionPane.showMessageDialog(null, "Group not created, wrong input, no error");
+//					System.out.println("GUI: Failed to create group, wrong input, no error");
 				}
 			}
 		});
