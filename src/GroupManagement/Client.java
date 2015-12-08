@@ -109,9 +109,6 @@ public class Client extends Observable implements ClientInterface {
 
 		ArrayList<Triple> tempClients = new ArrayList<Triple>();
 		tempClients = ns.getClientList();
-		for (int i = 0; i < tempClients.size(); i++) {
-			System.out.println("client list in joinGroup: " +tempClients.get(i).getUsername());
-		}
 
 		// To here
 

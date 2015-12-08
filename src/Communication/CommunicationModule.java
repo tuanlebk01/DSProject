@@ -92,7 +92,6 @@ public class CommunicationModule {
 						}
 					} catch (Exception e) {
 						crashedUser.add(clients.get(i).getUsername());
-						System.out.println("crashed clients: " + clients.get(i).getUsername());
 					}
 				}
 			}
