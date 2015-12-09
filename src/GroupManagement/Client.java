@@ -212,6 +212,7 @@ public class Client extends Observable implements ClientInterface {
 		try {
 			cm.sendMessage(message);
 		} catch (Exception e) {
+			//gui handle's error
 		}
 	}
 
