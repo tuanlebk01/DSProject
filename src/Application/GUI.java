@@ -318,7 +318,11 @@ public class GUI implements Observer {
 					try {
 						Thread.sleep(100);
 						mapOfGroups = client.askNSforGroupsInfo();
-						listOfMembers.clear();
+
+						//added null check
+						if(listOfMembers != null) {
+							listOfMembers.clear();
+						}
 						listOfMembers = mapOfGroups.get(source.getSelectedValue().toString());
 
 
@@ -380,7 +384,8 @@ public class GUI implements Observer {
 											| AlreadyBoundException
 											| NotBoundException e) {
 											JOptionPane.showMessageDialog(
-											null, "Failed to join group, leader in group probably crashed!");
+											null, "Failed to join group, either you are in a group" +
+													" or the leader in group might have crashed!");
 //											e.printStackTrace();
 										}
 									}
@@ -456,7 +461,7 @@ public class GUI implements Observer {
 
 						} else {
 							JOptionPane.showMessageDialog(null,
-									"Group not created, Nameserver error");
+									"Group not created, groupname already exists");
 //							System.out.println("GUI: Failed to create group");
 						}
 
