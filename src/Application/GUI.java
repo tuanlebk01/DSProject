@@ -545,7 +545,7 @@ public class GUI implements Observer {
 				client.disconnect(myGroupName, userName);
 			} catch (RemoteException | NotBoundException e) {
 				JOptionPane.showMessageDialog(frame,
-						"Some error occurred disconnecting.");
+						"Some error occurred disconnecting, nameserver probably crashed");
 //				e.printStackTrace();
 			}
 			connectButton.setText("Connect");
