@@ -534,7 +534,8 @@ public class Client extends Observable implements ClientInterface {
 			try {
 				cm.releaseMsgFromOutgoingQuene(textMessage);
 			} catch (RemoteException | NotBoundException e) {
-				e.printStackTrace();
+				System.out.println("Some error forwarding message, client probably crashed");
+				//e.printStackTrace();
 			}
 		}
 	}
