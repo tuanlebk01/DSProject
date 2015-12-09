@@ -224,7 +224,7 @@ public class Debugwindow {
 		outgoingList = client.getOutgoingMsgQueue();
 
 		for(int i = 0; i < client.getOutgoingMsgQueue().size(); i++) {
-			list1.add(i, client.getOutgoingMsgQueue().get(i).getMessage());
+			list1.add(i, client.getOutgoingMsgQueue().get(i).getSeqNr() + " : " + client.getOutgoingMsgQueue().get(i).getMessage());
 		}
 	}
 
@@ -234,7 +234,7 @@ public class Debugwindow {
 		incommingList = client.getIncommingMsgQueue();
 
 		for(int i = 0; i < client.getIncommingMsgQueue().size(); i++) {
-				list2.add(i, client.getIncommingMsgQueue().get(i).getMessage());
+				list2.add(i, client.getIncommingMsgQueue().get(i).getSeqNr() + " : " + client.getIncommingMsgQueue().get(i).getMessage());
 		}
 	}
 
@@ -244,7 +244,7 @@ public class Debugwindow {
 		holdbackList = client.getHoldbackQueue();
 
 		for(int i = 0; i < client.getHoldbackQueue().size(); i++) {
-			list3.add(i, client.getHoldbackQueue().get(i).getMessage());
+			list3.add(i, client.getHoldbackQueue().get(i).getSeqNr() + " : " + client.getHoldbackQueue().get(i).getMessage());
 		}
 	}
 
