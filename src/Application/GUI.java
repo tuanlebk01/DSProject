@@ -700,7 +700,8 @@ public class GUI implements Observer {
 					dw.outgoingQueue();
 				}
 			} catch (RemoteException | NotBoundException e) {
-				e.printStackTrace();
+				System.out.println("Could not send message");
+				//e.printStackTrace();
 			}
 		}
 	}
